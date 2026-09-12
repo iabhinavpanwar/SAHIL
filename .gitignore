@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+*.egg-info/
+.DS_Store
+fix_*.py
+tmp_*.txt
+fa_slice.txt
