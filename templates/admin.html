@@ -1432,7 +1432,7 @@
 
         .admin-content {
           padding: clamp(1rem, 2.6vw, 1.5rem) clamp(0.9rem, 2.6vw, 1.25rem)
-            clamp(2rem, 5vw, 3rem);
+            calc(clamp(2rem, 5vw, 3rem) + env(safe-area-inset-bottom, 0px));
         }
 
         /* Muscle map grid: 3-col → 2-col stacked */
@@ -1741,7 +1741,7 @@
         }
 
         .admin-content {
-          padding: 0.85rem 0.7rem 2.25rem;
+          padding: 0.85rem 0.7rem calc(5rem + env(safe-area-inset-bottom, 0px));
         }
 
         .sidebar-logo {
