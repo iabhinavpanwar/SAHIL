@@ -1,0 +1,1270 @@
+{% extends "base.html" %} {% block title %}About — {{ cfg.get('hero_name','Sahil
+Panwar') }}{% endblock %} {% block head %}
+<style>
+  /* ══════════════════════════════════════════════════════════════════════════
+   ABOUT PAGE — FULLY RESPONSIVE STYLES
+   Breakpoints: 1400 · 1200 · 1024 · 900 · 768 · 640 · 560 · 480 · 380 · 320
+   ══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── 0. PAGE-SCOPED GLOBAL GUARDS ──────────────────────────────────────── */
+  .about-hero,
+  .about-section,
+  .certs-section,
+  .gallery-preview {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .about-hero img,
+  .about-section img,
+  .certs-section img,
+  .gallery-preview img {
+    max-width: 100%;
+  }
+
+  .about-section .container,
+  .certs-section .container,
+  .gallery-preview .container {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+
+  /* never let long words / URLs blow out the layout */
+  .about-text h2,
+  .about-bio,
+  .cert-card h4,
+  .cert-card p,
+  .gallery-item p,
+  .stat-box label {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* ── 1. PAGE HERO ──────────────────────────────────────────────────────── */
+  .about-hero {
+    position: relative;
+    padding: calc(var(--nav-h, 70px) + clamp(2.25rem, 6vw, 4rem))
+      clamp(1rem, 4vw, 1.5rem) clamp(2.5rem, 6vw, 4rem);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .about-hero::before {
+    content: "";
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: clamp(240px, 42vw, 600px);
+    height: clamp(240px, 42vw, 600px);
+    background: radial-gradient(
+      circle,
+      rgba(232, 255, 0, 0.06) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .about-hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40%;
+    left: -10%;
+    width: clamp(200px, 34vw, 450px);
+    height: clamp(200px, 34vw, 450px);
+    background: radial-gradient(
+      circle,
+      rgba(232, 255, 0, 0.04) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .about-hero .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .about-hero .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: clamp(0.68rem, 1.6vw, 0.8rem);
+  }
+
+  .about-hero .section-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 12px var(--primary);
+    animation: about-pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes about-pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.3);
+    }
+  }
+
+  .about-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 7vw, 4.5rem);
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    margin-top: 0.5rem;
+    animation: about-fade-up 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  .about-hero h1 .accent {
+    color: var(--primary);
+    position: relative;
+    display: inline-block;
+  }
+
+  .about-hero h1 .accent::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: about-underline 0.9s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      forwards;
+  }
+
+  @keyframes about-underline {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes about-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── 2. ABOUT SECTION ──────────────────────────────────────────────────── */
+  .about-section {
+    padding: clamp(3rem, 7vw, 5rem) 0;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  .about-grid > * {
+    min-width: 0;
+  }
+
+  /* ── 3. MEDIA COLUMN ───────────────────────────────────────────────────── */
+  .about-media {
+    position: relative;
+    animation: about-fade-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  .about-photo,
+  .about-photo-placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    max-height: 560px;
+    border-radius: var(--radius);
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+    border: 1px solid var(--border);
+    transition:
+      transform var(--transition),
+      box-shadow var(--transition);
+  }
+
+  .about-photo:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .about-photo-placeholder {
+    background: var(--bg3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(3rem, 10vw, 5rem);
+    color: var(--text3);
+    aspect-ratio: 4 / 5;
+  }
+
+  /* decorative frame behind the photo */
+  .about-media::before {
+    content: "";
+    position: absolute;
+    inset: -14px -14px 14px 14px;
+    border: 2px solid rgba(232, 255, 0, 0.15);
+    border-radius: var(--radius);
+    z-index: 0;
+    pointer-events: none;
+    transition: all var(--transition);
+  }
+
+  .about-media:hover::before {
+    inset: -10px -10px 10px 10px;
+    border-color: rgba(232, 255, 0, 0.35);
+  }
+
+  /* corner accents */
+  .about-media::after {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    width: 60px;
+    height: 60px;
+    border-top: 3px solid var(--primary);
+    border-left: 3px solid var(--primary);
+    border-radius: 8px 0 0 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity var(--transition);
+  }
+
+  .about-media:hover::after {
+    opacity: 1;
+  }
+
+  /* floating experience badge */
+  .about-badge {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    background: var(--primary);
+    color: #000;
+    border-radius: var(--radius);
+    padding: clamp(0.7rem, 1.6vw, 1rem) clamp(0.85rem, 2vw, 1.25rem);
+    z-index: 3;
+    box-shadow: 0 12px 40px rgba(232, 255, 0, 0.25);
+    animation: about-badge-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes about-badge-pulse {
+    0%,
+    100% {
+      transform: translateY(0);
+      box-shadow: 0 12px 40px rgba(232, 255, 0, 0.25);
+    }
+    50% {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px rgba(232, 255, 0, 0.4);
+    }
+  }
+
+  .about-badge .badge-num {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 3.4vw, 2.2rem);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    display: block;
+  }
+
+  .about-badge .badge-lbl {
+    font-size: clamp(0.6rem, 1.4vw, 0.7rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.75;
+    white-space: nowrap;
+  }
+
+  /* video wrapper */
+  .video-wrapper {
+    margin-top: clamp(1.25rem, 3vw, 2rem);
+    border-radius: var(--radius);
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    position: relative;
+    z-index: 1;
+    background: #000;
+  }
+
+  .video-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 0;
+  }
+
+  /* ── 4. TEXT COLUMN ────────────────────────────────────────────────────── */
+  .about-text {
+    animation: about-fade-up 0.7s 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      both;
+  }
+
+  .about-text h2 {
+    font-size: clamp(1.45rem, 3.4vw, 2.4rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+    line-height: 1.15;
+  }
+
+  .about-text .about-role {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--primary);
+    font-size: clamp(0.7rem, 1.7vw, 0.85rem);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    padding: 0.35rem 0.85rem;
+    background: rgba(232, 255, 0, 0.06);
+    border: 1px solid rgba(232, 255, 0, 0.18);
+    border-radius: 999px;
+    max-width: 100%;
+  }
+
+  .about-text .about-role img {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    object-fit: contain;
+  }
+
+  .about-text .about-role span {
+    min-width: 0;
+  }
+
+  .about-bio {
+    color: var(--text2);
+    line-height: 1.85;
+    font-size: clamp(0.94rem, 1.6vw, 1.02rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+    white-space: pre-line;
+  }
+
+  /* ── 5. STATS ──────────────────────────────────────────────────────────── */
+  .about-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.5rem, 2vw, 1rem);
+    margin: clamp(1.5rem, 3vw, 2rem) 0 clamp(1.75rem, 3.5vw, 2.25rem);
+    padding: clamp(1rem, 2.5vw, 1.5rem) 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-box {
+    text-align: center;
+    padding: 0.5rem 0.25rem;
+    position: relative;
+    min-width: 0;
+    transition: transform var(--transition);
+  }
+
+  .stat-box:hover {
+    transform: translateY(-2px);
+  }
+
+  .stat-box:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 15%;
+    bottom: 15%;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .stat-box span {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 4.2vw, 2.4rem);
+    color: var(--primary);
+    line-height: 1.05;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.35rem;
+  }
+
+  .stat-box label {
+    display: block;
+    font-size: clamp(0.62rem, 1.5vw, 0.72rem);
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  /* ── 6. CTA BUTTONS ────────────────────────────────────────────────────── */
+  .about-cta-row {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .about-cta-row .btn {
+    flex: 0 1 auto;
+  }
+
+  /* ── 7. CERTIFICATIONS ─────────────────────────────────────────────────── */
+  .certs-section {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: clamp(3rem, 7vw, 5rem) 0;
+  }
+
+  .certs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+    gap: clamp(1rem, 2.5vw, 1.5rem);
+  }
+
+  .cert-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(1.25rem, 3vw, 1.75rem) clamp(1rem, 2.5vw, 1.5rem);
+    text-align: center;
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+    animation: about-fade-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  .cert-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 50% 0%,
+      rgba(232, 255, 0, 0.05) 0%,
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity var(--transition);
+    pointer-events: none;
+  }
+
+  .cert-card:hover {
+    border-color: rgba(232, 255, 0, 0.3);
+    transform: translateY(-6px);
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.4);
+  }
+
+  .cert-card:hover::before {
+    opacity: 1;
+  }
+
+  .cert-badge {
+    width: clamp(48px, 12vw, 64px);
+    height: clamp(48px, 12vw, 64px);
+    object-fit: contain;
+    margin: 0 auto 1rem;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+  }
+
+  .cert-icon {
+    width: clamp(48px, 12vw, 64px);
+    height: clamp(48px, 12vw, 64px);
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: rgba(232, 255, 0, 0.08);
+    border: 1px solid rgba(232, 255, 0, 0.2);
+    font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+    color: var(--primary);
+    transition: all var(--transition);
+  }
+
+  .cert-card:hover .cert-icon {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #000;
+    transform: scale(1.05) rotate(-3deg);
+  }
+
+  .cert-card h4 {
+    font-size: clamp(0.88rem, 1.7vw, 0.95rem);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
+  .cert-card p {
+    font-size: clamp(0.75rem, 1.5vw, 0.8rem);
+    color: var(--text2);
+    margin-bottom: 0.35rem;
+  }
+
+  .cert-year {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: var(--primary);
+    background: rgba(232, 255, 0, 0.08);
+    border: 1px solid rgba(232, 255, 0, 0.15);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── 8. GALLERY PREVIEW ────────────────────────────────────────────────── */
+  .gallery-preview {
+    padding: clamp(3rem, 7vw, 5rem) 0;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+    gap: clamp(0.65rem, 1.8vw, 1rem);
+  }
+
+  .gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--border);
+    transition: all var(--transition);
+    animation: about-fade-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  .gallery-item:hover {
+    border-color: rgba(232, 255, 0, 0.3);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.08);
+  }
+
+  .gallery-item p {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: clamp(1rem, 3vw, 1.5rem) 0.9rem 0.7rem;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+    color: #fff;
+    font-size: clamp(0.75rem, 1.6vw, 0.82rem);
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all var(--transition);
+  }
+
+  .gallery-item:hover p {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── 9. SECTION HEADER / CTA ───────────────────────────────────────────── */
+  .section-header {
+    text-align: center;
+    margin-bottom: clamp(1.75rem, 4vw, 3rem);
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.35rem, 3.4vw, 2.4rem);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .section-cta {
+    text-align: center;
+    margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── ≤ 1200px : trim gaps ──────────────────────────────────────────────── */
+  @media (max-width: 1200px) {
+    .about-grid {
+      gap: clamp(1.75rem, 4vw, 3rem);
+    }
+  }
+
+  /* ── ≤ 1024px : tablets landscape ──────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .about-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      gap: 2.5rem;
+    }
+
+    .about-photo,
+    .about-photo-placeholder {
+      max-height: 480px;
+    }
+
+    .certs-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
+    }
+
+    .gallery-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+    }
+  }
+
+  /* ── ≤ 900px : stack the about grid, kill decorative offsets ───────────── */
+  @media (max-width: 900px) {
+    .about-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.5rem;
+    }
+
+    .about-media {
+      max-width: 520px;
+      margin-inline: auto;
+      width: 100%;
+    }
+
+    .about-media::before,
+    .about-media::after {
+      display: none;
+    }
+
+    .about-badge {
+      bottom: 1rem;
+      right: 1rem;
+      animation: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .about-photo,
+    .about-photo-placeholder {
+      max-height: 560px;
+      aspect-ratio: 4 / 5;
+    }
+
+    .about-text {
+      text-align: left;
+    }
+
+    .about-stats {
+      max-width: 640px;
+    }
+
+    .about-cta-row {
+      max-width: 640px;
+    }
+
+    .stat-box:not(:last-child)::after {
+      display: none;
+    }
+  }
+
+  /* ── ≤ 768px : tablets portrait ────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .about-hero {
+      padding: calc(var(--nav-h, 70px) + 2.25rem) clamp(1rem, 5vw, 1.5rem)
+        2.5rem;
+    }
+
+    .about-photo,
+    .about-photo-placeholder {
+      aspect-ratio: 1 / 1;
+      max-height: 460px;
+    }
+
+    .certs-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr));
+      gap: 1rem;
+    }
+
+    .gallery-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(170px, 100%), 1fr));
+    }
+
+    .about-stats {
+      max-width: 100%;
+    }
+  }
+
+  /* ── ≤ 640px : large phones ────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .about-hero h1 {
+      font-size: clamp(1.75rem, 8.5vw, 2.6rem);
+    }
+
+    .about-section,
+    .certs-section,
+    .gallery-preview {
+      padding: 3.25rem 0;
+    }
+
+    .about-photo,
+    .about-photo-placeholder {
+      aspect-ratio: 4 / 5;
+      max-height: 420px;
+    }
+
+    .about-badge {
+      bottom: 0.85rem;
+      right: 0.85rem;
+      padding: 0.65rem 0.9rem;
+    }
+
+    .about-badge .badge-num {
+      font-size: 1.5rem;
+    }
+
+    .about-badge .badge-lbl {
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+    }
+
+    .about-text .about-role {
+      font-size: 0.72rem;
+      padding: 0.3rem 0.7rem;
+      letter-spacing: 0.09em;
+    }
+
+    .about-bio {
+      font-size: 0.94rem;
+      line-height: 1.75;
+    }
+
+    .about-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.1rem 0.75rem;
+      padding: 1.25rem 0;
+    }
+
+    .about-stats .stat-box:last-child {
+      grid-column: 1 / -1;
+    }
+
+    .about-cta-row {
+      gap: 0.6rem;
+    }
+
+    .about-cta-row .btn {
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .section-header {
+      margin-bottom: 2rem;
+    }
+
+    .section-cta .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* ── ≤ 560px : small phones ────────────────────────────────────────────── */
+  @media (max-width: 560px) {
+    .certs-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
+      gap: 0.85rem;
+    }
+
+    .cert-card {
+      padding: 1.15rem 0.85rem;
+    }
+
+    .gallery-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.6rem;
+    }
+
+    .gallery-item p {
+      opacity: 1;
+      transform: none;
+      font-size: 0.72rem;
+      padding: 0.9rem 0.6rem 0.5rem;
+    }
+
+    .video-wrapper {
+      margin-top: 1.25rem;
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  /* ── ≤ 480px : standard mobile ─────────────────────────────────────────── */
+  @media (max-width: 480px) {
+    .about-hero {
+      padding: calc(var(--nav-h, 70px) + 1.85rem) clamp(0.9rem, 5vw, 1.25rem)
+        2rem;
+    }
+
+    .about-hero .section-eyebrow {
+      font-size: 0.66rem;
+      letter-spacing: 0.12em;
+    }
+
+    .about-photo,
+    .about-photo-placeholder {
+      aspect-ratio: 1 / 1;
+      max-height: 380px;
+    }
+
+    .about-badge {
+      bottom: 0.7rem;
+      right: 0.7rem;
+      padding: 0.55rem 0.8rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .about-badge .badge-num {
+      font-size: 1.3rem;
+    }
+
+    .about-badge .badge-lbl {
+      font-size: 0.55rem;
+      letter-spacing: 0.06em;
+    }
+
+    .about-text h2 {
+      font-size: 1.4rem;
+    }
+
+    .stat-box span {
+      font-size: clamp(1.3rem, 6.5vw, 1.7rem);
+    }
+
+    .stat-box label {
+      font-size: 0.6rem;
+      letter-spacing: 0.07em;
+    }
+
+    .about-stats {
+      gap: 0.9rem 0.5rem;
+    }
+
+    .certs-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .cert-badge,
+    .cert-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+    }
+
+    .section-header h2 {
+      font-size: 1.3rem;
+    }
+  }
+
+  /* ── ≤ 380px : iPhone SE / small Android ───────────────────────────────── */
+  @media (max-width: 380px) {
+    .about-hero h1 {
+      font-size: 1.6rem;
+    }
+
+    .about-photo,
+    .about-photo-placeholder {
+      max-height: 320px;
+    }
+
+    .about-text .about-role {
+      font-size: 0.65rem;
+      padding: 0.28rem 0.6rem;
+      gap: 0.4rem;
+    }
+
+    .about-text .about-role img {
+      width: 16px;
+      height: 16px;
+      flex-basis: 16px;
+    }
+
+    .about-bio {
+      font-size: 0.9rem;
+    }
+
+    .about-stats {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.85rem;
+    }
+
+    .about-stats .stat-box:last-child {
+      grid-column: auto;
+    }
+
+    .stat-box:not(:last-child)::after {
+      display: none;
+    }
+
+    .stat-box {
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-box:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .certs-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .gallery-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+  }
+
+  /* ── ≤ 320px : ultra-small / foldables ─────────────────────────────────── */
+  @media (max-width: 320px) {
+    .about-hero h1 {
+      font-size: 1.45rem;
+    }
+
+    .about-photo,
+    .about-photo-placeholder {
+      max-height: 270px;
+    }
+
+    .about-badge .badge-num {
+      font-size: 1.15rem;
+    }
+
+    .about-badge .badge-lbl {
+      font-size: 0.5rem;
+    }
+
+    .stat-box span {
+      font-size: 1.25rem;
+    }
+
+    .gallery-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* ── Landscape phones (short viewports) ────────────────────────────────── */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .about-hero {
+      padding: calc(var(--nav-h, 60px) + 1.25rem) clamp(1rem, 4vw, 1.5rem)
+        1.5rem;
+    }
+
+    .about-hero h1 {
+      font-size: clamp(1.5rem, 5vw, 2.25rem);
+    }
+
+    .about-photo,
+    .about-photo-placeholder {
+      aspect-ratio: 16 / 10;
+      max-height: 300px;
+    }
+
+    .about-section,
+    .certs-section,
+    .gallery-preview {
+      padding: 2rem 0;
+    }
+  }
+
+  /* ── Touch devices: remove hover-only lifts ────────────────────────────── */
+  @media (hover: none) {
+    .about-photo:hover,
+    .stat-box:hover,
+    .cert-card:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .about-media:hover::before {
+      inset: -14px -14px 14px 14px;
+      border-color: rgba(232, 255, 0, 0.15);
+    }
+
+    .about-media:hover::after {
+      opacity: 0.6;
+    }
+
+    .cert-card:hover .cert-icon {
+      background: rgba(232, 255, 0, 0.08);
+      border-color: rgba(232, 255, 0, 0.2);
+      color: var(--primary);
+      transform: none;
+    }
+
+    .gallery-item:hover img {
+      transform: none;
+    }
+  }
+
+  /* ── Reduced motion ────────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  /* ── Scroll reveal ─────────────────────────────────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
+    transition-delay: var(--delay, 0s);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+
+<!-- ══ PAGE HERO ══════════════════════════════════════════════════════════ -->
+<section class="about-hero">
+  <div class="container">
+    <p class="section-eyebrow">Get To Know Me</p>
+    <h1>
+      About
+      <span class="accent">{{ cfg.get('hero_name','Sahil').split()[0] }}</span>
+    </h1>
+  </div>
+</section>
+
+<!-- ══ ABOUT CONTENT ══════════════════════════════════════════════════════ -->
+<section class="section about-section">
+  <div class="container about-grid">
+    <!-- MEDIA -->
+    <div class="about-media">
+      {% if cfg.get('about_photo') %}
+      <img
+        src="{{ cfg.about_photo }}"
+        alt="{{ cfg.get('hero_name','Sahil') }}"
+        class="about-photo"
+      />
+      {% elif cfg.get('hero_image') %}
+      <img
+        src="{{ cfg.hero_image }}"
+        alt="{{ cfg.get('hero_name','Sahil') }}"
+        class="about-photo"
+      />
+      {% else %}
+      <div class="about-photo-placeholder"><i class="fas fa-user"></i></div>
+      {% endif %}
+
+      <!-- floating experience badge -->
+      <div class="about-badge">
+        <span class="badge-num"
+          >{{ cfg.get('stat_years','5') }}<sup style="font-size: 0.6em"
+            >+</sup
+          ></span
+        >
+        <span class="badge-lbl">Years Coaching</span>
+      </div>
+
+      {% if cfg.get('about_video') %}
+      <div class="video-wrapper">
+        <iframe
+          src="{{ cfg.about_video }}"
+          frameborder="0"
+          allow="
+            accelerometer;
+            autoplay;
+            clipboard-write;
+            encrypted-media;
+            gyroscope;
+            picture-in-picture;
+          "
+          allowfullscreen
+          loading="lazy"
+          title="Trainer intro video"
+        ></iframe>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- TEXT -->
+    <div class="about-text">
+      <h2>{{ cfg.get('hero_name','Sahil Panwar') }}</h2>
+      <div class="about-role">
+        <img
+          src="{{ url_for('static', filename='IMAGE/logo.png') }}"
+          alt="Logo"
+          style="width: 20px; height: 20px; object-fit: contain"
+        />
+        <span>Certified Personal Trainer</span>
+      </div>
+
+      <p class="about-bio">{{ cfg.get('about_bio','') }}</p>
+
+      <div class="about-stats">
+        <div class="stat-box">
+          <span>{{ cfg.get('stat_years','5+') }}</span>
+          <label>Years Experience</label>
+        </div>
+        <div class="stat-box">
+          <span>{{ cfg.get('stat_clients','200+') }}</span>
+          <label>Clients Trained</label>
+        </div>
+        <div class="stat-box">
+          <span>{{ cfg.get('stat_transformations','150+') }}</span>
+          <label>Transformations</label>
+        </div>
+      </div>
+
+      <div class="about-cta-row">
+        <a href="{{ url_for('contact') }}" class="btn btn-primary">
+          <i class="fas fa-bolt"></i>
+          {{ cfg.get('hero_cta','Book Free Consultation') }}
+        </a>
+        <a href="{{ url_for('transformations') }}" class="btn btn-outline">
+          <i class="fas fa-images"></i>
+          See Results
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CERTIFICATIONS ═════════════════════════════════════════════════════ -->
+{% if certs %}
+<section class="section certs-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Credentials</p>
+      <h2>Certifications &amp; Qualifications</h2>
+    </div>
+    <div class="certs-grid">
+      {% for c in certs %}
+      <div class="cert-card reveal" style="--delay:{{ loop.index0 * 0.06 }}s">
+        {% if c.get('badge') %}
+        <img
+          src="{{ c.badge }}"
+          alt="{{ c.name }}"
+          class="cert-badge"
+          loading="lazy"
+        />
+        {% else %}
+        <div class="cert-icon"><i class="fas fa-certificate"></i></div>
+        {% endif %}
+        <h4>{{ c.name }}</h4>
+        {% if c.get('org') %}
+        <p>{{ c.org }}</p>
+        {% endif %} {% if c.get('year') %}<span class="cert-year"
+          >{{ c.year }}</span
+        >{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ══ GALLERY PREVIEW ════════════════════════════════════════════════════ -->
+{% if gallery %}
+<section class="section gallery-preview">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">In Action</p>
+      <h2>Photo Gallery</h2>
+    </div>
+    <div class="gallery-grid">
+      {% for img in gallery[:6] %}
+      <div
+        class="gallery-item reveal"
+        style="--delay:{{ loop.index0 * 0.06 }}s"
+      >
+        <img
+          src="{{ img.url }}"
+          alt="{{ img.get('caption','') }}"
+          loading="lazy"
+        />
+        {% if img.get('caption') %}
+        <p>{{ img.caption }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="section-cta reveal">
+      <a href="{{ url_for('gallery') }}" class="btn btn-outline">
+        View Full Gallery <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %} {% endblock %} {% block scripts %}
+<script>
+  /* ── SCROLL REVEAL ────────────────────────────────────────────────────── */
+  (function () {
+    if (!("IntersectionObserver" in window)) {
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => el.classList.add("visible"));
+      return;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("visible");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+    );
+
+    document.querySelectorAll(".reveal").forEach((el) => obs.observe(el));
+  })();
+</script>
+{% endblock %}

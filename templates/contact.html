@@ -1,0 +1,1913 @@
+{% extends "base.html" %} {% block title %}Contact — {{
+cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
+<style>
+  /* ══════════════════════════════════════════════════════════════════════════
+   CONTACT PAGE — FULLY RESPONSIVE STYLESHEET
+   Breakpoints: 1400 · 1200 · 1024 · 900 · 768 · 640 · 560 · 480 · 380 · 320
+   ══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── PAGE HERO ─────────────────────────────────────────────────────────── */
+  .contact-hero {
+    position: relative;
+    padding: calc(var(--nav-h, 72px) + clamp(2.25rem, 6vw, 4rem))
+      clamp(1rem, 4vw, 1.5rem) clamp(2.25rem, 6vw, 4rem);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .contact-hero::before {
+    content: "";
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: clamp(260px, 45vw, 600px);
+    height: clamp(260px, 45vw, 600px);
+    background: radial-gradient(
+      circle,
+      rgba(232, 255, 0, 0.06) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .contact-hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40%;
+    left: -10%;
+    width: clamp(200px, 36vw, 450px);
+    height: clamp(200px, 36vw, 450px);
+    background: radial-gradient(
+      circle,
+      rgba(232, 255, 0, 0.04) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .contact-hero .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .contact-hero .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: clamp(0.7rem, 1.7vw, 0.85rem);
+  }
+
+  .contact-hero .section-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 12px var(--primary);
+    animation: ct-pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes ct-pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.3);
+    }
+  }
+
+  .contact-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.85rem, 7vw, 4rem);
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    margin-top: 0.5rem;
+    animation: ct-fade-up 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    overflow-wrap: break-word;
+  }
+
+  .contact-hero h1 .accent {
+    color: var(--primary);
+    position: relative;
+    display: inline-block;
+  }
+
+  .contact-hero h1 .accent::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: ct-underline 0.9s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      forwards;
+  }
+
+  @keyframes ct-underline {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes ct-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .contact-hero p.lead {
+    color: var(--text2);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    max-width: 620px;
+    margin-top: 1rem;
+    line-height: 1.7;
+  }
+
+  /* ── LAYOUT ────────────────────────────────────────────────────────────── */
+  .contact-section {
+    padding: clamp(2.5rem, 7vw, 5rem) 0;
+    width: 100%;
+  }
+
+  .contact-section .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: clamp(2rem, 5vw, 3rem);
+    align-items: start;
+  }
+
+  .contact-grid > * {
+    min-width: 0;
+  }
+
+  /* ── INFO PANEL (LEFT) ─────────────────────────────────────────────────── */
+  .contact-info {
+    animation: ct-fade-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    min-width: 0;
+  }
+
+  .contact-info h2 {
+    font-size: clamp(1.2rem, 3vw, 1.85rem);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+    overflow-wrap: break-word;
+  }
+
+  .contact-info .info-sub {
+    color: var(--text2);
+    font-size: clamp(0.85rem, 1.9vw, 0.92rem);
+    line-height: 1.65;
+    margin-bottom: 1.75rem;
+    max-width: 420px;
+  }
+
+  .contact-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(0.7rem, 2vw, 1rem);
+    padding: clamp(0.85rem, 2.2vw, 1rem) clamp(0.9rem, 2.4vw, 1.1rem);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .contact-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 3px;
+    background: var(--primary);
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform var(--transition);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .contact-item:hover {
+    border-color: rgba(232, 255, 0, 0.25);
+    transform: translateX(4px);
+  }
+
+  .contact-item:hover::before {
+    transform: scaleY(1);
+  }
+
+  .contact-item .icon-wrap {
+    width: clamp(34px, 9vw, 40px);
+    height: clamp(34px, 9vw, 40px);
+    border-radius: 10px;
+    background: rgba(232, 255, 0, 0.08);
+    border: 1px solid rgba(232, 255, 0, 0.18);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    flex-shrink: 0;
+    transition: all var(--transition);
+  }
+
+  .contact-item:hover .icon-wrap {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #000;
+    transform: scale(1.05) rotate(-3deg);
+  }
+
+  .contact-item:hover .icon-wrap i {
+    color: #000 !important;
+  }
+
+  .contact-item .info-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .contact-item strong {
+    display: block;
+    font-size: clamp(0.62rem, 1.4vw, 0.7rem);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text3);
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+  }
+
+  .contact-item a,
+  .contact-item .value {
+    display: block;
+    color: var(--text);
+    font-size: clamp(0.85rem, 1.9vw, 0.95rem);
+    font-weight: 500;
+    transition: color var(--transition);
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .contact-item a:hover {
+    color: var(--primary);
+  }
+
+  /* ── CTA buttons in panel ──────────────────────────────────────────────── */
+  .contact-ctas {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.75rem;
+  }
+
+  .contact-ctas .btn,
+  .contact-ctas .btn-wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: clamp(0.65rem, 1.8vw, 0.75rem) clamp(1.1rem, 3vw, 1.5rem);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: clamp(0.82rem, 1.9vw, 0.92rem);
+    transition: all var(--transition);
+    white-space: nowrap;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .btn-wa {
+    background: #25d366;
+    color: #fff;
+    border: 2px solid #25d366;
+  }
+
+  .btn-wa:hover {
+    background: #1ebe5d;
+    border-color: #1ebe5d;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+  }
+
+  /* ── MAP CARD ──────────────────────────────────────────────────────────── */
+  .maps-embed {
+    position: relative;
+    margin-top: 0.25rem;
+    border-radius: var(--radius);
+    overflow: hidden;
+    height: clamp(200px, 34vw, 260px);
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    transition: border-color var(--transition);
+  }
+
+  .maps-embed:hover {
+    border-color: rgba(232, 255, 0, 0.25);
+  }
+
+  .maps-embed iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    filter: grayscale(0.3) contrast(1.05);
+    transition: filter var(--transition);
+  }
+
+  .maps-embed:hover iframe {
+    filter: grayscale(0) contrast(1);
+  }
+
+  /* ── FORM PANEL (RIGHT) ────────────────────────────────────────────────── */
+  .contact-form-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(1.35rem, 3.4vw, 2.25rem);
+    position: relative;
+    overflow: hidden;
+    animation: ct-fade-up 0.7s 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    min-width: 0;
+  }
+
+  .contact-form-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 100% 0%,
+      rgba(232, 255, 0, 0.05) 0%,
+      transparent 45%
+    );
+    pointer-events: none;
+  }
+
+  .contact-form-wrap h2 {
+    font-size: clamp(1.2rem, 3vw, 1.85rem);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+    overflow-wrap: break-word;
+  }
+
+  .contact-form-wrap .form-sub {
+    color: var(--text2);
+    font-size: clamp(0.82rem, 1.8vw, 0.9rem);
+    margin-bottom: 1.75rem;
+    position: relative;
+    z-index: 1;
+    line-height: 1.6;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .form-group label {
+    font-size: clamp(0.78rem, 1.7vw, 0.82rem);
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.01em;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+
+  .form-group label .req {
+    color: var(--primary);
+    margin-left: 2px;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    background: var(--bg3);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: clamp(0.7rem, 1.9vw, 0.8rem) clamp(0.85rem, 2.2vw, 1rem);
+    font-size: 16px; /* prevents iOS zoom */
+    font-weight: 500;
+    transition: all var(--transition);
+    width: 100%;
+    outline: none;
+    font-family: var(--font);
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: var(--text3);
+  }
+
+  .form-group input:hover,
+  .form-group textarea:hover,
+  .form-group select:hover {
+    border-color: #3a3a3a;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+    background: var(--bg3);
+  }
+
+  .form-group input:user-invalid,
+  .form-group textarea:user-invalid {
+    border-color: rgba(255, 68, 68, 0.5);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: clamp(100px, 22vw, 120px);
+    line-height: 1.6;
+  }
+
+  .form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%23aaaaaa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  .form-group select option {
+    background: var(--bg3);
+    color: var(--text);
+  }
+
+  /* ── SUBMIT BUTTON ─────────────────────────────────────────────────────── */
+  .contact-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: clamp(0.85rem, 2.2vw, 0.95rem) 1.5rem;
+    background: var(--primary);
+    color: #000;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: clamp(0.88rem, 2vw, 0.95rem);
+    letter-spacing: 0.02em;
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+    margin-top: 0.35rem;
+    cursor: pointer;
+    font-family: var(--font);
+    min-height: 46px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .contact-submit::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      transparent 100%
+    );
+    transition: left 0.6s ease;
+    pointer-events: none;
+  }
+
+  .contact-submit:hover:not(:disabled)::before {
+    left: 120%;
+  }
+
+  .contact-submit:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px rgba(232, 255, 0, 0.3);
+  }
+
+  .contact-submit:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .contact-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+
+  .contact-submit .btn-label,
+  .contact-submit .btn-spinner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: opacity 0.2s ease;
+  }
+
+  .contact-submit .btn-spinner {
+    position: absolute;
+    inset: 0;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .contact-submit.loading .btn-label {
+    opacity: 0;
+  }
+
+  .contact-submit.loading .btn-spinner {
+    opacity: 1;
+  }
+
+  .ct-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(0, 0, 0, 0.2);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: ct-spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes ct-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ── FORM MESSAGE ──────────────────────────────────────────────────────── */
+  .form-msg {
+    font-size: clamp(0.8rem, 1.8vw, 0.88rem);
+    margin-top: 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    padding: 0.7rem 0.9rem;
+    border-radius: var(--radius-sm);
+    animation: ct-fade-up 0.3s ease;
+    position: relative;
+    z-index: 1;
+    line-height: 1.5;
+  }
+
+  .form-msg:empty {
+    display: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .form-msg.success {
+    background: rgba(68, 204, 136, 0.08);
+    border: 1px solid rgba(68, 204, 136, 0.25);
+    color: var(--success);
+  }
+
+  .form-msg.success::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .form-msg.error {
+    background: rgba(255, 68, 68, 0.08);
+    border: 1px solid rgba(255, 68, 68, 0.25);
+    color: var(--danger);
+  }
+
+  .form-msg.error::before {
+    content: "\f071";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  /* ── FAQ SECTION ───────────────────────────────────────────────────────── */
+  .faq-section {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: clamp(2.5rem, 7vw, 5rem) 0;
+    width: 100%;
+  }
+
+  .faq-section .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .faq-container {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .faq-section .section-header {
+    text-align: center;
+    margin-bottom: clamp(1.75rem, 4.5vw, 3rem);
+  }
+
+  .faq-section .section-header h2 {
+    font-size: clamp(1.3rem, 3.4vw, 2.25rem);
+    letter-spacing: -0.02em;
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .faq-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: all var(--transition);
+  }
+
+  .faq-item:hover {
+    border-color: rgba(232, 255, 0, 0.2);
+  }
+
+  .faq-item.open {
+    border-color: rgba(232, 255, 0, 0.4);
+    background:
+      linear-gradient(180deg, rgba(232, 255, 0, 0.03) 0%, transparent 50%),
+      var(--card);
+  }
+
+  .faq-q {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: clamp(0.6rem, 2vw, 1rem);
+    padding: clamp(1rem, 2.6vw, 1.25rem) clamp(1rem, 3vw, 1.5rem);
+    font-size: clamp(0.88rem, 2vw, 1rem);
+    font-weight: 600;
+    color: var(--text);
+    text-align: left;
+    transition: all var(--transition);
+    line-height: 1.5;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--font);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .faq-q span {
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+
+  .faq-q:hover {
+    color: var(--primary);
+  }
+
+  .faq-item.open .faq-q {
+    color: var(--primary);
+  }
+
+  .faq-q i {
+    flex-shrink: 0;
+    width: clamp(24px, 6vw, 28px);
+    height: clamp(24px, 6vw, 28px);
+    border-radius: 50%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--text3);
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .faq-item.open .faq-q i {
+    transform: rotate(180deg);
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #000;
+  }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .faq-item.open .faq-a {
+    max-height: 900px;
+  }
+
+  .faq-a p {
+    padding: 0 clamp(1rem, 3vw, 1.5rem) clamp(1rem, 2.6vw, 1.35rem);
+    color: var(--text2);
+    line-height: 1.75;
+    font-size: clamp(0.85rem, 1.9vw, 0.95rem);
+    white-space: pre-line;
+    overflow-wrap: break-word;
+  }
+
+  /* ── SCROLL REVEAL ────────────────────────────────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
+    transition-delay: var(--delay, 0s);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── ≤ 1200px : tighten grids ─────────────────────────────────────────── */
+  @media (max-width: 1200px) {
+    .contact-grid {
+      gap: 2.5rem;
+    }
+  }
+
+  /* ── ≤ 1024px : tablets landscape ─────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .contact-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 2rem;
+    }
+
+    .contact-form-wrap {
+      padding: 1.75rem;
+    }
+  }
+
+  /* ── ≤ 900px : stack info + form ──────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .contact-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.5rem;
+    }
+
+    .contact-info .info-sub {
+      max-width: 100%;
+    }
+
+    .maps-embed {
+      height: 240px;
+    }
+  }
+
+  /* ── ≤ 768px : tablets portrait ───────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .contact-hero {
+      padding: calc(var(--nav-h, 72px) + 2.25rem) clamp(1rem, 4vw, 1.5rem)
+        2.5rem;
+    }
+
+    .contact-hero h1 {
+      font-size: clamp(1.75rem, 8vw, 2.5rem);
+    }
+
+    .contact-form-wrap {
+      padding: 1.5rem;
+    }
+
+    .maps-embed {
+      height: 220px;
+    }
+
+    .faq-section .section-header {
+      margin-bottom: 2rem;
+    }
+  }
+
+  /* ── ≤ 640px : large phones ───────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    :root {
+      --radius: 14px;
+      --radius-sm: 9px;
+    }
+
+    .contact-hero {
+      padding: calc(var(--nav-h, 72px) + 1.75rem) clamp(1rem, 4vw, 1.25rem) 2rem;
+    }
+
+    .contact-hero h1 {
+      font-size: clamp(1.55rem, 8.5vw, 2.1rem);
+      line-height: 1.1;
+    }
+
+    .contact-hero p.lead {
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    .contact-section {
+      padding: 2.25rem 0 3rem;
+    }
+
+    .contact-section .container {
+      padding: 0 clamp(0.9rem, 3.4vw, 1.15rem);
+    }
+
+    .contact-info h2,
+    .contact-form-wrap h2 {
+      font-size: 1.2rem;
+    }
+
+    .contact-info .info-sub,
+    .contact-form-wrap .form-sub {
+      font-size: 0.86rem;
+      margin-bottom: 1.35rem;
+    }
+
+    .contact-item {
+      padding: 0.85rem 0.9rem;
+      gap: 0.75rem;
+    }
+
+    .contact-item:hover {
+      transform: none;
+    }
+
+    .contact-item:hover .icon-wrap {
+      transform: none;
+    }
+
+    /* CTAs full-width */
+    .contact-ctas {
+      gap: 0.5rem;
+    }
+
+    .contact-ctas .btn,
+    .contact-ctas .btn-wa {
+      flex: 1 1 100%;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .maps-embed {
+      height: 200px;
+    }
+
+    .contact-form-wrap {
+      padding: 1.25rem 1rem;
+    }
+
+    .form-row-2 {
+      grid-template-columns: 1fr;
+      gap: 0.9rem;
+    }
+
+    .contact-form {
+      gap: 1rem;
+    }
+
+    .form-group textarea {
+      min-height: 110px;
+    }
+
+    .contact-submit {
+      padding: 0.85rem 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    /* FAQ */
+    .faq-section {
+      padding: 2.25rem 0 3rem;
+    }
+
+    .faq-q {
+      padding: 1rem 1.15rem;
+      font-size: 0.92rem;
+    }
+
+    .faq-a p {
+      padding: 0 1.15rem 1.1rem;
+      font-size: 0.87rem;
+    }
+  }
+
+  /* ── ≤ 560px : small phones ───────────────────────────────────────────── */
+  @media (max-width: 560px) {
+    .contact-hero h1 {
+      font-size: clamp(1.4rem, 9vw, 1.85rem);
+    }
+
+    .contact-hero .section-eyebrow {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+    }
+
+    .contact-hero p.lead {
+      font-size: 0.85rem;
+    }
+
+    .contact-item .icon-wrap {
+      width: 34px;
+      height: 34px;
+      font-size: 0.85rem;
+      border-radius: 9px;
+    }
+
+    .contact-item strong {
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+    }
+
+    .contact-item a,
+    .contact-item .value {
+      font-size: 0.86rem;
+    }
+
+    .maps-embed {
+      height: 180px;
+      border-radius: var(--radius-sm);
+    }
+
+    .contact-form-wrap {
+      padding: 1.15rem 0.9rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 0.7rem 0.85rem;
+    }
+
+    .faq-q {
+      padding: 0.95rem 1rem;
+      font-size: 0.88rem;
+    }
+
+    .faq-a p {
+      padding: 0 1rem 1rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  /* ── ≤ 480px : standard mobile ────────────────────────────────────────── */
+  @media (max-width: 480px) {
+    :root {
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    .contact-hero {
+      padding: calc(var(--nav-h, 72px) + 1.4rem) 0.9rem 1.75rem;
+    }
+
+    .contact-hero h1 {
+      font-size: clamp(1.3rem, 9.5vw, 1.65rem);
+      line-height: 1.15;
+    }
+
+    .contact-hero p.lead {
+      font-size: 0.82rem;
+      line-height: 1.6;
+      margin-top: 0.8rem;
+    }
+
+    .contact-section .container,
+    .faq-section .container {
+      padding: 0 0.9rem;
+    }
+
+    .contact-section {
+      padding: 1.75rem 0 2.5rem;
+    }
+
+    .contact-grid {
+      gap: 2rem;
+    }
+
+    .contact-info h2,
+    .contact-form-wrap h2 {
+      font-size: 1.1rem;
+    }
+
+    .contact-items {
+      gap: 0.5rem;
+      margin-bottom: 1.35rem;
+    }
+
+    .contact-item {
+      padding: 0.75rem 0.8rem;
+      gap: 0.65rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .contact-item .icon-wrap {
+      width: 32px;
+      height: 32px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+
+    .contact-item strong {
+      font-size: 0.6rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .contact-item a,
+    .contact-item .value {
+      font-size: 0.82rem;
+    }
+
+    .contact-ctas {
+      margin-bottom: 1.35rem;
+      gap: 0.45rem;
+    }
+
+    .contact-ctas .btn,
+    .contact-ctas .btn-wa {
+      padding: 0.65rem 1rem;
+      font-size: 0.82rem;
+    }
+
+    .maps-embed {
+      height: 160px;
+    }
+
+    .contact-form-wrap {
+      padding: 1.1rem 0.85rem;
+    }
+
+    .contact-form-wrap .form-sub {
+      font-size: 0.82rem;
+      margin-bottom: 1.15rem;
+    }
+
+    .contact-form {
+      gap: 0.85rem;
+    }
+
+    .form-row-2 {
+      gap: 0.8rem;
+    }
+
+    .form-group label {
+      font-size: 0.75rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 0.65rem 0.8rem;
+      font-size: 16px;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+    }
+
+    .contact-submit {
+      padding: 0.75rem 1.1rem;
+      font-size: 0.86rem;
+      min-height: 44px;
+    }
+
+    .form-msg {
+      font-size: 0.78rem;
+      padding: 0.6rem 0.75rem;
+      gap: 0.4rem;
+    }
+
+    .faq-section {
+      padding: 1.75rem 0 2.5rem;
+    }
+
+    .faq-section .section-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .faq-section .section-header h2 {
+      font-size: 1.2rem;
+    }
+
+    .faq-list {
+      gap: 0.5rem;
+    }
+
+    .faq-q {
+      padding: 0.85rem 0.9rem;
+      font-size: 0.85rem;
+      gap: 0.6rem;
+    }
+
+    .faq-q i {
+      width: 24px;
+      height: 24px;
+      font-size: 0.68rem;
+    }
+
+    .faq-a p {
+      padding: 0 0.9rem 0.9rem;
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+  }
+
+  /* ── ≤ 380px : iPhone SE / small Android ──────────────────────────────── */
+  @media (max-width: 380px) {
+    .contact-hero {
+      padding: calc(var(--nav-h, 72px) + 1.2rem) 0.75rem 1.5rem;
+    }
+
+    .contact-hero h1 {
+      font-size: 1.2rem;
+      letter-spacing: 0.01em;
+    }
+
+    .contact-hero p.lead {
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+
+    .contact-section .container,
+    .faq-section .container {
+      padding: 0 0.75rem;
+    }
+
+    .contact-info h2,
+    .contact-form-wrap h2 {
+      font-size: 1rem;
+    }
+
+    .contact-info .info-sub,
+    .contact-form-wrap .form-sub {
+      font-size: 0.78rem;
+    }
+
+    .contact-item {
+      padding: 0.7rem 0.7rem;
+      gap: 0.6rem;
+    }
+
+    .contact-item .icon-wrap {
+      width: 30px;
+      height: 30px;
+      font-size: 0.75rem;
+    }
+
+    .contact-item strong {
+      font-size: 0.56rem;
+      letter-spacing: 0.08em;
+    }
+
+    .contact-item a,
+    .contact-item .value {
+      font-size: 0.78rem;
+    }
+
+    .contact-ctas .btn,
+    .contact-ctas .btn-wa {
+      padding: 0.6rem 0.85rem;
+      font-size: 0.78rem;
+    }
+
+    .maps-embed {
+      height: 150px;
+    }
+
+    .contact-form-wrap {
+      padding: 1rem 0.75rem;
+    }
+
+    .contact-form {
+      gap: 0.8rem;
+    }
+
+    .form-row-2 {
+      gap: 0.75rem;
+    }
+
+    .form-group label {
+      font-size: 0.72rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 0.6rem 0.7rem;
+    }
+
+    .contact-submit {
+      padding: 0.7rem 0.95rem;
+      font-size: 0.82rem;
+      min-height: 42px;
+    }
+
+    .faq-q {
+      padding: 0.75rem 0.8rem;
+      font-size: 0.82rem;
+    }
+
+    .faq-q i {
+      width: 22px;
+      height: 22px;
+      font-size: 0.62rem;
+    }
+
+    .faq-a p {
+      padding: 0 0.8rem 0.8rem;
+      font-size: 0.78rem;
+    }
+  }
+
+  /* ── ≤ 320px : ultra-small / foldables ────────────────────────────────── */
+  @media (max-width: 320px) {
+    .contact-hero {
+      padding: calc(var(--nav-h, 72px) + 1rem) 0.65rem 1.25rem;
+    }
+
+    .contact-hero h1 {
+      font-size: 1.1rem;
+    }
+
+    .contact-hero p.lead {
+      font-size: 0.74rem;
+    }
+
+    .contact-section .container,
+    .faq-section .container {
+      padding: 0 0.65rem;
+    }
+
+    .contact-item {
+      padding: 0.6rem 0.6rem;
+      gap: 0.5rem;
+    }
+
+    .contact-item .icon-wrap {
+      width: 28px;
+      height: 28px;
+      font-size: 0.7rem;
+      border-radius: 7px;
+    }
+
+    .contact-item strong {
+      font-size: 0.52rem;
+    }
+
+    .contact-item a,
+    .contact-item .value {
+      font-size: 0.75rem;
+    }
+
+    .contact-ctas .btn,
+    .contact-ctas .btn-wa {
+      padding: 0.55rem 0.75rem;
+      font-size: 0.74rem;
+    }
+
+    .maps-embed {
+      height: 140px;
+    }
+
+    .contact-form-wrap {
+      padding: 0.9rem 0.65rem;
+    }
+
+    .form-group label {
+      font-size: 0.7rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 0.55rem 0.65rem;
+    }
+
+    .contact-submit {
+      padding: 0.65rem 0.85rem;
+      font-size: 0.78rem;
+      min-height: 40px;
+    }
+
+    .faq-q {
+      padding: 0.7rem 0.7rem;
+      font-size: 0.78rem;
+      gap: 0.5rem;
+    }
+
+    .faq-a p {
+      padding: 0 0.7rem 0.75rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  /* ── Landscape phones (short viewport) ────────────────────────────────── */
+  @media (max-height: 520px) and (orientation: landscape) {
+    .contact-hero {
+      padding: calc(var(--nav-h, 72px) + 1rem) 1rem 1.5rem;
+    }
+
+    .contact-hero h1 {
+      font-size: clamp(1.4rem, 4.5vw, 2rem);
+    }
+
+    .contact-section {
+      padding: 1.5rem 0 2rem;
+    }
+
+    .maps-embed {
+      height: 180px;
+    }
+
+    .faq-section {
+      padding: 1.5rem 0 2rem;
+    }
+  }
+
+  /* ── Touch devices: neutralize hover-only effects ─────────────────────── */
+  @media (hover: none) {
+    .contact-item:hover {
+      transform: none;
+      border-color: var(--border);
+    }
+
+    .contact-item:hover::before {
+      transform: scaleY(0);
+    }
+
+    .contact-item:hover .icon-wrap {
+      background: rgba(232, 255, 0, 0.08);
+      border-color: rgba(232, 255, 0, 0.18);
+      color: var(--primary);
+      transform: none;
+    }
+
+    .contact-item:hover .icon-wrap i {
+      color: var(--primary) !important;
+    }
+
+    .btn-wa:hover {
+      transform: none;
+      background: #25d366;
+      border-color: #25d366;
+      box-shadow: none;
+    }
+
+    .contact-submit:hover:not(:disabled) {
+      transform: none;
+      box-shadow: none;
+      background: var(--primary);
+    }
+
+    .contact-submit:hover:not(:disabled)::before {
+      left: -120%;
+    }
+
+    .maps-embed:hover {
+      border-color: var(--border);
+    }
+
+    .maps-embed:hover iframe {
+      filter: grayscale(0.3) contrast(1.05);
+    }
+
+    .faq-item:hover {
+      border-color: var(--border);
+    }
+
+    .faq-q:hover {
+      color: var(--text);
+    }
+
+    .faq-item.open .faq-q:hover {
+      color: var(--primary);
+    }
+  }
+
+  /* ── Focus visibility (keyboard accessibility) ────────────────────────── */
+  .contact-item a:focus-visible,
+  .contact-ctas .btn:focus-visible,
+  .contact-ctas .btn-wa:focus-visible,
+  .form-group input:focus-visible,
+  .form-group textarea:focus-visible,
+  .form-group select:focus-visible,
+  .contact-submit:focus-visible,
+  .faq-q:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* ── Reduced motion ───────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+
+    .contact-hero h1 .accent::after {
+      transform: scaleX(1);
+    }
+
+    .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+
+  /* ── Print ────────────────────────────────────────────────────────────── */
+  @media print {
+    .contact-hero::before,
+    .contact-hero::after,
+    .maps-embed,
+    .contact-ctas,
+    .contact-submit,
+    .form-msg {
+      display: none !important;
+    }
+
+    body {
+      background: #fff;
+      color: #000;
+    }
+
+    .contact-hero {
+      background: #fff;
+      border-bottom: 1px solid #ccc;
+      padding: 1rem 0;
+    }
+
+    .contact-hero h1 {
+      color: #000;
+    }
+
+    .contact-hero h1 .accent {
+      color: #333;
+    }
+
+    .contact-item,
+    .contact-form-wrap,
+    .faq-item {
+      border: 1px solid #ccc;
+      box-shadow: none;
+      break-inside: avoid;
+    }
+
+    .faq-a {
+      max-height: none !important;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+
+<!-- ══ PAGE HERO ══════════════════════════════════════════════════════════ -->
+<section class="contact-hero">
+  <div class="container">
+    <p class="section-eyebrow">Let's Talk</p>
+    <h1>Book Your <span class="accent">Free Consultation</span></h1>
+    <p class="lead">
+      Have a question about training, nutrition, or which program fits you best?
+      Send a message — I usually reply within 24 hours.
+    </p>
+  </div>
+</section>
+
+<!-- ══ CONTACT CONTENT ════════════════════════════════════════════════════ -->
+<section class="contact-section">
+  <div class="container contact-grid">
+    <!-- ══ INFO PANEL ══════════════════════════════════════════════════════ -->
+    <div class="contact-info">
+      <h2>Get In Touch</h2>
+      <p class="info-sub">
+        Reach out through any channel below — or fill in the form and I'll get
+        back to you personally.
+      </p>
+
+      <div class="contact-items">
+        {% if cfg.get('contact_email') %}
+        <div class="contact-item">
+          <div class="icon-wrap">
+            <i class="fas fa-envelope" aria-hidden="true"></i>
+          </div>
+          <div class="info-body">
+            <strong>Email</strong>
+            <a href="mailto:{{ cfg.contact_email }}">{{ cfg.contact_email }}</a>
+          </div>
+        </div>
+        {% endif %} {% if cfg.get('contact_phone') %}
+        <div class="contact-item">
+          <div class="icon-wrap">
+            <i class="fas fa-phone" aria-hidden="true"></i>
+          </div>
+          <div class="info-body">
+            <strong>Phone</strong>
+            <a href="tel:{{ cfg.contact_phone }}">{{ cfg.contact_phone }}</a>
+          </div>
+        </div>
+        {% endif %} {% if cfg.get('contact_whatsapp') %}
+        <div class="contact-item">
+          <div class="icon-wrap">
+            <i class="fab fa-whatsapp" aria-hidden="true"></i>
+          </div>
+          <div class="info-body">
+            <strong>WhatsApp</strong>
+            <a
+              href="https://wa.me/{{ cfg.contact_whatsapp|replace('+','') }}"
+              target="_blank"
+              rel="noopener"
+              >Chat directly →</a
+            >
+          </div>
+        </div>
+        {% endif %} {% if cfg.get('contact_address') %}
+        <div class="contact-item">
+          <div class="icon-wrap">
+            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+          </div>
+          <div class="info-body">
+            <strong>Location</strong>
+            <span class="value">{{ cfg.contact_address }}</span>
+          </div>
+        </div>
+        {% endif %} {% if cfg.get('contact_hours') %}
+        <div class="contact-item">
+          <div class="icon-wrap">
+            <i class="fas fa-clock" aria-hidden="true"></i>
+          </div>
+          <div class="info-body">
+            <strong>Business Hours</strong>
+            <span class="value">{{ cfg.contact_hours }}</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- quick CTAs -->
+      <div class="contact-ctas">
+        {% if cfg.get('calendly_url') %}
+        <a
+          href="{{ cfg.calendly_url }}"
+          target="_blank"
+          rel="noopener"
+          class="btn btn-primary"
+        >
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i> Book on
+          Calendly
+        </a>
+        {% endif %} {% if cfg.get('contact_whatsapp') %}
+        <a
+          href="https://wa.me/{{ cfg.contact_whatsapp|replace('+','') }}"
+          target="_blank"
+          rel="noopener"
+          class="btn-wa"
+        >
+          <i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp Me
+        </a>
+        {% endif %}
+      </div>
+
+      {% if cfg.get('contact_maps_embed') %}
+      <div class="maps-embed">
+        <iframe
+          src="{{ cfg.contact_maps_embed }}"
+          allowfullscreen
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Location map"
+        ></iframe>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ══ FORM PANEL ══════════════════════════════════════════════════════ -->
+    <div class="contact-form-wrap">
+      <h2>Send a Message</h2>
+      <p class="form-sub">
+        Fill in the details below and I'll get back to you personally within 24
+        hours.
+      </p>
+
+      <form id="contactForm" class="contact-form" novalidate>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="cName">Full Name <span class="req">*</span></label>
+            <input
+              type="text"
+              id="cName"
+              name="name"
+              placeholder="Your name"
+              required
+              maxlength="100"
+              autocomplete="name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="cEmail">Email <span class="req">*</span></label>
+            <input
+              type="email"
+              id="cEmail"
+              name="email"
+              placeholder="your@email.com"
+              required
+              maxlength="200"
+              autocomplete="email"
+            />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="cPhone">Phone</label>
+            <input
+              type="tel"
+              id="cPhone"
+              name="phone"
+              placeholder="+91 99999 99999"
+              maxlength="20"
+              autocomplete="tel"
+            />
+          </div>
+          <div class="form-group">
+            <label for="cGoal">Your Goal</label>
+            <select id="cGoal" name="goal">
+              <option value="">Select a goal</option>
+              <option>Weight Loss</option>
+              <option>Muscle Gain</option>
+              <option>Strength Training</option>
+              <option>General Fitness</option>
+              <option>Sports Performance</option>
+              <option>Rehabilitation</option>
+              <option>Nutrition Coaching</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cMsg">Message <span class="req">*</span></label>
+          <textarea
+            id="cMsg"
+            name="message"
+            rows="5"
+            placeholder="Tell me about your goals, current routine, and any questions you have..."
+            required
+            maxlength="2000"
+          ></textarea>
+        </div>
+
+        <button type="submit" class="contact-submit" id="contactSubmit">
+          <span class="btn-label">
+            <i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message
+          </span>
+          <span class="btn-spinner">
+            <span class="ct-spinner"></span> Sending…
+          </span>
+        </button>
+
+        <p
+          id="contactMsg"
+          class="form-msg"
+          role="status"
+          aria-live="polite"
+        ></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ════════════════════════════════════════════════════════════════ -->
+{% if faqs %}
+<section class="faq-section">
+  <div class="container faq-container">
+    <div class="section-header">
+      <p class="section-eyebrow">Questions</p>
+      <h2>Frequently Asked</h2>
+    </div>
+    <div class="faq-list" id="faqList">
+      {% for f in faqs %}
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false">
+          <span>{{ f.question | e }}</span>
+          <i class="fas fa-chevron-down" aria-hidden="true"></i>
+        </button>
+        <div class="faq-a"><p>{{ f.answer | e }}</p></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %} {% endblock %} {% block scripts %}
+<script>
+  /* ══════════════════════════════════════════════════════════════════════
+     CONTACT FORM — validation + submit with loading state
+     ══════════════════════════════════════════════════════════════════════ */
+  (function () {
+    const form = document.getElementById("contactForm");
+    const btn = document.getElementById("contactSubmit");
+    const msgEl = document.getElementById("contactMsg");
+    if (!form || !btn) return;
+
+    const setMsg = (text, type) => {
+      msgEl.textContent = text;
+      msgEl.className = "form-msg " + (type || "");
+    };
+
+    // Simple client-side validation
+    function validate(data) {
+      if (!data.name || data.name.trim().length < 2)
+        return "Please enter your name.";
+      if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))
+        return "Please enter a valid email.";
+      if (!data.message || data.message.trim().length < 10)
+        return "Please write a slightly longer message (10+ chars).";
+      return null;
+    }
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      // gather
+      const data = {
+        name: document.getElementById("cName").value.trim(),
+        email: document.getElementById("cEmail").value.trim(),
+        phone: document.getElementById("cPhone").value.trim(),
+        goal: document.getElementById("cGoal").value,
+        message: document.getElementById("cMsg").value.trim(),
+      };
+
+      // validate
+      const err = validate(data);
+      if (err) {
+        setMsg(err, "error");
+        return;
+      }
+
+      // loading state
+      btn.classList.add("loading");
+      btn.disabled = true;
+      setMsg("", "");
+
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const resp = await res.json();
+
+        if (res.ok) {
+          setMsg(
+            "Message sent! I'll get back to you within 24 hours.",
+            "success",
+          );
+          form.reset();
+        } else {
+          setMsg(
+            resp.error || "Something went wrong. Please try again.",
+            "error",
+          );
+        }
+      } catch {
+        setMsg(
+          "Network error. Please check your connection and try again.",
+          "error",
+        );
+      } finally {
+        btn.classList.remove("loading");
+        btn.disabled = false;
+      }
+    });
+
+    // clear success/error messages when user edits fields again
+    form.addEventListener("input", () => {
+      if (msgEl.classList.contains("error")) {
+        msgEl.textContent = "";
+        msgEl.className = "form-msg";
+      }
+    });
+  })();
+
+  /* ══════════════════════════════════════════════════════════════════════
+     FAQ ACCORDION (event-delegated, keyboard accessible)
+     ══════════════════════════════════════════════════════════════════════ */
+  /* ── SCROLL REVEAL ────────────────────────────────────────────────────── */
+  (function () {
+    if (!("IntersectionObserver" in window)) {
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => el.classList.add("visible"));
+      return;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("visible");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" },
+    );
+    document.querySelectorAll(".reveal").forEach((el) => obs.observe(el));
+  })();
+
+  /* ── FAQ ACCORDION ─────────────────────────────────────────────────────── */
+  (function () {
+    const list = document.getElementById("faqList");
+    if (!list) return;
+
+    list.addEventListener("click", (e) => {
+      const btn = e.target.closest(".faq-q");
+      if (!btn) return;
+      toggleFaq(btn);
+    });
+
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains("open");
+
+      // close all
+      list.querySelectorAll(".faq-item.open").forEach((el) => {
+        el.classList.remove("open");
+        const q = el.querySelector(".faq-q");
+        if (q) q.setAttribute("aria-expanded", "false");
+      });
+
+      // open this one if it was closed
+      if (!isOpen) {
+        item.classList.add("open");
+        btn.setAttribute("aria-expanded", "true");
+      }
+    }
+  })();
+</script>
+{% endblock %}

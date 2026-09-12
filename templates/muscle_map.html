@@ -1,0 +1,921 @@
+{% extends "base.html" %} {% block title %}Muscle Map — Sahil Panwar Fitness{%
+endblock %} {% block head %}
+<style>
+  /* ── PAGE WRAP ─────────────────────────────────────────────────────────── */
+  .mm-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: calc(var(--nav-h) + 2.5rem) 1.5rem 4rem;
+    animation: mm-fade-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  @keyframes mm-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── HEADER ────────────────────────────────────────────────────────────── */
+  .mm-header {
+    margin-bottom: 2rem;
+  }
+  .mm-header .mm-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  .mm-header .mm-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 12px var(--primary);
+    animation: mm-pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes mm-pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.3);
+    }
+  }
+  .mm-header h1 {
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+  }
+  .mm-header p {
+    color: var(--text2);
+    font-size: 0.95rem;
+    max-width: 620px;
+  }
+
+  /* ── CONTROLS BAR ──────────────────────────────────────────────────────── */
+  .mm-controls {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.75rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.1rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .mm-legend {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text2);
+    align-items: center;
+  }
+  .mm-legend .item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .mm-legend .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    transition: transform var(--transition-fast);
+  }
+  .mm-legend .item:hover .dot {
+    transform: scale(1.15);
+  }
+  .mm-legend .dot.muted {
+    background: #2e2e2e;
+    border: 1px solid #505050;
+  }
+  .mm-legend .dot.has {
+    background: rgba(232, 255, 0, 0.3);
+    border: 1px solid #c8df00;
+  }
+  .mm-legend .dot.sel {
+    background: rgba(232, 255, 0, 0.65);
+    border: 1px solid #e8ff00;
+    box-shadow: 0 0 8px rgba(232, 255, 0, 0.6);
+  }
+
+  /* gender badge / anatomy indicator */
+  .mm-anatomy-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.8rem;
+    background: rgba(232, 255, 0, 0.06);
+    border: 1px solid rgba(232, 255, 0, 0.18);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: 0.02em;
+  }
+  .mm-anatomy-badge i {
+    font-size: 0.7rem;
+  }
+
+  /* ── BODY GRID ─────────────────────────────────────────────────────────── */
+  .mm-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.15fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .mm-body {
+      grid-template-columns: 1fr 1fr;
+    }
+    .mm-panel {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 560px) {
+    .mm-body {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+  }
+
+  /* ── SVG CARDS ─────────────────────────────────────────────────────────── */
+  .mm-svg-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.35rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition);
+    animation: mm-col-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+  .mm-svg-wrap:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  .mm-svg-wrap:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  @keyframes mm-col-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .mm-svg-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 50% 0%,
+      rgba(232, 255, 0, 0.05) 0%,
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity var(--transition);
+    pointer-events: none;
+  }
+  .mm-svg-wrap:hover {
+    border-color: rgba(232, 255, 0, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  }
+  .mm-svg-wrap:hover::before {
+    opacity: 1;
+  }
+
+  .mm-svg-wrap h3 {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text3);
+    margin-bottom: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    position: relative;
+    z-index: 1;
+  }
+  .mm-svg-wrap h3::before {
+    content: "";
+    width: 16px;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+  .mm-svg-inner {
+    width: 100%;
+    max-width: 200px;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+  }
+  .mm-svg-inner svg {
+    width: 100%;
+    height: auto;
+    color: #3a3a4a;
+    transition: color 0.3s ease;
+  }
+  .mm-svg-inner svg line,
+  .mm-svg-inner svg path[stroke] {
+    stroke: #484a68;
+  }
+
+  /* ── MUSCLE GROUP INTERACTIONS ─────────────────────────────────────────── */
+  [data-muscle] {
+    cursor: pointer;
+    outline: none;
+  }
+  [data-muscle] path,
+  [data-muscle] ellipse,
+  [data-muscle] rect,
+  [data-muscle] circle,
+  [data-muscle] polygon {
+    transition:
+      color 0.2s ease,
+      filter 0.25s ease;
+  }
+  [data-muscle]:hover {
+    color: rgba(232, 255, 0, 0.5) !important;
+    filter: drop-shadow(0 0 6px rgba(232, 255, 0, 0.6));
+  }
+  [data-muscle].assigned {
+    color: rgba(232, 255, 0, 0.32) !important;
+  }
+  [data-muscle].selected {
+    color: rgba(232, 255, 0, 0.7) !important;
+    filter: drop-shadow(0 0 10px rgba(232, 255, 0, 0.85));
+  }
+  [data-muscle]:focus-visible {
+    color: rgba(232, 255, 0, 0.55) !important;
+    filter: drop-shadow(0 0 8px rgba(232, 255, 0, 0.7));
+  }
+  [data-muscle]:focus-visible::after {
+    content: "";
+  }
+  /* keep non-interactive groups inert */
+  .mm-svg-inner svg g:not([data-muscle]) {
+    pointer-events: none;
+  }
+
+  /* ── SIDE PANEL ────────────────────────────────────────────────────────── */
+  .mm-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    min-height: 260px;
+    position: relative;
+    animation: mm-col-in 0.6s 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    transition: border-color var(--transition);
+  }
+  .mm-panel.has-selection {
+    border-color: rgba(232, 255, 0, 0.25);
+  }
+
+  .mm-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    color: var(--text3);
+    text-align: center;
+    gap: 0.9rem;
+    animation: mm-fade-up 0.4s ease;
+  }
+  .mm-placeholder i {
+    font-size: 2.6rem;
+    color: var(--border);
+    animation: mm-bob 3s ease-in-out infinite;
+  }
+  @keyframes mm-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+  .mm-placeholder p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 200px;
+  }
+
+  .mm-content {
+    animation: mm-fade-up 0.4s ease;
+  }
+  .mm-panel h2 {
+    font-size: 1.25rem;
+    color: var(--primary);
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .mm-panel h2 .mm-muscle-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 12px var(--primary);
+    flex-shrink: 0;
+  }
+  .mm-panel-sub {
+    font-size: 0.85rem;
+    color: var(--text3);
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .mm-panel-sub .count-num {
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* ── EXERCISE LIST ─────────────────────────────────────────────────────── */
+  .mm-ex-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .mm-ex-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    transition: all var(--transition);
+    animation: mm-ex-in 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+  .mm-ex-item:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  .mm-ex-item:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  .mm-ex-item:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+  .mm-ex-item:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+  @keyframes mm-ex-in {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  .mm-ex-item:hover {
+    border-color: rgba(232, 255, 0, 0.2);
+    transform: translateX(4px);
+  }
+  .mm-ex-item strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .mm-ex-item .mm-ex-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--text2);
+  }
+  .mm-ex-item .mm-ex-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.5rem;
+    background: rgba(232, 255, 0, 0.05);
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .mm-ex-item .mm-ex-note {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text3);
+    margin-top: 0.4rem;
+    font-style: italic;
+  }
+  .mm-ex-item iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    border-radius: 8px;
+    margin-top: 0.75rem;
+    background: #000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+  .mm-empty {
+    color: var(--text3);
+    font-size: 0.9rem;
+    font-style: italic;
+    text-align: center;
+    padding: 2rem 1rem;
+    background: var(--bg3);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .mm-empty i {
+    display: block;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--border);
+    font-style: normal;
+  }
+
+  /* ── LOADING STATE ─────────────────────────────────────────────────────── */
+  .mm-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem 1rem;
+    color: var(--text3);
+    font-size: 0.85rem;
+  }
+  .mm-loading .mm-spinner {
+    width: 26px;
+    height: 26px;
+    border: 2.5px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: mm-spin 0.7s linear infinite;
+  }
+  @keyframes mm-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .mm-body.loading [data-muscle] {
+    pointer-events: none;
+    opacity: 0.75;
+  }
+
+  /* ── ERROR STATE ───────────────────────────────────────────────────────── */
+  .mm-error {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.1rem;
+    background: rgba(255, 68, 68, 0.08);
+    border: 1px solid rgba(255, 68, 68, 0.25);
+    border-radius: var(--radius-sm);
+    color: var(--danger);
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+    animation: mm-fade-up 0.3s ease;
+  }
+  .mm-error i {
+    flex-shrink: 0;
+  }
+
+  /* ── MOBILE REFINEMENTS ────────────────────────────────────────────────── */
+  @media (max-width: 560px) {
+    .mm-wrap {
+      padding-top: calc(var(--nav-h) + 1.75rem);
+    }
+    .mm-controls {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem 0.9rem;
+    }
+    .mm-legend {
+      gap: 0.85rem;
+      font-size: 0.72rem;
+    }
+    .mm-legend .dot {
+      width: 9px;
+      height: 9px;
+    }
+    .mm-panel {
+      padding: 1.25rem;
+    }
+    .mm-svg-wrap {
+      padding: 1.1rem 0.9rem;
+    }
+    .mm-svg-inner {
+      max-width: 170px;
+    }
+  }
+
+  /* ── REDUCED MOTION ────────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="mm-wrap">
+  <!-- HEADER -->
+  <div class="mm-header">
+    <div class="mm-eyebrow">Interactive</div>
+    <h1>Muscle Map</h1>
+    <p>
+      Tap any muscle group on the anatomy below to see the exercises your
+      trainer has assigned for it.
+    </p>
+  </div>
+
+  <!-- ERROR BANNER (hidden by default) -->
+  <div class="mm-error" id="mmError" style="display: none" role="alert">
+    <i class="fas fa-exclamation-circle"></i>
+    <span id="mmErrorText">Couldn't load your muscle assignments.</span>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="mm-controls">
+    <div class="mm-legend">
+      <span class="item"><span class="dot muted"></span>No exercises</span>
+      <span class="item"><span class="dot has"></span>Has exercises</span>
+      <span class="item"><span class="dot sel"></span>Selected</span>
+    </div>
+    <span class="mm-anatomy-badge" id="mmAnatomyBadge">
+      <i class="fas fa-mars"></i> Male anatomy
+    </span>
+  </div>
+
+  <!-- DAY FILTER -->
+  <div id="mmDayFilter" style="display:none;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.25rem"></div>
+
+  <!-- DAY FILTER -->
+  <div id="mmDayFilter" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.25rem"></div>
+
+  <!-- BODY GRID -->
+  <div class="mm-body loading" id="mmBody">
+    <!-- FRONT -->
+    <div class="mm-svg-wrap">
+      <h3>Front View</h3>
+      <div class="mm-svg-inner">
+        <div id="svgFrontMale">
+          {% include 'partials/svg_male_front.html' %}
+        </div>
+        <div id="svgFrontFemale" style="display: none">
+          {% include 'partials/svg_female_front.html' %}
+        </div>
+      </div>
+    </div>
+
+    <!-- BACK -->
+    <div class="mm-svg-wrap">
+      <h3>Back View</h3>
+      <div class="mm-svg-inner">
+        <div id="svgBackMale">{% include 'partials/svg_male_back.html' %}</div>
+        <div id="svgBackFemale" style="display: none">
+          {% include 'partials/svg_female_back.html' %}
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL -->
+    <div class="mm-panel" id="mmPanel" aria-live="polite">
+      <div class="mm-placeholder" id="mmPlaceholder">
+        <i class="fas fa-hand-pointer"></i>
+        <p>Click a muscle group<br />to see your exercises</p>
+      </div>
+      <div class="mm-content" id="mmContent" style="display: none">
+        <h2 id="mmMuscleName">
+          <span class="mm-muscle-dot"></span
+          ><span id="mmMuscleNameText">Selected Area</span>
+        </h2>
+        <p class="mm-panel-sub" id="mmMuscleCount"></p>
+        <div class="mm-ex-list" id="mmExList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  (function () {
+    "use strict";
+
+    // ── HELPERS ───────────────────────────────────────────────────────────
+    const esc = (s) =>
+      String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+
+    const $ = (id) => document.getElementById(id);
+
+    // ── STATE ─────────────────────────────────────────────────────────────
+    let assignments = {}; // { muscleKey: [ {name, sets, reps, notes, video_embed} ] }
+    let assignmentDays = {}; // { muscleKey: dayString }
+    let selectedEl = null; // the currently selected <g data-muscle>
+    let isReady = false; // true once assignments have loaded
+    let activeDay = ''; // '' = show all
+
+    // ── STABLE KEY ────────────────────────────────────────────────────────
+    // Prefer the data-muscle attribute (matches admin panel).
+    // Fall back to positional index ONLY if the attribute is missing.
+    function getKey(el) {
+      const attr = (el.getAttribute("data-muscle") || "").trim();
+      if (attr) return attr;
+      const all = Array.from(document.querySelectorAll("[data-muscle]"));
+      return "g" + all.indexOf(el);
+    }
+
+    // ── ARIA LABEL (derive a human-readable name) ─────────────────────────
+    function getMuscleName(el) {
+      const attr = (el.getAttribute("data-muscle") || "").trim();
+      if (!attr) {
+        // Fallback: try aria-label, then title
+        return (
+          el.getAttribute("aria-label") ||
+          el.getAttribute("title") ||
+          "Muscle group"
+        );
+      }
+      // Convert "left-biceps" / "left_biceps" / "leftBiceps" → "Left Biceps"
+      return attr
+        .replace(/[-_]/g, " ")
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    // ── MAKE MUSCLES KEYBOARD ACCESSIBLE ──────────────────────────────────
+    function makeAccessible() {
+      document.querySelectorAll("[data-muscle]").forEach((el) => {
+        el.setAttribute("tabindex", "0");
+        el.setAttribute("role", "button");
+        const name = getMuscleName(el);
+        el.setAttribute("aria-label", name);
+      });
+    }
+
+    // ── DAY FILTER BAR ─────────────────────────────────────────────────────
+    function buildDayFilter() {
+      const days = [...new Set(Object.values(assignmentDays).filter(Boolean))];
+      const bar = $("mmDayFilter");
+      if (!bar) return;
+      if (!days.length) { bar.style.display = 'none'; return; }
+      bar.style.display = 'flex';
+      const mk = (label, val) => {
+        const b = document.createElement('button');
+        b.textContent = label;
+        b.onclick = () => setDayFilter(val);
+        applyDayBtnStyle(b, activeDay === val);
+        return b;
+      };
+      bar.innerHTML = '';
+      bar.appendChild(mk('All Days', ''));
+      days.forEach(d => bar.appendChild(mk(d, d)));
+    }
+
+    function applyDayBtnStyle(btn, active) {
+      btn.style.cssText = `padding:0.35rem 0.9rem;border-radius:999px;font-size:0.8rem;font-weight:600;
+        border:1px solid ${active ? 'var(--primary)' : 'var(--border)'};
+        background:${active ? 'rgba(232,255,0,0.12)' : 'var(--bg2)'};
+        color:${active ? 'var(--primary)' : 'var(--text2)'};cursor:pointer;transition:all 0.2s`;
+    }
+
+    function setDayFilter(day) {
+      activeDay = day;
+      buildDayFilter();
+      updateColors();
+      if (selectedEl) selectMuscle(selectedEl);
+    }
+
+    // ── UPDATE VISUAL STATE ───────────────────────────────────────────────
+    function updateColors() {
+      document.querySelectorAll("[data-muscle]").forEach((el) => {
+        const k = getKey(el);
+        el.classList.remove("assigned", "selected");
+        const exs = assignments[k] || [];
+        const day = assignmentDays[k] || '';
+        const visible = exs.length && (!activeDay || !day || day === activeDay);
+        if (visible) el.classList.add("assigned");
+        if (el === selectedEl) el.classList.add("selected");
+        el.setAttribute("aria-pressed", el === selectedEl ? "true" : "false");
+      });
+    }
+
+    // ── SELECT MUSCLE ─────────────────────────────────────────────────────
+    function selectMuscle(el) {
+      if (!isReady) return; // don't allow selection before data loads
+
+      selectedEl = el;
+      updateColors();
+
+      const key = getKey(el);
+      const exs = assignments[key] || [];
+      const day = assignmentDays[key] || '';
+      const name = getMuscleName(el);
+
+      $("mmPlaceholder").style.display = "none";
+      $("mmContent").style.display = "block";
+      $("mmPanel").classList.add("has-selection");
+
+      $("mmMuscleNameText").textContent = name;
+
+      const dayTag = day
+        ? ' <span style="font-size:0.78rem;font-weight:500;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.45rem;margin-left:0.4rem">' + esc(day) + '</span>'
+        : '';
+
+      const countEl = $("mmMuscleCount");
+      if (exs.length) {
+        countEl.innerHTML =
+          '<span class="count-num">' + exs.length + "</span> exercise" +
+          (exs.length > 1 ? "s" : "") + " assigned" + dayTag;
+      } else {
+        countEl.innerHTML = "No exercises assigned yet" + dayTag;
+      }
+
+      const list = $("mmExList");
+      if (!exs.length) {
+        list.innerHTML =
+          '<div class="mm-empty">' +
+          '<i class="fas fa-dumbbell"></i>' +
+          "Ask your trainer to assign exercises for this muscle group." +
+          "</div>";
+        return;
+      }
+
+      list.innerHTML = exs
+        .map((e) => {
+          const meta = [];
+          if (e.sets)
+            meta.push(
+              '<span><i class="fas fa-layer-group"></i>' +
+                esc(e.sets) +
+                " sets</span>",
+            );
+          if (e.reps)
+            meta.push(
+              '<span><i class="fas fa-redo"></i>' +
+                esc(e.reps) +
+                " reps</span>",
+            );
+          return (
+            '<div class="mm-ex-item">' +
+            "<strong>" +
+            esc(e.name) +
+            "</strong>" +
+            (meta.length
+              ? '<div class="mm-ex-meta">' + meta.join("") + "</div>"
+              : "") +
+            (e.notes
+              ? '<span class="mm-ex-note">' + esc(e.notes) + "</span>"
+              : "") +
+            (e.video_embed
+              ? '<iframe src="' +
+                esc(e.video_embed) +
+                '" title="' +
+                esc(e.name) +
+                ' demo" ' +
+                'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ' +
+                'allowfullscreen loading="lazy"></iframe>'
+              : "") +
+            "</div>"
+          );
+        })
+        .join("");
+    }
+
+    // ── SET GENDER / ANATOMY VIEW ─────────────────────────────────────────
+    function setGender(g) {
+      const isFemale = g === "female";
+      $("svgFrontMale").style.display = isFemale ? "none" : "";
+      $("svgBackMale").style.display = isFemale ? "none" : "";
+      $("svgFrontFemale").style.display = isFemale ? "" : "none";
+      $("svgBackFemale").style.display = isFemale ? "" : "none";
+
+      const badge = $("mmAnatomyBadge");
+      if (badge) {
+        badge.innerHTML = isFemale
+          ? '<i class="fas fa-venus"></i> Female anatomy'
+          : '<i class="fas fa-mars"></i> Male anatomy';
+      }
+
+      // re-apply accessibility + colors after visibility change
+      makeAccessible();
+      updateColors();
+    }
+
+    // ── LOAD ASSIGNMENTS ──────────────────────────────────────────────────
+    async function loadAssignments() {
+      const body = $("mmBody");
+      body.classList.add("loading");
+
+      try {
+        const res = await fetch("/api/client/muscle-assignments", {
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        const data = await res.json();
+        assignments = {};
+        assignmentDays = {};
+        (Array.isArray(data) ? data : []).forEach((a) => {
+          if (a && a.muscle) {
+            assignments[a.muscle] = a.exercises || [];
+            if (a.day) assignmentDays[a.muscle] = a.day;
+          }
+        });
+
+        isReady = true;
+        body.classList.remove("loading");
+        buildDayFilter();
+        updateColors();
+      } catch (err) {
+        console.error("[muscle-map] load failed:", err);
+        body.classList.remove("loading");
+
+        const errBox = $("mmError");
+        const errTxt = $("mmErrorText");
+        if (errBox && errTxt) {
+          errTxt.textContent =
+            "Couldn't load your muscle assignments. Please refresh the page.";
+          errBox.style.display = "flex";
+        }
+
+        // leave muscles un-clickable so we don't show false negatives
+        document.querySelectorAll("[data-muscle]").forEach((el) => {
+          el.style.pointerEvents = "none";
+          el.style.opacity = "0.6";
+        });
+      }
+    }
+
+    // ── EVENT WIRING ──────────────────────────────────────────────────────
+    function wireEvents() {
+      // click
+      document.addEventListener("click", (e) => {
+        const g = e.target.closest("[data-muscle]");
+        if (g) {
+          e.preventDefault();
+          selectMuscle(g);
+        }
+      });
+
+      // keyboard: Enter / Space
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        const g = e.target.closest && e.target.closest("[data-muscle]");
+        if (g) {
+          e.preventDefault();
+          selectMuscle(g);
+        }
+      });
+    }
+
+    // ── INIT ──────────────────────────────────────────────────────────────
+    function init() {
+      wireEvents();
+      makeAccessible();
+      setGender('{{ gender if gender else "male" }}');
+      loadAssignments();
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,2054 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ client.name }} — Client Detail</title>
+    <link rel="icon" type="image/png" href="/static/IMAGE/favicon.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Bebas+Neue&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ══════════════════════════════════════════════════════════════════════════
+   CLIENT DETAIL — FULLY RESPONSIVE STYLESHEET
+   Breakpoints: 1280 · 1200 · 1024 · 900 · 768 · 640 · 560 · 480 · 380 · 320
+   ══════════════════════════════════════════════════════════════════════════ */
+
+      /* ── RESET & VARIABLES ─────────────────────────────────────────────────── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --primary: #e8ff00;
+        --primary-dark: #c8df00;
+        --primary-glow: rgba(232, 255, 0, 0.15);
+        --bg: #0a0a0a;
+        --bg2: #111111;
+        --bg3: #1a1a1a;
+        --card: #161616;
+        --border: #2a2a2a;
+        --border-hover: #3a3a3a;
+        --text: #f0f0f0;
+        --text2: #aaaaaa;
+        --text3: #666666;
+        --danger: #ff4444;
+        --success: #44cc88;
+        --warning: #ffb74d;
+        --info: #4fc3f7;
+        --radius: 16px;
+        --radius-sm: 10px;
+        --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.5);
+        --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        --font: "Inter", sans-serif;
+        --font-display: "Bebas Neue", sans-serif;
+
+        /* fluid spacing tokens */
+        --pad-x: clamp(0.85rem, 3.4vw, 1.75rem);
+        --gap-grid: clamp(1rem, 2.4vw, 1.5rem);
+        --gap-sm: clamp(0.55rem, 1.6vw, 0.85rem);
+      }
+
+      /* ── BASE ──────────────────────────────────────────────────────────────── */
+      html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button {
+        cursor: pointer;
+        font-family: var(--font);
+        border: none;
+        background: none;
+        color: inherit;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      input,
+      textarea,
+      select {
+        font-family: var(--font);
+        font-size: 16px; /* prevents iOS zoom on focus */
+      }
+
+      img,
+      svg {
+        max-width: 100%;
+        display: block;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #3a3a3a;
+      }
+      ::selection {
+        background: rgba(232, 255, 0, 0.2);
+        color: var(--text);
+      }
+
+      /* long content guards */
+      .profile-info h2,
+      .profile-info .meta span,
+      .ap-name,
+      .msg-text,
+      .notes-area,
+      .empty {
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+
+      /* ── TOP BAR ───────────────────────────────────────────────────────────── */
+      .topbar {
+        background: rgba(17, 17, 17, 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: clamp(0.6rem, 1.6vw, 0.85rem)
+          max(var(--pad-x), env(safe-area-inset-right))
+          clamp(0.6rem, 1.6vw, 0.85rem)
+          max(var(--pad-x), env(safe-area-inset-left));
+        display: flex;
+        align-items: center;
+        gap: clamp(0.5rem, 2vw, 1rem);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .topbar-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text2);
+        font-size: clamp(0.78rem, 1.7vw, 0.88rem);
+        font-weight: 500;
+        padding: 0.4rem 0.75rem;
+        border-radius: var(--radius-sm);
+        transition: all var(--transition);
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+
+      .topbar-back:hover {
+        color: var(--primary);
+        background: rgba(232, 255, 0, 0.05);
+        gap: 0.75rem;
+      }
+
+      .topbar-back i {
+        transition: transform var(--transition);
+      }
+      .topbar-back:hover i {
+        transform: translateX(-3px);
+      }
+
+      .topbar h1 {
+        flex: 1;
+        min-width: 0;
+        font-size: clamp(0.9rem, 2.2vw, 1.05rem);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .topbar-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+      }
+
+      /* ── LAYOUT ────────────────────────────────────────────────────────────── */
+      .page {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: clamp(1.15rem, 3vw, 2rem)
+          max(var(--pad-x), env(safe-area-inset-right)) clamp(2.5rem, 6vw, 4rem)
+          max(var(--pad-x), env(safe-area-inset-left));
+      }
+
+      /* ── PROFILE CARD ──────────────────────────────────────────────────────── */
+      .profile-card {
+        background:
+          linear-gradient(135deg, rgba(232, 255, 0, 0.04) 0%, transparent 55%),
+          var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: clamp(1.15rem, 3vw, 1.85rem);
+        display: flex;
+        align-items: center;
+        gap: clamp(1rem, 2.6vw, 1.5rem);
+        margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+        flex-wrap: wrap;
+        position: relative;
+        overflow: hidden;
+        animation: fade-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      .profile-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: clamp(200px, 40vw, 350px);
+        height: clamp(200px, 40vw, 350px);
+        background: radial-gradient(
+          circle,
+          rgba(232, 255, 0, 0.06) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .profile-avatar {
+        width: clamp(60px, 14vw, 84px);
+        height: clamp(60px, 14vw, 84px);
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          rgba(232, 255, 0, 0.15),
+          rgba(232, 255, 0, 0.03)
+        );
+        border: 2px solid rgba(232, 255, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(1.5rem, 5vw, 2.2rem);
+        color: var(--primary);
+        flex-shrink: 0;
+        font-weight: 800;
+        box-shadow: 0 0 30px rgba(232, 255, 0, 0.15);
+        position: relative;
+        z-index: 1;
+        line-height: 1;
+      }
+
+      .profile-info {
+        flex: 1 1 240px;
+        min-width: 0;
+        position: relative;
+        z-index: 1;
+      }
+
+      .profile-info h2 {
+        font-size: clamp(1.2rem, 3.4vw, 1.5rem);
+        letter-spacing: -0.02em;
+        margin-bottom: 0.2rem;
+        font-weight: 800;
+        line-height: 1.2;
+      }
+
+      .profile-info .meta {
+        font-size: clamp(0.76rem, 1.7vw, 0.85rem);
+        color: var(--text2);
+        display: flex;
+        gap: clamp(0.6rem, 2vw, 1.25rem);
+        flex-wrap: wrap;
+        margin-top: 0.35rem;
+      }
+
+      .profile-info .meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        max-width: 100%;
+      }
+
+      .profile-info .meta span i {
+        color: var(--primary);
+        font-size: 0.75rem;
+        flex-shrink: 0;
+      }
+
+      .profile-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+      }
+
+      .badge {
+        font-size: clamp(0.64rem, 1.5vw, 0.72rem);
+        font-weight: 700;
+        padding: 0.28rem 0.7rem;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        max-width: 100%;
+      }
+
+      .badge i {
+        font-size: 0.7rem;
+        flex-shrink: 0;
+      }
+
+      .badge-active {
+        background: rgba(68, 204, 136, 0.12);
+        color: var(--success);
+        border: 1px solid rgba(68, 204, 136, 0.25);
+      }
+
+      .badge-inactive {
+        background: rgba(255, 68, 68, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(255, 68, 68, 0.25);
+      }
+
+      .badge-tag {
+        background: rgba(232, 255, 0, 0.08);
+        color: var(--primary);
+        border: 1px solid rgba(232, 255, 0, 0.18);
+        text-transform: none;
+        letter-spacing: 0.01em;
+        font-weight: 600;
+        font-size: clamp(0.68rem, 1.6vw, 0.75rem);
+      }
+
+      /* ── QUICK STATS ───────────────────────────────────────────────────────── */
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+        gap: clamp(0.65rem, 2vw, 1rem);
+        margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+      }
+
+      .stat-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: clamp(0.85rem, 2.4vw, 1.15rem) clamp(0.9rem, 2.6vw, 1.25rem);
+        display: flex;
+        align-items: center;
+        gap: clamp(0.65rem, 2vw, 0.95rem);
+        transition: all var(--transition);
+        animation: fade-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        position: relative;
+        overflow: hidden;
+        min-width: 0;
+      }
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--primary);
+        opacity: 0;
+        transition: opacity var(--transition);
+      }
+
+      .stat-card:hover {
+        border-color: rgba(232, 255, 0, 0.25);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      }
+
+      .stat-card:hover::before {
+        opacity: 1;
+      }
+
+      .stat-card i {
+        font-size: clamp(1.05rem, 2.8vw, 1.35rem);
+        color: var(--primary);
+        width: clamp(24px, 5vw, 30px);
+        text-align: center;
+        flex-shrink: 0;
+        transition: transform var(--transition);
+      }
+
+      .stat-card:hover i {
+        transform: scale(1.1);
+      }
+
+      .stat-card > div {
+        min-width: 0;
+      }
+
+      .stat-card .val {
+        font-size: clamp(1.05rem, 3vw, 1.4rem);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        overflow-wrap: break-word;
+      }
+
+      .stat-card .lbl {
+        font-size: clamp(0.6rem, 1.5vw, 0.7rem);
+        color: var(--text2);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        margin-top: 0.2rem;
+        line-height: 1.3;
+      }
+
+      /* ── SECTIONS GRID ─────────────────────────────────────────────────────── */
+      .sections-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--gap-grid);
+        align-items: start;
+      }
+
+      .sections-grid > * {
+        min-width: 0;
+      }
+
+      /* ── SECTION CARD ──────────────────────────────────────────────────────── */
+      .sec {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: clamp(1.05rem, 2.8vw, 1.5rem);
+        transition: border-color var(--transition);
+        animation: fade-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .sec:hover {
+        border-color: rgba(232, 255, 0, 0.12);
+      }
+
+      .sec-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.1rem;
+        padding-bottom: 0.85rem;
+        border-bottom: 1px solid var(--border);
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .sec-header h3 {
+        font-size: clamp(0.7rem, 1.7vw, 0.78rem);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text3);
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+      }
+
+      .sec-header h3 i {
+        color: var(--primary);
+        font-size: 0.85rem;
+        flex-shrink: 0;
+      }
+
+      .sec-header a,
+      .sec-header button {
+        font-size: clamp(0.72rem, 1.7vw, 0.78rem);
+        color: var(--primary);
+        font-weight: 600;
+        transition: all var(--transition);
+        padding: 0.35rem 0.7rem;
+        border-radius: 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .sec-header a:hover,
+      .sec-header button:hover {
+        background: rgba(232, 255, 0, 0.08);
+        opacity: 0.95;
+      }
+
+      /* ── ASSIGNMENT PILL ───────────────────────────────────────────────────── */
+      .assign-pill {
+        display: flex;
+        align-items: center;
+        gap: clamp(0.65rem, 2vw, 0.85rem);
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: clamp(0.7rem, 2vw, 0.85rem) clamp(0.8rem, 2.4vw, 1rem);
+        margin-bottom: 0.6rem;
+        transition: all var(--transition);
+        min-width: 0;
+      }
+
+      .assign-pill:last-child {
+        margin-bottom: 0;
+      }
+
+      .assign-pill:hover {
+        border-color: rgba(232, 255, 0, 0.2);
+        transform: translateX(3px);
+      }
+
+      .assign-pill .ap-icon {
+        width: clamp(34px, 8vw, 38px);
+        height: clamp(34px, 8vw, 38px);
+        border-radius: 10px;
+        background: rgba(232, 255, 0, 0.08);
+        border: 1px solid rgba(232, 255, 0, 0.18);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(0.85rem, 2vw, 0.95rem);
+        flex-shrink: 0;
+      }
+
+      .assign-pill .ap-body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .assign-pill .ap-name {
+        font-size: clamp(0.84rem, 2vw, 0.92rem);
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .assign-pill .ap-sub {
+        font-size: clamp(0.66rem, 1.5vw, 0.72rem);
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+        margin-top: 0.1rem;
+      }
+
+      /* ── CHECK-IN ROW ──────────────────────────────────────────────────────── */
+      .ci-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--border);
+        font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+        flex-wrap: wrap;
+        min-width: 0;
+      }
+
+      .ci-row:last-child {
+        border-bottom: none;
+      }
+
+      .ci-row .ci-date {
+        color: var(--text3);
+        font-size: clamp(0.7rem, 1.6vw, 0.78rem);
+        min-width: 78px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        flex-shrink: 0;
+      }
+
+      .ci-dots {
+        display: flex;
+        gap: 0.4rem;
+        flex: 1 1 140px;
+        flex-wrap: wrap;
+        min-width: 0;
+      }
+
+      .ci-dot {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.15rem 0.5rem;
+        font-size: clamp(0.66rem, 1.5vw, 0.72rem);
+        color: var(--text2);
+        font-weight: 600;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .ci-dot i {
+        color: var(--primary);
+        font-size: 0.65rem;
+      }
+
+      .ci-reviewed {
+        font-size: clamp(0.62rem, 1.5vw, 0.7rem);
+        font-weight: 700;
+        padding: 0.15rem 0.5rem;
+        border-radius: 999px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .ci-reviewed.yes {
+        background: rgba(68, 204, 136, 0.12);
+        color: var(--success);
+      }
+
+      .ci-reviewed.no {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text3);
+      }
+
+      /* ── MEASUREMENT ROW ───────────────────────────────────────────────────── */
+      .meas-row {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid var(--border);
+        font-size: clamp(0.76rem, 1.8vw, 0.82rem);
+        align-items: center;
+        min-width: 0;
+      }
+
+      .meas-row:last-child {
+        border-bottom: none;
+      }
+
+      .meas-chip {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.2rem 0.55rem;
+        color: var(--text2);
+        font-weight: 600;
+        font-size: clamp(0.68rem, 1.6vw, 0.75rem);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: all var(--transition);
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .meas-chip:hover {
+        border-color: rgba(232, 255, 0, 0.25);
+        color: var(--text);
+      }
+
+      .meas-chip i {
+        color: var(--primary);
+        font-size: 0.7rem;
+      }
+
+      .meas-date {
+        color: var(--text3);
+        font-size: clamp(0.68rem, 1.6vw, 0.75rem);
+        width: 100%;
+        margin-bottom: 0.2rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ── SESSION ROW ───────────────────────────────────────────────────────── */
+      .sess-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--border);
+        font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+        flex-wrap: wrap;
+        min-width: 0;
+      }
+
+      .sess-row:last-child {
+        border-bottom: none;
+      }
+
+      .sess-row > span {
+        min-width: 0;
+        overflow-wrap: break-word;
+      }
+
+      .sess-status {
+        font-size: clamp(0.6rem, 1.4vw, 0.68rem);
+        font-weight: 700;
+        padding: 0.18rem 0.55rem;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+
+      .s-confirmed {
+        background: rgba(68, 204, 136, 0.12);
+        color: var(--success);
+        border: 1px solid rgba(68, 204, 136, 0.25);
+      }
+      .s-pending {
+        background: rgba(255, 183, 77, 0.12);
+        color: var(--warning);
+        border: 1px solid rgba(255, 183, 77, 0.25);
+      }
+      .s-cancelled {
+        background: rgba(255, 68, 68, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(255, 68, 68, 0.25);
+      }
+      .s-completed {
+        background: rgba(232, 255, 0, 0.08);
+        color: var(--primary);
+        border: 1px solid rgba(232, 255, 0, 0.2);
+      }
+
+      /* ── INVOICE ROW ───────────────────────────────────────────────────────── */
+      .inv-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--border);
+        font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+        flex-wrap: wrap;
+        min-width: 0;
+      }
+
+      .inv-row:last-child {
+        border-bottom: none;
+      }
+
+      .inv-row > span {
+        min-width: 0;
+        overflow-wrap: break-word;
+      }
+
+      .inv-amount {
+        font-weight: 800;
+        color: var(--primary);
+        font-size: clamp(0.85rem, 2.1vw, 0.95rem);
+        min-width: 68px;
+        font-variant-numeric: tabular-nums;
+        flex-shrink: 0;
+      }
+
+      .inv-status {
+        font-size: clamp(0.6rem, 1.4vw, 0.68rem);
+        font-weight: 700;
+        padding: 0.18rem 0.55rem;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .i-paid {
+        background: rgba(68, 204, 136, 0.12);
+        color: var(--success);
+        border: 1px solid rgba(68, 204, 136, 0.25);
+      }
+      .i-unpaid {
+        background: rgba(255, 68, 68, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(255, 68, 68, 0.25);
+      }
+
+      /* ── NOTES AREA ────────────────────────────────────────────────────────── */
+      .notes-area {
+        width: 100%;
+        background: var(--bg3);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        padding: clamp(0.75rem, 2vw, 0.85rem) clamp(0.8rem, 2.4vw, 1rem);
+        font-size: clamp(0.85rem, 1.9vw, 0.9rem);
+        resize: vertical;
+        min-height: clamp(100px, 22vw, 120px);
+        transition: all var(--transition);
+        line-height: 1.6;
+        font-family: var(--font);
+      }
+
+      .notes-area:hover {
+        border-color: var(--border-hover);
+      }
+
+      .notes-area:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px var(--primary-glow);
+      }
+
+      .notes-area::placeholder {
+        color: var(--text3);
+      }
+
+      /* ── MUSCLE MAP CHIPS ──────────────────────────────────────────────────── */
+      .mm-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .mm-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(232, 255, 0, 0.07);
+        border: 1px solid rgba(232, 255, 0, 0.18);
+        border-radius: 8px;
+        padding: 0.3rem 0.7rem;
+        font-size: clamp(0.7rem, 1.6vw, 0.78rem);
+        color: var(--primary);
+        font-weight: 600;
+        transition: all var(--transition);
+        max-width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .mm-chip:hover {
+        background: rgba(232, 255, 0, 0.12);
+        transform: translateY(-2px);
+      }
+
+      .mm-chip .day-tag {
+        color: var(--text3);
+        font-weight: 500;
+        font-size: 0.7rem;
+        padding-left: 0.35rem;
+        border-left: 1px solid rgba(232, 255, 0, 0.2);
+        margin-left: 0.15rem;
+      }
+
+      .mm-chip .ex-count {
+        color: var(--text3);
+        font-weight: 500;
+        font-size: 0.72rem;
+      }
+
+      /* ── MESSAGE ROW ───────────────────────────────────────────────────────── */
+      .msg-row {
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--border);
+        font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+        min-width: 0;
+      }
+
+      .msg-row:last-child {
+        border-bottom: none;
+      }
+
+      .msg-row .msg-head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .msg-row .msg-sender {
+        font-weight: 700;
+        font-size: clamp(0.62rem, 1.4vw, 0.75rem);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.1rem 0.45rem;
+        border-radius: 4px;
+        white-space: nowrap;
+      }
+
+      .msg-row .msg-sender.trainer {
+        background: rgba(232, 255, 0, 0.1);
+        color: var(--primary);
+      }
+      .msg-row .msg-sender.client {
+        background: var(--bg3);
+        color: var(--text2);
+      }
+
+      .msg-row .msg-date {
+        color: var(--text3);
+        font-size: clamp(0.66rem, 1.5vw, 0.72rem);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .msg-row .msg-text {
+        color: var(--text2);
+        margin-top: 0.15rem;
+        line-height: 1.5;
+      }
+
+      /* ── EMPTY STATE ───────────────────────────────────────────────────────── */
+      .empty {
+        color: var(--text3);
+        font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+        font-style: italic;
+        padding: 1rem 0.5rem;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .empty::before {
+        content: "\f0f6";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 400;
+        font-size: 1.3rem;
+        color: var(--border);
+      }
+
+      /* ── BUTTONS ───────────────────────────────────────────────────────────── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.25rem;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: clamp(0.78rem, 1.8vw, 0.88rem);
+        transition: all var(--transition);
+        white-space: nowrap;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: #000;
+      }
+      .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(232, 255, 0, 0.25);
+      }
+
+      .btn-outline {
+        border: 1px solid var(--border);
+        color: var(--text);
+        background: transparent;
+      }
+      .btn-outline:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: rgba(232, 255, 0, 0.05);
+      }
+
+      .btn-sm {
+        padding: 0.45rem 0.9rem;
+        font-size: clamp(0.72rem, 1.7vw, 0.8rem);
+      }
+
+      .btn-danger {
+        background: var(--danger);
+        color: #fff;
+      }
+      .btn-danger:hover {
+        opacity: 0.9;
+      }
+
+      /* ── FORM MESSAGE ──────────────────────────────────────────────────────── */
+      .form-msg {
+        font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-weight: 500;
+        min-height: 1.2em;
+      }
+
+      .form-msg.success {
+        color: var(--success);
+      }
+      .form-msg.error {
+        color: var(--danger);
+      }
+
+      .form-msg.success::before {
+        content: "\f00c";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: 0.75rem;
+      }
+      .form-msg.error::before {
+        content: "\f071";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: 0.75rem;
+      }
+
+      /* ── ANIMATION ─────────────────────────────────────────────────────────── */
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+      /* ── ≤ 1280px ──────────────────────────────────────────────────────────── */
+      @media (max-width: 1280px) {
+        .page {
+          max-width: 1100px;
+        }
+      }
+
+      /* ── ≤ 1024px : tablets landscape ──────────────────────────────────────── */
+      @media (max-width: 1024px) {
+        .stats-row {
+          grid-template-columns: repeat(
+            auto-fit,
+            minmax(min(150px, 100%), 1fr)
+          );
+        }
+
+        .sections-grid {
+          gap: 1.25rem;
+        }
+      }
+
+      /* ── ≤ 900px : stack the two-column grid ───────────────────────────────── */
+      @media (max-width: 900px) {
+        .sections-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .profile-avatar {
+          width: 72px;
+          height: 72px;
+          font-size: 1.9rem;
+        }
+      }
+
+      /* ── ≤ 768px : tablets portrait ────────────────────────────────────────── */
+      @media (max-width: 768px) {
+        .stats-row {
+          grid-template-columns: repeat(
+            auto-fit,
+            minmax(min(140px, 100%), 1fr)
+          );
+        }
+
+        .profile-card {
+          padding: 1.15rem 1rem;
+        }
+
+        .profile-info {
+          flex: 1 1 100%;
+        }
+      }
+
+      /* ── ≤ 640px : large phones ────────────────────────────────────────────── */
+      @media (max-width: 640px) {
+        .topbar {
+          padding: 0.7rem var(--pad-x);
+          gap: 0.5rem;
+        }
+
+        .topbar-actions .btn-sm span {
+          display: none;
+        }
+
+        .topbar-actions .btn-sm {
+          padding: 0.45rem 0.65rem;
+        }
+
+        .profile-card {
+          flex-direction: column;
+          text-align: center;
+          justify-content: center;
+          align-items: center;
+          padding: 1.25rem 1rem;
+          gap: 0.9rem;
+        }
+
+        .profile-info {
+          flex: 1 1 auto;
+          width: 100%;
+        }
+
+        .profile-info .meta {
+          justify-content: center;
+          gap: 0.65rem 0.9rem;
+          font-size: 0.78rem;
+        }
+
+        .profile-badges {
+          justify-content: center;
+        }
+
+        .profile-info h2 {
+          font-size: 1.25rem;
+        }
+
+        .stats-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.6rem;
+        }
+
+        .stat-card {
+          padding: 0.8rem 0.85rem;
+          gap: 0.6rem;
+        }
+
+        .stat-card i {
+          font-size: 1.05rem;
+          width: 22px;
+        }
+
+        .stat-card .val {
+          font-size: 1.05rem;
+        }
+
+        .stat-card .lbl {
+          font-size: 0.6rem;
+          letter-spacing: 0.06em;
+        }
+
+        .sec {
+          padding: 1.05rem 0.9rem;
+        }
+
+        .sec-header {
+          margin-bottom: 0.9rem;
+          padding-bottom: 0.7rem;
+        }
+
+        .ci-row {
+          gap: 0.5rem;
+        }
+
+        .ci-row .ci-date {
+          min-width: 70px;
+          font-size: 0.7rem;
+        }
+
+        .ci-dots {
+          gap: 0.3rem;
+          flex: 1 1 100%;
+        }
+
+        .ci-reviewed {
+          margin-left: auto;
+        }
+
+        .sess-row {
+          gap: 0.5rem;
+        }
+
+        .inv-row {
+          gap: 0.5rem;
+        }
+
+        .inv-amount {
+          min-width: 58px;
+        }
+      }
+
+      /* ── ≤ 560px : small phones ────────────────────────────────────────────── */
+      @media (max-width: 560px) {
+        .topbar h1 {
+          font-size: 0.88rem;
+        }
+
+        .topbar-back {
+          font-size: 0.76rem;
+          padding: 0.35rem 0.55rem;
+        }
+
+        .profile-avatar {
+          width: 64px;
+          height: 64px;
+          font-size: 1.7rem;
+        }
+
+        .sec-header h3 {
+          font-size: 0.68rem;
+          letter-spacing: 0.1em;
+        }
+
+        .assign-pill:hover {
+          transform: none;
+        }
+
+        .mm-chip:hover {
+          transform: none;
+        }
+      }
+
+      /* ── ≤ 480px : standard mobile ─────────────────────────────────────────── */
+      @media (max-width: 480px) {
+        :root {
+          --radius: 14px;
+          --radius-sm: 9px;
+        }
+
+        .page {
+          padding-top: 1rem;
+        }
+
+        .profile-info .meta {
+          flex-direction: column;
+          align-items: center;
+          gap: 0.35rem;
+        }
+
+        .profile-info .meta span {
+          justify-content: center;
+        }
+
+        .stats-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.55rem;
+        }
+
+        .stat-card {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.35rem;
+          padding: 0.75rem 0.8rem;
+        }
+
+        .stat-card i {
+          font-size: 1rem;
+          width: auto;
+        }
+
+        .stat-card .val {
+          font-size: 1.05rem;
+        }
+
+        .sec-header {
+          gap: 0.5rem;
+        }
+
+        .sec-header a,
+        .sec-header button {
+          padding: 0.3rem 0.5rem;
+        }
+
+        .ci-row {
+          padding: 0.6rem 0;
+        }
+
+        .ci-row .ci-date {
+          min-width: 100%;
+          margin-bottom: 0.15rem;
+        }
+
+        .sess-row > span:not(.sess-status) {
+          flex: 1 1 100%;
+        }
+
+        .inv-row > span[style*="flex:1"] {
+          flex: 1 1 100%;
+          order: 3;
+        }
+
+        .msg-row .msg-text {
+          font-size: 0.8rem;
+        }
+
+        .badge {
+          font-size: 0.62rem;
+          padding: 0.24rem 0.6rem;
+        }
+
+        .badge-tag {
+          font-size: 0.66rem;
+        }
+
+        .empty {
+          padding: 0.85rem 0.35rem;
+        }
+
+        .form-msg {
+          font-size: 0.8rem;
+        }
+      }
+
+      /* ── ≤ 380px : iPhone SE / small Android ───────────────────────────────── */
+      @media (max-width: 380px) {
+        .topbar {
+          padding: 0.6rem 0.75rem;
+        }
+
+        .topbar h1 {
+          font-size: 0.82rem;
+        }
+
+        .topbar-back {
+          font-size: 0.72rem;
+          padding: 0.3rem 0.45rem;
+        }
+
+        .topbar-back i {
+          font-size: 0.8rem;
+        }
+
+        .page {
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
+          padding-bottom: 2.5rem;
+        }
+
+        .profile-avatar {
+          width: 58px;
+          height: 58px;
+          font-size: 1.5rem;
+        }
+
+        .profile-info h2 {
+          font-size: 1.1rem;
+        }
+
+        .profile-info .meta {
+          font-size: 0.72rem;
+        }
+
+        .stats-row {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 0.5rem;
+        }
+
+        .stat-card {
+          flex-direction: row;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .stat-card i {
+          font-size: 1.05rem;
+          width: 22px;
+        }
+
+        .sec {
+          padding: 0.9rem 0.75rem;
+          border-radius: 12px;
+        }
+
+        .sec-header h3 {
+          font-size: 0.64rem;
+          letter-spacing: 0.08em;
+        }
+
+        .assign-pill {
+          padding: 0.65rem 0.7rem;
+          gap: 0.6rem;
+        }
+
+        .assign-pill .ap-name {
+          font-size: 0.82rem;
+        }
+
+        .ci-dot {
+          font-size: 0.64rem;
+          padding: 0.12rem 0.42rem;
+        }
+
+        .meas-chip {
+          font-size: 0.66rem;
+          padding: 0.18rem 0.45rem;
+        }
+
+        .sess-status,
+        .inv-status,
+        .ci-reviewed {
+          font-size: 0.58rem;
+          padding: 0.15rem 0.45rem;
+        }
+
+        .inv-amount {
+          font-size: 0.85rem;
+          min-width: 52px;
+        }
+
+        .notes-area {
+          font-size: 0.82rem;
+          min-height: 92px;
+        }
+
+        .btn {
+          padding: 0.5rem 0.9rem;
+        }
+
+        .btn-sm {
+          padding: 0.4rem 0.7rem;
+          font-size: 0.72rem;
+        }
+      }
+
+      /* ── ≤ 320px : ultra-small / foldables ─────────────────────────────────── */
+      @media (max-width: 320px) {
+        .topbar {
+          padding: 0.5rem 0.6rem;
+          gap: 0.35rem;
+        }
+
+        .topbar h1 {
+          font-size: 0.76rem;
+        }
+
+        .topbar-back span {
+          display: none;
+        }
+
+        .topbar-back {
+          padding: 0.35rem 0.45rem;
+        }
+
+        .profile-card {
+          padding: 1rem 0.75rem;
+        }
+
+        .profile-info h2 {
+          font-size: 1rem;
+        }
+
+        .stat-card .val {
+          font-size: 0.98rem;
+        }
+
+        .stat-card .lbl {
+          font-size: 0.56rem;
+        }
+
+        .mm-chip {
+          font-size: 0.66rem;
+          padding: 0.25rem 0.55rem;
+        }
+
+        .msg-row .msg-text {
+          font-size: 0.76rem;
+        }
+      }
+
+      /* ── Landscape phones (short viewport) ─────────────────────────────────── */
+      @media (max-height: 520px) and (orientation: landscape) {
+        .topbar {
+          position: relative;
+        }
+
+        .page {
+          padding-top: 0.85rem;
+          padding-bottom: 2rem;
+        }
+
+        .profile-card {
+          flex-direction: row;
+          text-align: left;
+          justify-content: flex-start;
+          align-items: center;
+          padding: 0.9rem 1rem;
+        }
+
+        .profile-info {
+          flex: 1 1 240px;
+        }
+
+        .profile-info .meta,
+        .profile-badges {
+          justify-content: flex-start;
+        }
+
+        .stats-row {
+          grid-template-columns: repeat(
+            auto-fit,
+            minmax(min(130px, 100%), 1fr)
+          );
+          gap: 0.5rem;
+        }
+
+        .stat-card {
+          padding: 0.6rem 0.75rem;
+        }
+
+        .notes-area {
+          min-height: 80px;
+        }
+      }
+
+      /* ── Touch devices: neutralize hover-only effects ──────────────────────── */
+      @media (hover: none) {
+        .stat-card:hover,
+        .assign-pill:hover,
+        .mm-chip:hover,
+        .btn-primary:hover {
+          transform: none;
+          box-shadow: none;
+        }
+
+        .stat-card:hover::before {
+          opacity: 0;
+        }
+
+        .stat-card:hover i {
+          transform: none;
+        }
+
+        .stat-card:hover {
+          border-color: var(--border);
+        }
+
+        .assign-pill:hover {
+          border-color: var(--border);
+        }
+
+        .mm-chip:hover {
+          background: rgba(232, 255, 0, 0.07);
+        }
+
+        .sec:hover {
+          border-color: var(--border);
+        }
+
+        .topbar-back:hover {
+          gap: 0.5rem;
+          color: var(--text2);
+          background: transparent;
+        }
+
+        .topbar-back:hover i {
+          transform: none;
+        }
+      }
+
+      /* ── Focus visibility (keyboard accessibility) ─────────────────────────── */
+      .btn:focus-visible,
+      .sec-header a:focus-visible,
+      .sec-header button:focus-visible,
+      .topbar-back:focus-visible,
+      .notes-area:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+      }
+
+      /* ── Reduced motion ────────────────────────────────────────────────────── */
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
+
+      /* ── Print ─────────────────────────────────────────────────────────────── */
+      @media print {
+        .topbar,
+        .topbar-actions,
+        .sec-header a,
+        .sec-header button,
+        .notes-area {
+          display: none !important;
+        }
+
+        body {
+          background: #fff;
+          color: #000;
+        }
+
+        .sec,
+        .profile-card,
+        .stat-card {
+          border: 1px solid #ccc;
+          box-shadow: none;
+          break-inside: avoid;
+        }
+
+        .sections-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <a href="/admin" class="topbar-back"
+        ><i class="fas fa-arrow-left" aria-hidden="true"></i> Admin</a
+      >
+      <h1>{{ client.name }}</h1>
+      <div class="topbar-actions">
+        <a href="/admin#clients" class="btn btn-outline btn-sm">
+          <i class="fas fa-users" aria-hidden="true"></i>
+          <span>All Clients</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="page">
+      <!-- PROFILE -->
+      <div class="profile-card">
+        <div class="profile-avatar" aria-hidden="true">
+          {{ client.name[0]|upper }}
+        </div>
+        <div class="profile-info">
+          <h2>{{ client.name }}</h2>
+          <div class="meta">
+            <span
+              ><i class="fas fa-envelope" aria-hidden="true"></i> {{
+              client.email }}</span
+            >
+            <span
+              ><i class="fas fa-calendar" aria-hidden="true"></i> Joined {{
+              client.joined }}</span
+            >
+            {% if client.get('gender') %}
+            <span>
+              <i
+                class="fas fa-{{ 'mars' if client.gender == 'male' else 'venus' }}"
+                aria-hidden="true"
+              ></i>
+              {{ client.gender|capitalize }}
+            </span>
+            {% endif %}
+          </div>
+          <div class="profile-badges">
+            <span
+              class="badge {{ 'badge-active' if client.get('active', True) else 'badge-inactive' }}"
+            >
+              <i
+                class="fas fa-{{ 'check-circle' if client.get('active', True) else 'times-circle' }}"
+                aria-hidden="true"
+              ></i>
+              {{ 'Active' if client.get('active', True) else 'Inactive' }}
+            </span>
+            <span id="progBadge" style="display: none" class="badge badge-tag">
+              <i class="fas fa-dumbbell" aria-hidden="true"></i>
+              <span id="progBadgeName"></span>
+            </span>
+            <span id="mealBadge" style="display: none" class="badge badge-tag">
+              <i class="fas fa-apple-alt" aria-hidden="true"></i>
+              <span id="mealBadgeName"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK STATS -->
+      <div class="stats-row" id="quickStats">
+        <div class="stat-card" style="animation-delay: 0.05s">
+          <i class="fas fa-clipboard-check" aria-hidden="true"></i>
+          <div>
+            <div class="val" id="qCheckins">—</div>
+            <div class="lbl">Check-ins</div>
+          </div>
+        </div>
+        <div class="stat-card" style="animation-delay: 0.1s">
+          <i class="fas fa-weight" aria-hidden="true"></i>
+          <div>
+            <div class="val" id="qWeight">—</div>
+            <div class="lbl">Last Weight</div>
+          </div>
+        </div>
+        <div class="stat-card" style="animation-delay: 0.15s">
+          <i class="fas fa-file-invoice" aria-hidden="true"></i>
+          <div>
+            <div class="val" id="qUnpaid">—</div>
+            <div class="lbl">Unpaid</div>
+          </div>
+        </div>
+        <div class="stat-card" style="animation-delay: 0.2s">
+          <i class="fas fa-calendar-check" aria-hidden="true"></i>
+          <div>
+            <div class="val" id="qSessions">—</div>
+            <div class="lbl">Sessions</div>
+          </div>
+        </div>
+        <div class="stat-card" style="animation-delay: 0.25s">
+          <i class="fas fa-comments" aria-hidden="true"></i>
+          <div>
+            <div class="val" id="qMessages">—</div>
+            <div class="lbl">Messages</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTIONS GRID -->
+      <div class="sections-grid">
+        <!-- ASSIGNMENTS -->
+        <div class="sec" style="animation-delay: 0.05s">
+          <div class="sec-header">
+            <h3><i class="fas fa-tasks" aria-hidden="true"></i> Assignments</h3>
+          </div>
+          <div id="secAssignments"><p class="empty">Loading…</p></div>
+        </div>
+
+        <!-- TRAINER NOTES -->
+        <div class="sec" style="animation-delay: 0.1s">
+          <div class="sec-header">
+            <h3>
+              <i class="fas fa-sticky-note" aria-hidden="true"></i> Trainer
+              Notes
+            </h3>
+            <button onclick="saveNotes()" type="button">Save</button>
+          </div>
+          <textarea
+            class="notes-area"
+            id="trainerNotes"
+            placeholder="Private notes about this client…"
+            aria-label="Trainer notes"
+          >
+{{ client.get('trainer_notes', '') }}</textarea
+          >
+          <p
+            class="form-msg"
+            id="notesMsg"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </div>
+
+        <!-- MUSCLE MAP -->
+        <div class="sec" style="animation-delay: 0.15s">
+          <div class="sec-header">
+            <h3>
+              <i class="fas fa-person-running" aria-hidden="true"></i> Muscle
+              Map
+            </h3>
+            <a href="/admin?tab=musclemap&client={{ client._id }}">Edit</a>
+          </div>
+          <div id="secMuscleMap"><p class="empty">Loading…</p></div>
+        </div>
+
+        <!-- RECENT CHECK-INS -->
+        <div class="sec" style="animation-delay: 0.2s">
+          <div class="sec-header">
+            <h3>
+              <i class="fas fa-clipboard-check" aria-hidden="true"></i> Recent
+              Check-ins
+            </h3>
+          </div>
+          <div id="secCheckins"><p class="empty">Loading…</p></div>
+        </div>
+
+        <!-- MEASUREMENTS -->
+        <div class="sec" style="animation-delay: 0.25s">
+          <div class="sec-header">
+            <h3>
+              <i class="fas fa-ruler" aria-hidden="true"></i> Measurements
+            </h3>
+          </div>
+          <div id="secMeasurements"><p class="empty">Loading…</p></div>
+        </div>
+
+        <!-- SESSIONS -->
+        <div class="sec" style="animation-delay: 0.3s">
+          <div class="sec-header">
+            <h3>
+              <i class="fas fa-calendar-alt" aria-hidden="true"></i> Sessions
+            </h3>
+          </div>
+          <div id="secSessions"><p class="empty">Loading…</p></div>
+        </div>
+
+        <!-- INVOICES -->
+        <div class="sec" style="animation-delay: 0.35s">
+          <div class="sec-header">
+            <h3><i class="fas fa-receipt" aria-hidden="true"></i> Invoices</h3>
+          </div>
+          <div id="secInvoices"><p class="empty">Loading…</p></div>
+        </div>
+
+        <!-- MESSAGES PREVIEW -->
+        <div class="sec" style="animation-delay: 0.4s">
+          <div class="sec-header">
+            <h3>
+              <i class="fas fa-comments" aria-hidden="true"></i> Recent Messages
+            </h3>
+            <a href="/admin">Open Chat</a>
+          </div>
+          <div id="secMessages"><p class="empty">Loading…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const CID = '{{ client._id }}';
+      const esc = s => String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+      const api = async (url) => {
+        const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        return r.ok ? r.json() : [];
+      };
+
+      // consistent empty state renderer
+      const emptyState = (text) => `<p class="empty">${esc(text)}</p>`;
+
+      async function loadAll() {
+        const [checkins, progress, sessions, invoices, messages, muscleMap] = await Promise.all([
+          api('/api/admin/checkins'),
+          api(`/api/admin/clients/${CID}/progress`),
+          api('/api/admin/sessions'),
+          api('/api/admin/invoices'),
+          api(`/api/admin/messages/${CID}`),
+          api(`/api/admin/muscle-assignments/${CID}`),
+        ]);
+
+        const myCheckins = checkins.filter(c => c.client_id === CID);
+        const mySessions = sessions.filter(s => s.client_id === CID);
+        const myInvoices = invoices.filter(i => i.client_id === CID);
+
+        /* ── QUICK STATS ─────────────────────────────────────────────────── */
+        document.getElementById('qCheckins').textContent = myCheckins.length;
+        document.getElementById('qSessions').textContent = mySessions.length;
+        document.getElementById('qMessages').textContent = messages.length;
+
+        const unpaid = myInvoices.filter(i => i.status === 'unpaid');
+        document.getElementById('qUnpaid').textContent = unpaid.length
+          ? '₹' + unpaid.reduce((s, i) => s + i.amount, 0).toLocaleString()
+          : '0';
+
+        const lastW = progress.find(p => p.weight != null);
+        document.getElementById('qWeight').textContent = lastW ? lastW.weight + ' kg' : '—';
+
+        /* ── ASSIGNMENTS ─────────────────────────────────────────────────── */
+        const aEl = document.getElementById('secAssignments');
+        const progId = {{ client.get('assigned_program_id', '')|tojson }};
+        const mealId = {{ client.get('assigned_meal_plan_id', '')|tojson }};
+        const progName = {{ client.get('assigned_program_name', '')|tojson }};
+        const mealName = {{ client.get('assigned_meal_plan_name', '')|tojson }};
+
+        // verify they still exist
+        let validProg = false, validMeal = false;
+        if (progId) {
+          try {
+            const r = await fetch(`/api/admin/programs`);
+            const progs = r.ok ? await r.json() : [];
+            validProg = progs.some(p => p._id === progId);
+          } catch {}
+        }
+        if (mealId) {
+          try {
+            const r = await fetch(`/api/admin/meal_plans`);
+            const meals = r.ok ? await r.json() : [];
+            validMeal = meals.some(m => m._id === mealId);
+          } catch {}
+        }
+
+        if (validProg || validMeal) {
+          aEl.innerHTML = `
+            ${validProg ? `
+              <div class="assign-pill">
+                <div class="ap-icon"><i class="fas fa-dumbbell" aria-hidden="true"></i></div>
+                <div class="ap-body">
+                  <div class="ap-name">${esc(progName)}</div>
+                  <div class="ap-sub">Workout Program</div>
+                </div>
+              </div>` : ''}
+            ${validMeal ? `
+              <div class="assign-pill">
+                <div class="ap-icon"><i class="fas fa-apple-alt" aria-hidden="true"></i></div>
+                <div class="ap-body">
+                  <div class="ap-name">${esc(mealName)}</div>
+                  <div class="ap-sub">Meal Plan</div>
+                </div>
+              </div>` : ''}
+          `;
+        } else {
+          aEl.innerHTML = emptyState('No program or meal plan assigned yet.');
+        }
+
+        if (validProg) {
+          document.getElementById('progBadgeName').textContent = progName;
+          document.getElementById('progBadge').style.display = 'inline-flex';
+        }
+        if (validMeal) {
+          document.getElementById('mealBadgeName').textContent = mealName;
+          document.getElementById('mealBadge').style.display = 'inline-flex';
+        }
+
+        /* ── MUSCLE MAP ──────────────────────────────────────────────────── */
+        const mmEl = document.getElementById('secMuscleMap');
+        if (!muscleMap.length) {
+          mmEl.innerHTML = emptyState('No muscle assignments yet.');
+        } else {
+          mmEl.innerHTML = '<div class="mm-chips">' + muscleMap.map(a => `
+            <span class="mm-chip">
+              <i class="fas fa-circle" style="font-size:0.5rem" aria-hidden="true"></i>
+              ${esc(a.muscle)}
+              ${a.day ? `<span class="day-tag">${esc(a.day)}</span>` : ''}
+              <span class="ex-count">${a.exercises.length}ex</span>
+            </span>
+          `).join('') + '</div>';
+        }
+
+        /* ── CHECK-INS ───────────────────────────────────────────────────── */
+        const ciEl = document.getElementById('secCheckins');
+        const recent5ci = myCheckins.slice(0, 5);
+        if (recent5ci.length) {
+          ciEl.innerHTML = recent5ci.map(c => `
+            <div class="ci-row">
+              <span class="ci-date">${esc(c.date)}</span>
+              <div class="ci-dots">
+                <span class="ci-dot"><i class="fas fa-bolt" aria-hidden="true"></i>${c.energy}/10</span>
+                <span class="ci-dot"><i class="fas fa-moon" aria-hidden="true"></i>${c.sleep}/10</span>
+                <span class="ci-dot"><i class="fas fa-utensils" aria-hidden="true"></i>${c.adherence}/10</span>
+                ${c.weight ? `<span class="ci-dot"><i class="fas fa-weight" aria-hidden="true"></i>${esc(c.weight)}kg</span>` : ''}
+              </div>
+              <span class="ci-reviewed ${c.reviewed ? 'yes' : 'no'}">
+                ${c.reviewed ? 'Reviewed' : 'Pending'}
+              </span>
+            </div>
+          `).join('');
+        } else {
+          ciEl.innerHTML = emptyState('No check-ins yet.');
+        }
+
+        /* ── MEASUREMENTS ────────────────────────────────────────────────── */
+        const mEl = document.getElementById('secMeasurements');
+        const recent5m = progress.slice(0, 5);
+        if (recent5m.length) {
+          mEl.innerHTML = recent5m.map(m => `
+            <div class="meas-row">
+              <span class="meas-date">${esc(m.date)}</span>
+              ${m.weight != null ? `<span class="meas-chip"><i class="fas fa-weight" aria-hidden="true"></i>${m.weight}kg</span>` : ''}
+              ${m.body_fat != null ? `<span class="meas-chip"><i class="fas fa-fire" aria-hidden="true"></i>${m.body_fat}%</span>` : ''}
+              ${m.waist != null ? `<span class="meas-chip"><i class="fas fa-ruler-horizontal" aria-hidden="true"></i>W ${m.waist}</span>` : ''}
+              ${m.chest != null ? `<span class="meas-chip"><i class="fas fa-ruler-horizontal" aria-hidden="true"></i>C ${m.chest}</span>` : ''}
+              ${m.arms != null ? `<span class="meas-chip"><i class="fas fa-dumbbell" aria-hidden="true"></i>A ${m.arms}</span>` : ''}
+            </div>
+          `).join('');
+        } else {
+          mEl.innerHTML = emptyState('No measurements logged yet.');
+        }
+
+        /* ── SESSIONS ────────────────────────────────────────────────────── */
+        const sEl = document.getElementById('secSessions');
+        const recent5s = mySessions.slice(0, 5);
+        const sClass = {
+          confirmed: 's-confirmed',
+          pending: 's-pending',
+          cancelled: 's-cancelled',
+          completed: 's-completed',
+        };
+        if (recent5s.length) {
+          sEl.innerHTML = recent5s.map(s => `
+            <div class="sess-row">
+              <span class="sess-status ${sClass[s.status] || 's-pending'}">${esc(s.status)}</span>
+              <span style="flex:1;font-size:0.85rem">${esc(s.datetime || '')}</span>
+              <span style="font-size:0.78rem;color:var(--text3)">${esc(s.session_type || '')}</span>
+            </div>
+          `).join('');
+        } else {
+          sEl.innerHTML = emptyState('No sessions booked yet.');
+        }
+
+        /* ── INVOICES ────────────────────────────────────────────────────── */
+        const iEl = document.getElementById('secInvoices');
+        const recent5i = myInvoices.slice(0, 5);
+        if (recent5i.length) {
+          iEl.innerHTML = recent5i.map(i => `
+            <div class="inv-row">
+              <span class="inv-amount">₹${esc(String(i.amount))}</span>
+              <span style="flex:1;font-size:0.82rem;color:var(--text2)">${esc(i.description || 'Invoice')}</span>
+              <span class="inv-status ${i.status === 'paid' ? 'i-paid' : 'i-unpaid'}">${esc(i.status)}</span>
+            </div>
+          `).join('');
+        } else {
+          iEl.innerHTML = emptyState('No invoices yet.');
+        }
+
+        /* ── MESSAGES ────────────────────────────────────────────────────── */
+        const msgEl = document.getElementById('secMessages');
+        const recent5msg = messages.slice(-5).reverse();
+        if (recent5msg.length) {
+          msgEl.innerHTML = recent5msg.map(m => `
+            <div class="msg-row">
+              <div class="msg-head">
+                <span class="msg-sender ${m.sender === 'trainer' ? 'trainer' : 'client'}">
+                  ${m.sender === 'trainer' ? 'You' : 'Client'}
+                </span>
+                <span class="msg-date">${esc(m.date)}</span>
+              </div>
+              <div class="msg-text">
+                ${esc((m.text || '').substring(0, 80))}${(m.text || '').length > 80 ? '…' : ''}
+              </div>
+            </div>
+          `).join('');
+        } else {
+          msgEl.innerHTML = emptyState('No messages yet.');
+        }
+      }
+
+      async function saveNotes() {
+        const notes = document.getElementById('trainerNotes').value;
+        const el = document.getElementById('notesMsg');
+        el.textContent = 'Saving…';
+        el.className = 'form-msg';
+
+        try {
+          const res = await fetch(`/api/admin/clients/${CID}/notes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ notes }),
+          });
+          el.textContent = res.ok ? 'Saved' : 'Failed to save';
+          el.className = 'form-msg ' + (res.ok ? 'success' : 'error');
+          if (res.ok) setTimeout(() => { el.textContent = ''; el.className = 'form-msg'; }, 2500);
+        } catch {
+          el.textContent = 'Network error';
+          el.className = 'form-msg error';
+        }
+      }
+
+      loadAll();
+    </script>
+  </body>
+</html>

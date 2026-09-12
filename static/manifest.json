@@ -1,0 +1,16 @@
+{
+  "name": "Sahil Panwar Fitness",
+  "short_name": "SPFitness",
+  "description": "Your personal fitness training portal",
+  "start_url": "/client/dashboard",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#e8ff00",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/static/IMAGE/favicon.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/static/IMAGE/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["health", "fitness"],
+  "screenshots": []
+}

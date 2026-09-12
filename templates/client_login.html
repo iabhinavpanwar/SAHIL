@@ -1,0 +1,1893 @@
+{% extends "base.html" %} {% block title %}Client Login — Sahil Panwar Fitness{%
+endblock %} {% block head %}
+<style>
+  /* ══════════════════════════════════════════════════════════════════════════
+   CLIENT LOGIN — FULLY RESPONSIVE STYLESHEET
+   Breakpoints: 1400 · 1200 · 1024 · 960 · 768 · 640 · 560 · 480 · 380 · 320
+   ══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── LOGIN PAGE LAYOUT ─────────────────────────────────────────────────── */
+  .client-login-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+    background: var(--bg);
+    overflow: hidden;
+    padding-top: var(--nav-h);
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* ── ANIMATED BACKGROUND ───────────────────────────────────────────────── */
+  .client-login-page::before,
+  .client-login-page::after {
+    content: "";
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+    animation: cl-float 18s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .client-login-page::before {
+    width: clamp(280px, 42vw, 500px);
+    height: clamp(280px, 42vw, 500px);
+    background: radial-gradient(
+      circle,
+      rgba(232, 255, 0, 0.18) 0%,
+      transparent 70%
+    );
+    top: -15%;
+    right: -10%;
+  }
+
+  .client-login-page::after {
+    width: clamp(240px, 36vw, 420px);
+    height: clamp(240px, 36vw, 420px);
+    background: radial-gradient(
+      circle,
+      rgba(232, 255, 0, 0.1) 0%,
+      transparent 70%
+    );
+    bottom: -15%;
+    left: -10%;
+    animation-delay: -9s;
+  }
+
+  @keyframes cl-float {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    33% {
+      transform: translate(60px, -40px) scale(1.1);
+    }
+    66% {
+      transform: translate(-40px, 50px) scale(0.95);
+    }
+  }
+
+  /* ── BRAND PANEL (LEFT) ────────────────────────────────────────────────── */
+  .cl-brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(1.75rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3.5rem);
+    min-height: calc(100vh - var(--nav-h));
+    min-height: calc(100dvh - var(--nav-h));
+    background:
+      linear-gradient(135deg, rgba(232, 255, 0, 0.06) 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+    border-right: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    min-width: 0;
+  }
+
+  .cl-brand::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 20% 80%,
+      rgba(232, 255, 0, 0.07) 0%,
+      transparent 45%
+    );
+    pointer-events: none;
+  }
+
+  .cl-brand::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(232, 255, 0, 0.25),
+      transparent
+    );
+  }
+
+  .cl-brand-top {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    animation: cl-slide-down 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+  }
+
+  .cl-brand-top .brand-icon {
+    width: clamp(38px, 9vw, 48px);
+    height: clamp(38px, 9vw, 48px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #000000 !important;
+    border: 2px solid rgba(232, 255, 0, 0.3);
+    color: #000;
+    font-size: 1.4rem;
+    box-shadow: 0 8px 30px rgba(232, 255, 0, 0.3);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .cl-brand-top .brand-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .cl-brand-top .brand-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 3.2vw, 1.6rem);
+    letter-spacing: 0.06em;
+    color: var(--text);
+    line-height: 1;
+    overflow-wrap: break-word;
+  }
+
+  .cl-brand-top .brand-tag {
+    font-size: clamp(0.62rem, 1.5vw, 0.72rem);
+    color: var(--primary);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 0.2rem;
+  }
+
+  .cl-brand-hero {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(1.25rem, 3vw, 2rem) 0;
+    animation: cl-slide-up 0.8s 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  .cl-brand-hero .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    background: rgba(232, 255, 0, 0.06);
+    border: 1px solid rgba(232, 255, 0, 0.18);
+    border-radius: 999px;
+    font-size: clamp(0.62rem, 1.5vw, 0.72rem);
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .cl-brand-hero .hero-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 12px var(--primary);
+    animation: cl-pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes cl-pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.3);
+    }
+  }
+
+  .cl-brand-hero h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4.8vw, 3.4rem);
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin-bottom: clamp(1rem, 2.4vw, 1.25rem);
+    overflow-wrap: break-word;
+  }
+
+  .cl-brand-hero h2 .accent {
+    color: var(--primary);
+    position: relative;
+    display: inline-block;
+  }
+
+  .cl-brand-hero h2 .accent::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 6px;
+    width: 100%;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: cl-underline 1s 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      forwards;
+  }
+
+  @keyframes cl-underline {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .cl-brand-hero p {
+    font-size: clamp(0.88rem, 1.9vw, 1rem);
+    color: var(--text2);
+    max-width: 420px;
+    line-height: 1.7;
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .cl-brand-hero .feature-list-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    max-width: 380px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .cl-brand-hero .feature-list-mini li {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: clamp(0.8rem, 1.8vw, 0.88rem);
+    color: var(--text2);
+    min-width: 0;
+  }
+
+  .cl-brand-hero .feature-list-mini i {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    border-radius: 6px;
+    background: rgba(232, 255, 0, 0.1);
+    border: 1px solid rgba(232, 255, 0, 0.2);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+  }
+
+  .cl-brand-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: clamp(0.72rem, 1.6vw, 0.8rem);
+    color: var(--text3);
+    animation: cl-slide-up 0.8s 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  @keyframes cl-slide-down {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes cl-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── FORM PANEL (RIGHT) ────────────────────────────────────────────────── */
+  .cl-form-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.75rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3.5rem);
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+  }
+
+  .cl-card {
+    width: 100%;
+    max-width: 400px;
+    animation: cl-slide-up 0.75s 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  .cl-card-head {
+    text-align: center;
+    margin-bottom: clamp(1.5rem, 3.4vw, 2rem);
+  }
+
+  .cl-card-head .lock-icon {
+    width: clamp(52px, 12vw, 64px);
+    height: clamp(52px, 12vw, 64px);
+    margin: 0 auto 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: linear-gradient(
+      135deg,
+      rgba(232, 255, 0, 0.12),
+      rgba(232, 255, 0, 0.03)
+    );
+    border: 1px solid rgba(232, 255, 0, 0.2);
+    color: var(--primary);
+    font-size: clamp(1.35rem, 3.4vw, 1.6rem);
+    position: relative;
+    box-shadow: 0 0 40px rgba(232, 255, 0, 0.08);
+    animation: cl-logo-pulse 3s ease-in-out infinite;
+  }
+
+  .cl-card-head .lock-icon::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 24px;
+    border: 1px solid rgba(232, 255, 0, 0.1);
+    animation: cl-halo 3s ease-in-out infinite;
+  }
+
+  @keyframes cl-logo-pulse {
+    0%,
+    100% {
+      transform: translateY(0);
+      box-shadow: 0 0 40px rgba(232, 255, 0, 0.08);
+    }
+    50% {
+      transform: translateY(-4px);
+      box-shadow: 0 0 60px rgba(232, 255, 0, 0.18);
+    }
+  }
+
+  @keyframes cl-halo {
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.9;
+      transform: scale(1.06);
+    }
+  }
+
+  .cl-card-head h1 {
+    font-size: clamp(1.25rem, 3.4vw, 1.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+  }
+
+  .cl-card-head p {
+    font-size: clamp(0.8rem, 1.8vw, 0.88rem);
+    color: var(--text2);
+  }
+
+  /* ── ALERTS ────────────────────────────────────────────────────────────── */
+  .cl-alert {
+    padding: clamp(0.7rem, 1.8vw, 0.8rem) clamp(0.85rem, 2.2vw, 1rem);
+    border-radius: var(--radius-sm);
+    font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+    margin-bottom: 1.1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    animation: cl-alert-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    line-height: 1.5;
+  }
+
+  @keyframes cl-alert-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .cl-alert i {
+    flex-shrink: 0;
+    font-size: 0.9rem;
+  }
+
+  .cl-alert.success {
+    background: rgba(68, 204, 136, 0.08);
+    border: 1px solid rgba(68, 204, 136, 0.25);
+    color: var(--success);
+  }
+
+  .cl-alert.error {
+    background: rgba(255, 68, 68, 0.08);
+    border: 1px solid rgba(255, 68, 68, 0.25);
+    color: var(--danger);
+    animation:
+      cl-alert-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      cl-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.4s;
+  }
+
+  @keyframes cl-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-6px);
+    }
+    40% {
+      transform: translateX(5px);
+    }
+    60% {
+      transform: translateX(-3px);
+    }
+    80% {
+      transform: translateX(2px);
+    }
+  }
+
+  /* ── FLOATING LABEL INPUTS ─────────────────────────────────────────────── */
+  .cl-form {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 2.6vw, 1.25rem);
+  }
+
+  .cl-field {
+    position: relative;
+    width: 100%;
+  }
+
+  .cl-field input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 1.4rem 1rem 0.55rem 1rem;
+    font-size: 16px; /* prevents iOS zoom */
+    font-weight: 500;
+    transition: all var(--transition);
+    outline: none;
+    font-family: var(--font);
+  }
+
+  .cl-field input:hover {
+    border-color: var(--border-hover, #3a3a3a);
+  }
+
+  .cl-field input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+  }
+
+  .cl-field label {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text3);
+    pointer-events: none;
+    transition: all 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: 0 4px;
+  }
+
+  .cl-field input:focus + label,
+  .cl-field input:not(:placeholder-shown) + label,
+  .cl-field input:-webkit-autofill + label {
+    top: 0;
+    font-size: 0.68rem;
+    color: var(--primary);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: var(--bg2);
+  }
+
+  .cl-field.has-toggle input {
+    padding-right: 3rem;
+  }
+
+  .cl-pwd-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.9rem;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 0.95rem;
+    padding: 0.4rem;
+    border-radius: 6px;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .cl-pwd-toggle:hover {
+    color: var(--primary);
+    background: rgba(232, 255, 0, 0.06);
+  }
+
+  /* ── REMEMBER / FORGOT ROW ─────────────────────────────────────────────── */
+  .cl-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    flex-wrap: wrap;
+    margin-top: -0.35rem;
+  }
+
+  .cl-remember {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    cursor: pointer;
+    user-select: none;
+    font-size: clamp(0.76rem, 1.7vw, 0.84rem);
+    color: var(--text2);
+    transition: color var(--transition);
+  }
+
+  .cl-remember:hover {
+    color: var(--text);
+  }
+
+  .cl-remember input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    background: var(--bg3);
+    position: relative;
+    cursor: pointer;
+    transition: all var(--transition);
+    flex-shrink: 0;
+  }
+
+  .cl-remember input[type="checkbox"]:hover {
+    border-color: var(--primary);
+  }
+
+  .cl-remember input[type="checkbox"]:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .cl-remember input[type="checkbox"]:checked::after {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-size: 0.65rem;
+  }
+
+  .cl-forgot {
+    font-size: clamp(0.76rem, 1.7vw, 0.84rem);
+    color: var(--text2);
+    font-weight: 500;
+    transition: color var(--transition);
+    white-space: nowrap;
+  }
+
+  .cl-forgot:hover {
+    color: var(--primary);
+  }
+
+  /* ── SUBMIT BUTTON ─────────────────────────────────────────────────────── */
+  .cl-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: clamp(0.85rem, 2.2vw, 0.95rem) 1.5rem;
+    background: var(--primary);
+    color: #000;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: clamp(0.88rem, 2vw, 0.95rem);
+    letter-spacing: 0.02em;
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+    margin-top: 0.35rem;
+    cursor: pointer;
+    font-family: var(--font);
+    -webkit-tap-highlight-color: transparent;
+    min-height: 48px;
+  }
+
+  .cl-submit::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      transparent 100%
+    );
+    transition: left 0.6s ease;
+    pointer-events: none;
+  }
+
+  .cl-submit:hover:not(:disabled)::before {
+    left: 120%;
+  }
+
+  .cl-submit:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px rgba(232, 255, 0, 0.3);
+  }
+
+  .cl-submit:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .cl-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+
+  .cl-submit .btn-label,
+  .cl-submit .btn-spinner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: opacity 0.2s ease;
+  }
+
+  .cl-submit .btn-spinner {
+    position: absolute;
+    inset: 0;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cl-submit.loading .btn-label {
+    opacity: 0;
+  }
+
+  .cl-submit.loading .btn-spinner {
+    opacity: 1;
+  }
+
+  .cl-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(0, 0, 0, 0.2);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: cl-spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes cl-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ── DIVIDER ───────────────────────────────────────────────────────────── */
+  .cl-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: clamp(1.25rem, 3vw, 1.75rem) 0 clamp(1rem, 2.4vw, 1.25rem);
+    color: var(--text3);
+    font-size: clamp(0.62rem, 1.4vw, 0.7rem);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .cl-divider::before,
+  .cl-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  /* ── SECONDARY LINKS ───────────────────────────────────────────────────── */
+  .cl-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    align-items: center;
+  }
+
+  .cl-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: clamp(0.78rem, 1.8vw, 0.86rem);
+    color: var(--text2);
+    font-weight: 500;
+    transition: all var(--transition);
+    padding: 0.45rem 1rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .cl-link:hover {
+    color: var(--primary);
+    background: rgba(232, 255, 0, 0.05);
+  }
+
+  .cl-link i {
+    font-size: 0.78rem;
+    transition: transform var(--transition);
+  }
+
+  .cl-link:hover i {
+    transform: translateX(-4px);
+  }
+
+  .cl-register-cta {
+    margin-top: 0.5rem;
+    padding: clamp(0.75rem, 2vw, 0.9rem) clamp(0.85rem, 2.2vw, 1rem);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: clamp(0.78rem, 1.8vw, 0.86rem);
+    color: var(--text2);
+    transition: border-color var(--transition);
+    line-height: 1.5;
+  }
+
+  .cl-register-cta:hover {
+    border-color: rgba(232, 255, 0, 0.2);
+  }
+
+  .cl-register-cta a {
+    color: var(--primary);
+    font-weight: 700;
+    transition: color var(--transition);
+  }
+
+  .cl-register-cta a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── ≤ 1200px : tighten brand panel padding ────────────────────────────── */
+  @media (max-width: 1200px) {
+    .cl-brand {
+      padding: 2.25rem 2.25rem;
+    }
+
+    .cl-form-panel {
+      padding: 2.25rem 2rem;
+    }
+
+    .cl-brand-hero h2 {
+      font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+    }
+  }
+
+  /* ── ≤ 1024px : keep split but tighter ─────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .cl-brand {
+      padding: 2rem 1.75rem;
+    }
+
+    .cl-form-panel {
+      padding: 2rem 1.75rem;
+    }
+
+    .cl-brand-hero h2 {
+      font-size: clamp(1.65rem, 3.8vw, 2.5rem);
+    }
+
+    .cl-brand-hero p {
+      font-size: 0.9rem;
+    }
+
+    .cl-brand-hero .feature-list-mini li {
+      font-size: 0.82rem;
+    }
+  }
+
+  /* ── ≤ 960px : stack panels vertically ─────────────────────────────────── */
+  @media (max-width: 960px) {
+    .client-login-page {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    .cl-brand {
+      padding: 2rem 1.75rem;
+      min-height: unset;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cl-brand::after {
+      display: none;
+    }
+
+    .cl-brand-hero {
+      padding: 1.25rem 0;
+    }
+
+    .cl-brand-hero h2 {
+      font-size: clamp(1.65rem, 6vw, 2.4rem);
+      margin-bottom: 0.9rem;
+    }
+
+    .cl-brand-hero p {
+      font-size: 0.9rem;
+      margin-bottom: 1.25rem;
+      max-width: 100%;
+    }
+
+    .cl-brand-hero .feature-list-mini {
+      display: none;
+    }
+
+    .cl-brand-foot {
+      font-size: 0.76rem;
+      padding-top: 0.5rem;
+    }
+
+    .cl-form-panel {
+      padding: 2.25rem 1.75rem 2.75rem;
+      align-items: flex-start;
+    }
+
+    .cl-card {
+      max-width: 440px;
+      margin: 0 auto;
+    }
+  }
+
+  /* ── ≤ 768px : tablet portrait ─────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .cl-brand {
+      padding: 1.75rem 1.5rem;
+    }
+
+    .cl-form-panel {
+      padding: 2rem 1.5rem 2.5rem;
+    }
+
+    .cl-brand-hero .hero-eyebrow {
+      font-size: 0.65rem;
+      padding: 0.35rem 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .cl-brand-hero h2 {
+      font-size: clamp(1.55rem, 5.5vw, 2.1rem);
+    }
+  }
+
+  /* ── ≤ 640px : large phones ────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .client-login-page {
+      padding-top: var(--nav-h);
+    }
+
+    .cl-brand {
+      padding: 1.5rem 1.25rem;
+    }
+
+    .cl-brand-top {
+      gap: 0.7rem;
+    }
+
+    .cl-brand-top .brand-name {
+      font-size: 1.2rem;
+    }
+
+    .cl-brand-hero {
+      padding: 1rem 0;
+    }
+
+    .cl-brand-hero h2 {
+      font-size: clamp(1.4rem, 6.5vw, 1.85rem);
+      line-height: 1.1;
+    }
+
+    .cl-brand-hero p {
+      font-size: 0.86rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .cl-form-panel {
+      padding: 1.75rem 1.25rem 2.25rem;
+    }
+
+    .cl-card {
+      max-width: 100%;
+    }
+
+    .cl-card-head {
+      margin-bottom: 1.5rem;
+    }
+
+    .cl-card-head h1 {
+      font-size: 1.35rem;
+    }
+
+    .cl-card-head p {
+      font-size: 0.84rem;
+    }
+
+    /* keep form gap tighter */
+    .cl-form {
+      gap: 1rem;
+    }
+
+    .cl-field input {
+      padding: 1.25rem 0.9rem 0.5rem 0.9rem;
+      font-size: 0.94rem;
+    }
+
+    .cl-field label {
+      left: 0.9rem;
+      font-size: 0.88rem;
+    }
+
+    .cl-field input:focus + label,
+    .cl-field input:not(:placeholder-shown) + label {
+      font-size: 0.64rem;
+    }
+
+    .cl-field.has-toggle input {
+      padding-right: 2.75rem;
+    }
+
+    .cl-pwd-toggle {
+      right: 0.7rem;
+      font-size: 0.9rem;
+      padding: 0.35rem;
+    }
+
+    .cl-submit {
+      padding: 0.85rem 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    /* remember/forgot stack if tight */
+    .cl-row {
+      gap: 0.5rem 0.75rem;
+    }
+  }
+
+  /* ── ≤ 560px : small phones ────────────────────────────────────────────── */
+  @media (max-width: 560px) {
+    .cl-brand {
+      padding: 1.25rem 1rem;
+    }
+
+    .cl-brand-top .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+    }
+
+    .cl-brand-top .brand-name {
+      font-size: 1.1rem;
+    }
+
+    .cl-brand-top .brand-tag {
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+    }
+
+    .cl-brand-hero h2 {
+      font-size: clamp(1.3rem, 7vw, 1.7rem);
+    }
+
+    .cl-brand-hero p {
+      font-size: 0.82rem;
+    }
+
+    .cl-brand-foot {
+      font-size: 0.7rem;
+      gap: 0.5rem;
+    }
+
+    .cl-form-panel {
+      padding: 1.5rem 1rem 2rem;
+    }
+
+    .cl-card-head .lock-icon {
+      width: 54px;
+      height: 54px;
+      font-size: 1.35rem;
+      border-radius: 16px;
+    }
+
+    .cl-card-head h1 {
+      font-size: 1.25rem;
+    }
+
+    .cl-card-head p {
+      font-size: 0.8rem;
+    }
+
+    .cl-field input {
+      padding: 1.15rem 0.85rem 0.45rem 0.85rem;
+      font-size: 0.92rem;
+    }
+
+    .cl-field label {
+      left: 0.85rem;
+      font-size: 0.86rem;
+    }
+
+    .cl-remember {
+      font-size: 0.78rem;
+    }
+
+    .cl-forgot {
+      font-size: 0.78rem;
+    }
+
+    .cl-submit {
+      padding: 0.8rem 1.1rem;
+      font-size: 0.88rem;
+    }
+
+    .cl-divider {
+      font-size: 0.62rem;
+      margin: 1.25rem 0 1rem;
+    }
+
+    .cl-register-cta {
+      font-size: 0.8rem;
+      padding: 0.75rem 0.85rem;
+    }
+  }
+
+  /* ── ≤ 480px : standard mobile ─────────────────────────────────────────── */
+  @media (max-width: 480px) {
+    .cl-brand {
+      padding: 1.1rem 0.9rem;
+    }
+
+    .cl-brand-top {
+      gap: 0.6rem;
+    }
+
+    .cl-brand-top .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+    }
+
+    .cl-brand-top .brand-name {
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+    }
+
+    .cl-brand-top .brand-tag {
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      margin-top: 0.15rem;
+    }
+
+    .cl-brand-hero {
+      padding: 0.85rem 0;
+    }
+
+    .cl-brand-hero .hero-eyebrow {
+      font-size: 0.6rem;
+      padding: 0.3rem 0.65rem;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.85rem;
+    }
+
+    .cl-brand-hero h2 {
+      font-size: clamp(1.2rem, 7.5vw, 1.55rem);
+      line-height: 1.15;
+    }
+
+    .cl-brand-hero p {
+      font-size: 0.8rem;
+      line-height: 1.55;
+      margin-bottom: 0.75rem;
+    }
+
+    .cl-brand-foot {
+      font-size: 0.66rem;
+      padding-top: 0.35rem;
+    }
+
+    .cl-form-panel {
+      padding: 1.25rem 0.9rem 1.75rem;
+    }
+
+    .cl-card-head {
+      margin-bottom: 1.25rem;
+    }
+
+    .cl-card-head .lock-icon {
+      width: 50px;
+      height: 50px;
+      font-size: 1.25rem;
+      border-radius: 14px;
+      margin-bottom: 1rem;
+    }
+
+    .cl-card-head h1 {
+      font-size: 1.15rem;
+    }
+
+    .cl-card-head p {
+      font-size: 0.78rem;
+    }
+
+    .cl-form {
+      gap: 0.9rem;
+    }
+
+    .cl-field input {
+      padding: 1.1rem 0.8rem 0.4rem 0.8rem;
+      font-size: 16px;
+    }
+
+    .cl-field label {
+      left: 0.8rem;
+      font-size: 0.82rem;
+    }
+
+    .cl-field input:focus + label,
+    .cl-field input:not(:placeholder-shown) + label {
+      font-size: 0.6rem;
+    }
+
+    .cl-field.has-toggle input {
+      padding-right: 2.5rem;
+    }
+
+    .cl-pwd-toggle {
+      right: 0.55rem;
+      font-size: 0.85rem;
+      padding: 0.3rem;
+    }
+
+    .cl-row {
+      gap: 0.4rem 0.65rem;
+      margin-top: 0;
+    }
+
+    .cl-remember {
+      font-size: 0.74rem;
+      gap: 0.45rem;
+    }
+
+    .cl-remember input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    .cl-forgot {
+      font-size: 0.74rem;
+    }
+
+    .cl-submit {
+      padding: 0.75rem 1rem;
+      font-size: 0.86rem;
+      min-height: 46px;
+    }
+
+    .cl-divider {
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      margin: 1.1rem 0 0.9rem;
+    }
+
+    .cl-register-cta {
+      font-size: 0.78rem;
+      padding: 0.7rem 0.75rem;
+    }
+
+    .cl-links {
+      gap: 0.5rem;
+    }
+
+    .cl-link {
+      font-size: 0.76rem;
+      padding: 0.4rem 0.75rem;
+    }
+
+    .cl-alert {
+      font-size: 0.76rem;
+      padding: 0.65rem 0.75rem;
+      gap: 0.5rem;
+    }
+  }
+
+  /* ── ≤ 380px : iPhone SE / small Android ───────────────────────────────── */
+  @media (max-width: 380px) {
+    .cl-brand {
+      padding: 0.9rem 0.75rem;
+    }
+
+    .cl-brand-top .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+
+    .cl-brand-top .brand-name {
+      font-size: 0.92rem;
+    }
+
+    .cl-brand-top .brand-tag {
+      font-size: 0.5rem;
+      letter-spacing: 0.12em;
+    }
+
+    .cl-brand-hero h2 {
+      font-size: 1.15rem;
+      line-height: 1.15;
+      margin-bottom: 0.65rem;
+    }
+
+    .cl-brand-hero p {
+      font-size: 0.76rem;
+      line-height: 1.5;
+      margin-bottom: 0.6rem;
+    }
+
+    .cl-brand-hero .hero-eyebrow {
+      font-size: 0.55rem;
+      padding: 0.25rem 0.55rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.7rem;
+    }
+
+    .cl-brand-foot {
+      font-size: 0.6rem;
+    }
+
+    .cl-form-panel {
+      padding: 1rem 0.75rem 1.5rem;
+    }
+
+    .cl-card-head .lock-icon {
+      width: 46px;
+      height: 46px;
+      font-size: 1.15rem;
+      border-radius: 12px;
+      margin-bottom: 0.85rem;
+    }
+
+    .cl-card-head h1 {
+      font-size: 1.05rem;
+    }
+
+    .cl-card-head p {
+      font-size: 0.74rem;
+    }
+
+    .cl-field input {
+      padding: 1.05rem 0.75rem 0.4rem 0.75rem;
+    }
+
+    .cl-field label {
+      left: 0.75rem;
+      font-size: 0.78rem;
+    }
+
+    .cl-field input:focus + label,
+    .cl-field input:not(:placeholder-shown) + label {
+      font-size: 0.56rem;
+    }
+
+    .cl-submit {
+      padding: 0.7rem 0.9rem;
+      font-size: 0.84rem;
+      min-height: 44px;
+    }
+
+    .cl-submit .btn-label,
+    .cl-submit .btn-spinner {
+      gap: 0.45rem;
+    }
+
+    .cl-remember,
+    .cl-forgot {
+      font-size: 0.72rem;
+    }
+
+    .cl-register-cta {
+      font-size: 0.75rem;
+      padding: 0.65rem 0.7rem;
+    }
+
+    .cl-link {
+      font-size: 0.72rem;
+      padding: 0.35rem 0.65rem;
+    }
+  }
+
+  /* ── ≤ 320px : ultra-small / foldables ─────────────────────────────────── */
+  @media (max-width: 320px) {
+    .cl-brand {
+      padding: 0.75rem 0.65rem;
+    }
+
+    .cl-brand-top {
+      gap: 0.5rem;
+    }
+
+    .cl-brand-top .brand-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+    }
+
+    .cl-brand-top .brand-name {
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+    }
+
+    .cl-brand-top .brand-tag {
+      display: none;
+    }
+
+    .cl-brand-hero h2 {
+      font-size: 1.05rem;
+    }
+
+    .cl-brand-hero p {
+      font-size: 0.72rem;
+    }
+
+    .cl-form-panel {
+      padding: 0.9rem 0.65rem 1.25rem;
+    }
+
+    .cl-card-head .lock-icon {
+      width: 42px;
+      height: 42px;
+      font-size: 1.05rem;
+      border-radius: 11px;
+      margin-bottom: 0.75rem;
+    }
+
+    .cl-card-head h1 {
+      font-size: 1rem;
+    }
+
+    .cl-card-head p {
+      font-size: 0.72rem;
+    }
+
+    .cl-form {
+      gap: 0.8rem;
+    }
+
+    .cl-field input {
+      padding: 1rem 0.7rem 0.35rem 0.7rem;
+    }
+
+    .cl-field label {
+      left: 0.7rem;
+      font-size: 0.76rem;
+    }
+
+    .cl-submit {
+      padding: 0.65rem 0.85rem;
+      font-size: 0.82rem;
+      min-height: 42px;
+    }
+
+    .cl-alert {
+      font-size: 0.72rem;
+      padding: 0.6rem 0.65rem;
+    }
+
+    .cl-alert i {
+      font-size: 0.82rem;
+    }
+
+    .cl-register-cta {
+      font-size: 0.72rem;
+      padding: 0.6rem 0.6rem;
+    }
+
+    .cl-divider {
+      font-size: 0.55rem;
+    }
+  }
+
+  /* ── Landscape phones (short viewport) ────────────────────────────────── */
+  @media (max-height: 520px) and (orientation: landscape) {
+    .client-login-page {
+      padding-top: var(--nav-h);
+    }
+
+    .cl-brand {
+      padding: 1rem 1.25rem;
+    }
+
+    .cl-brand-hero {
+      padding: 0.6rem 0;
+    }
+
+    .cl-brand-hero h2 {
+      font-size: clamp(1.2rem, 4.5vw, 1.75rem);
+      margin-bottom: 0.5rem;
+    }
+
+    .cl-brand-hero p {
+      font-size: 0.8rem;
+      margin-bottom: 0.6rem;
+      line-height: 1.5;
+    }
+
+    .cl-brand-hero .hero-eyebrow {
+      margin-bottom: 0.6rem;
+      padding: 0.25rem 0.6rem;
+    }
+
+    .cl-brand-foot {
+      padding-top: 0.25rem;
+    }
+
+    .cl-form-panel {
+      padding: 1rem 1.25rem;
+      align-items: flex-start;
+    }
+
+    .cl-card-head {
+      margin-bottom: 1rem;
+    }
+
+    .cl-card-head .lock-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+      border-radius: 14px;
+    }
+
+    .cl-form {
+      gap: 0.75rem;
+    }
+
+    .cl-field input {
+      padding: 1rem 0.85rem 0.4rem 0.85rem;
+      font-size: 16px;
+    }
+  }
+
+  /* ── Touch devices: neutralize hover-only effects ─────────────────────── */
+  @media (hover: none) {
+    .cl-submit:hover:not(:disabled) {
+      transform: none;
+      box-shadow: none;
+      background: var(--primary);
+    }
+
+    .cl-submit:hover:not(:disabled)::before {
+      left: -120%;
+    }
+
+    .cl-remember:hover {
+      color: var(--text2);
+    }
+
+    .cl-forgot:hover {
+      color: var(--text2);
+    }
+
+    .cl-link:hover {
+      color: var(--text2);
+      background: transparent;
+    }
+
+    .cl-link:hover i {
+      transform: none;
+    }
+
+    .cl-pwd-toggle:hover {
+      color: var(--text3);
+      background: transparent;
+    }
+
+    .cl-register-cta:hover {
+      border-color: var(--border);
+    }
+  }
+
+  /* ── Focus visibility (keyboard accessibility) ────────────────────────── */
+  .cl-field input:focus-visible,
+  .cl-submit:focus-visible,
+  .cl-pwd-toggle:focus-visible,
+  .cl-remember input:focus-visible,
+  .cl-forgot:focus-visible,
+  .cl-link:focus-visible,
+  .cl-register-cta a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* ── Reduced motion ───────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+
+    .cl-brand-hero h2 .accent::after {
+      transform: scaleX(1);
+    }
+
+    .client-login-page::before,
+    .client-login-page::after {
+      animation: none;
+    }
+  }
+
+  /* ── Print ────────────────────────────────────────────────────────────── */
+  @media print {
+    .client-login-page::before,
+    .client-login-page::after {
+      display: none;
+    }
+
+    .cl-brand {
+      background: #fff;
+      border: 1px solid #ccc;
+    }
+
+    .cl-brand-hero h2 {
+      color: #000;
+    }
+
+    .cl-brand-hero h2 .accent {
+      color: #333;
+    }
+
+    body {
+      background: #fff;
+      color: #000;
+    }
+
+    .cl-submit {
+      background: #e0e0e0;
+      color: #000;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="client-login-page">
+  <!-- ══ BRAND PANEL (LEFT) ══════════════════════════════════════════════ -->
+  <aside class="cl-brand">
+    <div class="cl-brand-top">
+      <div class="brand-icon">
+        <img
+          src="{{ url_for('static', filename='IMAGE/logo.png') }}"
+          alt="Logo"
+          style="width: 48px; height: 48px; object-fit: contain"
+        />
+      </div>
+      <div>
+        <div class="brand-name">{{ cfg.get('hero_name', 'SAHIL PANWAR') }}</div>
+        <div class="brand-tag">Client Portal</div>
+      </div>
+    </div>
+
+    <div class="cl-brand-hero">
+      <div class="hero-eyebrow">Members Area</div>
+      <h2>
+        Your <span class="accent">fitness</span><br />
+        journey, tracked.
+      </h2>
+      <p>
+        Access your personal dashboard to log workouts, track progress, message
+        your trainer, and follow your assigned programs.
+      </p>
+      <ul class="feature-list-mini">
+        <li>
+          <i class="fas fa-chart-line" aria-hidden="true"></i> Track weight,
+          measurements &amp; daily stats
+        </li>
+        <li>
+          <i class="fas fa-dumbbell" aria-hidden="true"></i> View assigned
+          workout &amp; meal plans
+        </li>
+        <li>
+          <i class="fas fa-comments" aria-hidden="true"></i> Chat directly with
+          your trainer
+        </li>
+        <li>
+          <i class="fas fa-calendar-check" aria-hidden="true"></i> Weekly
+          check-ins &amp; session bookings
+        </li>
+      </ul>
+    </div>
+
+    <div class="cl-brand-foot">
+      <span
+        >&copy; {{ now.year if now else '2025' }} {{ cfg.get('hero_name', 'Sahil
+        Panwar') }}</span
+      >
+      <span
+        style="
+          color: var(--success);
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+        "
+      >
+        <i
+          class="fas fa-shield-alt"
+          aria-hidden="true"
+          style="font-size: 0.7rem"
+        ></i>
+        Secure Login
+      </span>
+    </div>
+  </aside>
+
+  <!-- ══ FORM PANEL (RIGHT) ══════════════════════════════════════════════ -->
+  <main class="cl-form-panel">
+    <div class="cl-card">
+      <div class="cl-card-head">
+        <div class="lock-icon">
+          <i class="fas fa-user-circle" aria-hidden="true"></i>
+        </div>
+        <h1>Welcome Back</h1>
+        <p>Log in to access your training dashboard</p>
+      </div>
+
+      {# ── ALERTS ───────────────────────────────────────────────────────── #}
+      {% if registered %}
+      <div class="cl-alert success" role="status">
+        <i class="fas fa-check-circle" aria-hidden="true"></i>
+        <span>Account created! Please log in to continue.</span>
+      </div>
+      {% endif %} {% if reset_ok %}
+      <div class="cl-alert success" role="status">
+        <i class="fas fa-check-circle" aria-hidden="true"></i>
+        <span>Password updated. You can log in now.</span>
+      </div>
+      {% endif %} {% if error %}
+      <div class="cl-alert error" role="alert">
+        <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+        <span>{{ error }}</span>
+      </div>
+      {% endif %} {# ── FORM
+      ─────────────────────────────────────────────────────────── #}
+      <form
+        method="POST"
+        class="cl-form"
+        id="clientLoginForm"
+        autocomplete="on"
+      >
+        <div class="cl-field">
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder=" "
+            required
+            autocomplete="email"
+            autofocus
+          />
+          <label for="email">Email address</label>
+        </div>
+
+        <div class="cl-field has-toggle">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder=" "
+            required
+            autocomplete="current-password"
+          />
+          <label for="password">Password</label>
+          <button
+            type="button"
+            class="cl-pwd-toggle"
+            id="pwdToggle"
+            aria-label="Toggle password visibility"
+            tabindex="-1"
+          >
+            <i class="fas fa-eye" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div class="cl-row">
+          <label class="cl-remember">
+            <input type="checkbox" name="remember" checked />
+            <span>Remember me</span>
+          </label>
+          <a href="{{ url_for('forgot_password') }}" class="cl-forgot">
+            Forgot password?
+          </a>
+        </div>
+
+        <button type="submit" class="cl-submit" id="clientLoginBtn">
+          <span class="btn-label">
+            <i class="fas fa-sign-in-alt" aria-hidden="true"></i> Log In
+          </span>
+          <span class="btn-spinner">
+            <span class="cl-spinner"></span> Signing in…
+          </span>
+        </button>
+      </form>
+
+      <div class="cl-divider">New here?</div>
+
+      <div class="cl-register-cta">
+        Don't have an account?
+        <a href="{{ url_for('register') }}">Create one now →</a>
+      </div>
+
+      <div class="cl-links" style="margin-top: 1.25rem">
+        <a href="{{ url_for('index') }}" class="cl-link">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to site
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  /* ── PASSWORD SHOW/HIDE ─────────────────────────────────────────────────── */
+  (function () {
+    const toggle = document.getElementById("pwdToggle");
+    const pwd = document.getElementById("password");
+    if (!toggle || !pwd) return;
+
+    toggle.addEventListener("click", () => {
+      const isPassword = pwd.type === "password";
+      pwd.type = isPassword ? "text" : "password";
+      const icon = toggle.querySelector("i");
+      icon.classList.toggle("fa-eye", !isPassword);
+      icon.classList.toggle("fa-eye-slash", isPassword);
+      pwd.focus();
+    });
+  })();
+
+  /* ── SUBMIT WITH LOADING STATE ──────────────────────────────────────────── */
+  (function () {
+    const form = document.getElementById("clientLoginForm");
+    const btn = document.getElementById("clientLoginBtn");
+    if (!form || !btn) return;
+
+    form.addEventListener("submit", (e) => {
+      const email = document.getElementById("email").value.trim();
+      const pw = document.getElementById("password").value;
+      if (!email || !pw) {
+        e.preventDefault();
+        return;
+      }
+
+      btn.classList.add("loading");
+      btn.disabled = true;
+
+      // safety: re-enable after 8s in case of network hang
+      setTimeout(() => {
+        if (btn.disabled) {
+          btn.classList.remove("loading");
+          btn.disabled = false;
+        }
+      }, 8000);
+    });
+  })();
+
+  /* ── SUBTLE PARALLAX ON BACKGROUND ORBS ─────────────────────────────────── */
+  (function () {
+    const page = document.querySelector(".client-login-page");
+    if (!page) return;
+    let ticking = false;
+    window.addEventListener("mousemove", (e) => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 14;
+        const y = (e.clientY / window.innerHeight - 0.5) * 14;
+        page.style.setProperty("--px", x + "px");
+        page.style.setProperty("--py", y + "px");
+        ticking = false;
+      });
+    });
+  })();
+</script>
+{% endblock %}

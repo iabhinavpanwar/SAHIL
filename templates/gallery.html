@@ -1,0 +1,1384 @@
+{% extends "base.html" %} {% block title %}Gallery — {{
+cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block content %}
+
+<section class="gallery-hero">
+  <div class="container">
+    <p class="section-eyebrow">In Action</p>
+    <h1>Gallery</h1>
+    <p class="gallery-hero-sub">Photos &amp; Videos from training sessions</p>
+  </div>
+</section>
+
+{% set photos = images | selectattr('media_type', 'ne', 'video') | list %} {%
+set videos = images | selectattr('media_type', 'equalto', 'video') | list %}
+
+<section class="section gallery-section">
+  <div class="container">
+    <!-- Filter Tabs -->
+    <div class="gallery-tabs">
+      <button
+        class="gtab active"
+        data-filter="all"
+        onclick="filterGallery('all', this)"
+      >
+        <i class="fas fa-th"></i> All
+        <span class="gtab-count">{{ images|length }}</span>
+      </button>
+      <button
+        class="gtab"
+        data-filter="photos"
+        onclick="filterGallery('photos', this)"
+      >
+        <i class="fas fa-image"></i> Photos
+        <span class="gtab-count">{{ photos|length }}</span>
+      </button>
+      <button
+        class="gtab"
+        data-filter="videos"
+        onclick="filterGallery('videos', this)"
+      >
+        <i class="fas fa-play-circle"></i> Videos
+        <span class="gtab-count">{{ videos|length }}</span>
+      </button>
+    </div>
+
+    {% if not images %}
+    <p class="empty-state">Gallery coming soon.</p>
+    {% else %}
+
+    <!-- PHOTOS GRID -->
+    {% if photos %}
+    <div class="gallery-block" id="block-photos">
+      <div class="gallery-masonry" id="photoGrid">
+        {% for img in photos %} {% set loop_mod = loop.index0 % 7 %}
+        <div
+          class="gal-item {% if loop_mod == 0 or loop_mod == 4 %}gal-tall{% elif loop_mod == 2 or loop_mod == 6 %}gal-wide{% endif %} {% if loop_mod == 1 or loop_mod == 5 %}gal-float{% endif %}"
+          data-url="{{ img.url }}"
+          data-caption="{{ img.get('caption','') }}"
+          onclick="openLightbox(this)"
+        >
+          <img
+            src="{{ img.url }}"
+            alt="{{ img.get('caption','') }}"
+            loading="lazy"
+          />
+          <div class="gal-overlay">
+            <i class="fas fa-expand-alt"></i>
+            {% if img.get('caption') %}<span>{{ img.caption }}</span>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- VIDEOS GRID -->
+    {% if videos %}
+    <div
+      class="gallery-block"
+      id="block-videos"
+      {%
+      if
+      photos
+      %}style="margin-top:3rem"
+      {%
+      endif
+      %}
+    >
+      {% if photos %}
+      <h3 class="gallery-section-title">
+        <i class="fas fa-play-circle"></i> Videos
+      </h3>
+      {% endif %}
+      <div class="videos-grid">
+        {% for vid in videos %}
+        <div class="video-card reveal">
+          {% if vid.get('video_embed') %}
+          <div class="video-embed-wrap">
+            <iframe
+              src="{{ vid.video_embed }}?rel=0&modestbranding=1"
+              title="{{ vid.get('caption','Video') }}"
+              frameborder="0"
+              allow="
+                accelerometer;
+                autoplay;
+                clipboard-write;
+                encrypted-media;
+                gyroscope;
+                picture-in-picture;
+              "
+              allowfullscreen
+              loading="lazy"
+            >
+            </iframe>
+          </div>
+          {% else %}
+          <a
+            class="video-link-card"
+            href="{{ vid.video_url }}"
+            target="_blank"
+            rel="noopener"
+          >
+            <div class="video-link-thumb">
+              <i class="fab fa-youtube"></i>
+            </div>
+          </a>
+          {% endif %} {% if vid.get('caption') %}
+          <p class="video-caption">{{ vid.caption }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %} {% endif %}
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">
+    <i class="fas fa-times"></i>
+  </button>
+  <button
+    class="lightbox-prev"
+    onclick="
+      event.stopPropagation();
+      lightboxNav(-1);
+    "
+  >
+    <i class="fas fa-chevron-left"></i>
+  </button>
+  <div class="lightbox-inner" onclick="event.stopPropagation()">
+    <img id="lightboxImg" src="" alt="" />
+    <p id="lightboxCaption"></p>
+  </div>
+  <button
+    class="lightbox-next"
+    onclick="
+      event.stopPropagation();
+      lightboxNav(1);
+    "
+  >
+    <i class="fas fa-chevron-right"></i>
+  </button>
+</div>
+
+{% endblock %} {% block scripts %}
+<style>
+  /* ══════════════════════════════════════════════════════════════════════════
+   GALLERY PAGE — FULLY RESPONSIVE STYLESHEET
+   Breakpoints: 1400 · 1200 · 1024 · 900 · 768 · 640 · 560 · 480 · 380 · 320
+   ══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── GALLERY HERO ──────────────────────────────────────────────────────── */
+  .gallery-hero {
+    position: relative;
+    padding: calc(var(--nav-h, 72px) + clamp(2.25rem, 6vw, 4rem))
+      clamp(1rem, 4vw, 1.5rem) clamp(2.25rem, 6vw, 4rem);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .gallery-hero::before {
+    content: "";
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: clamp(260px, 45vw, 600px);
+    height: clamp(260px, 45vw, 600px);
+    background: radial-gradient(
+      circle,
+      rgba(232, 255, 0, 0.06) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .gallery-hero .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gallery-hero .section-eyebrow {
+    font-size: clamp(0.7rem, 1.7vw, 0.85rem);
+  }
+
+  .gallery-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 7.5vw, 4.5rem);
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    margin-top: 0.5rem;
+    overflow-wrap: break-word;
+  }
+
+  .gallery-hero-sub {
+    color: var(--text2);
+    margin-top: 0.75rem;
+    font-size: clamp(0.9rem, 2vw, 1.05rem);
+    line-height: 1.6;
+  }
+
+  /* ── GALLERY SECTION ───────────────────────────────────────────────────── */
+  .gallery-section {
+    padding: clamp(2rem, 6vw, 5rem) 0;
+    width: 100%;
+  }
+
+  .gallery-section .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 1.5rem);
+  }
+
+  /* ── GALLERY FILTER TABS ───────────────────────────────────────────────── */
+  .gallery-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 0.35rem;
+    width: fit-content;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .gtab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: clamp(0.45rem, 1.4vw, 0.55rem) clamp(0.9rem, 2.6vw, 1.4rem);
+    border-radius: 50px;
+    font-size: clamp(0.78rem, 1.8vw, 0.9rem);
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: none;
+    border: none;
+    font-family: var(--font);
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .gtab:hover {
+    color: var(--text);
+  }
+
+  .gtab.active {
+    background: var(--primary);
+    color: #000;
+  }
+
+  .gtab-count {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 0.1rem 0.5rem;
+    font-size: clamp(0.66rem, 1.4vw, 0.75rem);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gtab.active .gtab-count {
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  /* ── MASONRY PHOTO GRID ────────────────────────────────────────────────── */
+  .gallery-masonry {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: clamp(160px, 18vw, 220px);
+    gap: clamp(0.6rem, 1.6vw, 1rem);
+    width: 100%;
+  }
+
+  .gal-item {
+    position: relative;
+    border-radius: clamp(10px, 1.6vw, 12px);
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.5s ease,
+      transform 0.5s ease,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+    min-width: 0;
+  }
+
+  .gal-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .gal-item.gal-tall {
+    grid-row: span 2;
+  }
+  .gal-item.gal-wide {
+    grid-column: span 2;
+  }
+
+  .gal-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: block;
+  }
+
+  .gal-item:hover img {
+    transform: scale(1.08);
+  }
+
+  .gal-item:hover {
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+    border-color: rgba(232, 255, 0, 0.3);
+  }
+
+  /* floating animation on select items — only after reveal */
+  .gal-item.gal-float {
+    animation: none;
+  }
+
+  .gal-item.gal-float.visible {
+    animation: galFloat 6s ease-in-out infinite;
+  }
+
+  .gal-item.gal-float.visible:hover {
+    animation: none;
+  }
+
+  @keyframes galFloat {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  .gal-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.75) 0%,
+      transparent 50%
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    gap: 0.5rem;
+    pointer-events: none;
+  }
+
+  .gal-overlay i {
+    font-size: clamp(1.35rem, 3.4vw, 1.8rem);
+    color: var(--primary);
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+  }
+
+  .gal-overlay span {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: clamp(0.72rem, 1.6vw, 0.82rem);
+    color: #fff;
+    padding: 0 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .gal-item:hover .gal-overlay {
+    opacity: 1;
+  }
+
+  /* ── GALLERY SECTION TITLE ─────────────────────────────────────────────── */
+  .gallery-section-title {
+    font-size: clamp(1.1rem, 2.6vw, 1.3rem);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: clamp(1rem, 2.6vw, 1.5rem);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .gallery-section-title i {
+    color: var(--primary);
+  }
+
+  /* ── VIDEOS GRID ───────────────────────────────────────────────────────── */
+  .videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    gap: clamp(1rem, 2.6vw, 1.5rem);
+  }
+
+  .video-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: clamp(12px, 2vw, 16px);
+    overflow: hidden;
+    transition: all 0.35s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    min-width: 0;
+  }
+
+  .video-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .video-card:hover {
+    border-color: rgba(232, 255, 0, 0.3);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .video-card.visible:hover {
+    transform: translateY(-4px);
+  }
+
+  .video-embed-wrap {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .video-embed-wrap iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .video-link-card {
+    display: block;
+    text-decoration: none;
+  }
+
+  .video-link-thumb {
+    height: clamp(150px, 22vw, 180px);
+    background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+  }
+
+  .video-link-thumb i {
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    color: #ff4444;
+    transition: transform 0.3s ease;
+  }
+
+  .video-link-card:hover .video-link-thumb {
+    background: linear-gradient(135deg, #2a1a1a, #1a0a0a);
+  }
+
+  .video-link-card:hover .video-link-thumb i {
+    transform: scale(1.15);
+  }
+
+  .video-caption {
+    padding: clamp(0.7rem, 1.8vw, 0.85rem) clamp(0.85rem, 2.2vw, 1rem);
+    font-size: clamp(0.8rem, 1.8vw, 0.88rem);
+    color: var(--text2);
+    margin: 0;
+    border-top: 1px solid var(--border);
+    overflow-wrap: break-word;
+  }
+
+  /* ── LIGHTBOX ──────────────────────────────────────────────────────────── */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(0.75rem, 3vw, 1rem);
+    animation: lbFadeIn 0.25s ease;
+  }
+
+  @keyframes lbFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .lightbox.open {
+    display: flex;
+  }
+
+  .lightbox-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 92vw;
+    max-height: 88vh;
+    max-height: 88dvh;
+    animation: lbPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 0;
+  }
+
+  @keyframes lbPop {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .lightbox-inner img {
+    max-width: 100%;
+    max-height: 76vh;
+    max-height: 76dvh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8);
+    width: auto;
+    height: auto;
+  }
+
+  .lightbox-inner p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: clamp(0.78rem, 1.8vw, 0.9rem);
+    margin-top: 0.75rem;
+    text-align: center;
+    padding: 0 0.5rem;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+
+  .lightbox-close {
+    position: fixed;
+    top: clamp(0.75rem, 2.4vw, 1.25rem);
+    right: clamp(0.75rem, 2.4vw, 1.25rem);
+    width: clamp(38px, 9vw, 44px);
+    height: clamp(38px, 9vw, 44px);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: clamp(1rem, 2.6vw, 1.2rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s ease;
+    z-index: 10;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .lightbox-close:hover {
+    background: rgba(255, 68, 68, 0.6);
+  }
+
+  .lightbox-prev,
+  .lightbox-next {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: clamp(38px, 9vw, 48px);
+    height: clamp(38px, 9vw, 48px);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: clamp(0.9rem, 2.4vw, 1.1rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s ease;
+    z-index: 10;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .lightbox-prev {
+    left: clamp(0.4rem, 1.6vw, 1rem);
+  }
+
+  .lightbox-next {
+    right: clamp(0.4rem, 1.6vw, 1rem);
+  }
+
+  .lightbox-prev:hover,
+  .lightbox-next:hover {
+    background: rgba(232, 255, 0, 0.25);
+  }
+
+  /* ── FILTER HIDE ───────────────────────────────────────────────────────── */
+  .gallery-block {
+    transition: opacity 0.3s ease;
+  }
+
+  .gallery-block.hidden {
+    display: none;
+  }
+
+  /* ── EMPTY STATE (in case no images) ──────────────────────────────────── */
+  .gallery-section .empty-state {
+    text-align: center;
+    color: var(--text3);
+    padding: clamp(2rem, 5vw, 3rem) clamp(1rem, 3vw, 1.5rem);
+    font-size: clamp(0.88rem, 2vw, 1rem);
+    background: var(--bg2);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── ≤ 1400px : keep 4-col but tighten ─────────────────────────────────── */
+  @media (max-width: 1400px) {
+    .gallery-masonry {
+      grid-auto-rows: clamp(150px, 16vw, 200px);
+    }
+  }
+
+  /* ── ≤ 1200px : slightly smaller tiles ─────────────────────────────────── */
+  @media (max-width: 1200px) {
+    .gallery-masonry {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-rows: clamp(140px, 15vw, 180px);
+      gap: 0.85rem;
+    }
+  }
+
+  /* ── ≤ 1024px : 3-column masonry ──────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .gallery-masonry {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: clamp(140px, 17vw, 200px);
+    }
+
+    .videos-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    }
+  }
+
+  /* ── ≤ 900px : tablet portrait ────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .gallery-masonry {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: clamp(130px, 18vw, 180px);
+      gap: 0.75rem;
+    }
+
+    .gallery-tabs {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .gtab {
+      flex: 1 1 auto;
+    }
+  }
+
+  /* ── ≤ 768px : 2-column masonry, tabs full-width ──────────────────────── */
+  @media (max-width: 768px) {
+    .gallery-masonry {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: clamp(130px, 22vw, 180px);
+      gap: 0.65rem;
+    }
+
+    /* wide tiles lose their 2-col span */
+    .gal-item.gal-wide {
+      grid-column: span 1;
+    }
+
+    .gallery-tabs {
+      flex-wrap: wrap;
+      border-radius: 16px;
+      width: 100%;
+      padding: 0.3rem;
+      gap: 0.35rem;
+    }
+
+    .gtab {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .videos-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .lightbox-prev {
+      left: 0.35rem;
+    }
+    .lightbox-next {
+      right: 0.35rem;
+    }
+
+    .lightbox-inner img {
+      max-height: 70vh;
+      max-height: 70dvh;
+    }
+  }
+
+  /* ── ≤ 640px : large phones ────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .gallery-hero {
+      padding: calc(var(--nav-h, 72px) + 1.75rem) clamp(1rem, 4vw, 1.25rem) 2rem;
+    }
+
+    .gallery-hero h1 {
+      font-size: clamp(1.75rem, 8.5vw, 2.4rem);
+    }
+
+    .gallery-section {
+      padding: 1.75rem 0 2.75rem;
+    }
+
+    .gallery-section .container {
+      padding: 0 clamp(0.9rem, 3.4vw, 1rem);
+    }
+
+    .gallery-masonry {
+      grid-auto-rows: clamp(120px, 26vw, 160px);
+      gap: 0.55rem;
+    }
+
+    .gal-item {
+      border-radius: 10px;
+    }
+
+    /* always show overlay on touch, shrink icon */
+    .gal-overlay i {
+      font-size: 1.25rem;
+    }
+
+    .gal-overlay span {
+      font-size: 0.7rem;
+      bottom: 0.5rem;
+      padding: 0 0.5rem;
+    }
+
+    /* disable floating animation on small screens */
+    .gal-item.gal-float.visible {
+      animation: none;
+    }
+
+    .gallery-section-title {
+      font-size: 1.05rem;
+      margin-bottom: 1rem;
+    }
+
+    .video-caption {
+      font-size: 0.82rem;
+      padding: 0.7rem 0.85rem;
+    }
+
+    .lightbox {
+      padding: 0.5rem;
+    }
+
+    .lightbox-inner img {
+      max-height: 66vh;
+      max-height: 66dvh;
+      border-radius: 6px;
+    }
+
+    .lightbox-inner p {
+      font-size: 0.78rem;
+      margin-top: 0.6rem;
+    }
+  }
+
+  /* ── ≤ 560px : small phones ────────────────────────────────────────────── */
+  @media (max-width: 560px) {
+    .gallery-hero h1 {
+      font-size: clamp(1.6rem, 9vw, 2.1rem);
+    }
+
+    .gallery-hero-sub {
+      font-size: 0.88rem;
+    }
+
+    .gallery-tabs {
+      padding: 0.25rem;
+      border-radius: 14px;
+      margin-bottom: 1.5rem;
+    }
+
+    .gtab {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.78rem;
+      gap: 0.35rem;
+    }
+
+    .gtab-count {
+      font-size: 0.65rem;
+      padding: 0.08rem 0.4rem;
+    }
+
+    .gallery-masonry {
+      grid-auto-rows: clamp(110px, 28vw, 150px);
+      gap: 0.5rem;
+    }
+
+    /* disable overlay completely, make images tap-friendly */
+    .gal-overlay {
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.6) 0%,
+        transparent 60%
+      );
+    }
+
+    .gal-overlay i {
+      font-size: 1.1rem;
+    }
+
+    .gallery-section-title {
+      font-size: 1rem;
+    }
+
+    .video-link-thumb {
+      height: 150px;
+    }
+
+    .lightbox-inner img {
+      max-height: 60vh;
+      max-height: 60dvh;
+    }
+
+    .lightbox-close {
+      top: 0.6rem;
+      right: 0.6rem;
+    }
+  }
+
+  /* ── ≤ 480px : standard mobile ─────────────────────────────────────────── */
+  @media (max-width: 480px) {
+    .gallery-hero {
+      padding: calc(var(--nav-h, 72px) + 1.4rem) clamp(0.9rem, 4vw, 1.1rem)
+        1.75rem;
+    }
+
+    .gallery-hero h1 {
+      font-size: clamp(1.5rem, 9.5vw, 1.9rem);
+    }
+
+    .gallery-hero-sub {
+      font-size: 0.82rem;
+      margin-top: 0.6rem;
+    }
+
+    .gallery-section .container {
+      padding: 0 clamp(0.75rem, 3.4vw, 0.9rem);
+    }
+
+    /* force single-tall collapse so all tiles equal height */
+    .gallery-masonry {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: clamp(110px, 32vw, 140px);
+      gap: 0.45rem;
+    }
+
+    .gal-item.gal-tall {
+      grid-row: span 1;
+    }
+
+    .gal-item.gal-wide {
+      grid-column: span 1;
+    }
+
+    /* always show the overlay lightly so users know tiles are tappable */
+    .gal-overlay {
+      opacity: 1;
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.55) 0%,
+        transparent 65%
+      );
+    }
+
+    .gal-overlay i {
+      font-size: 1rem;
+      opacity: 0.85;
+    }
+
+    .gal-overlay span {
+      font-size: 0.66rem;
+      bottom: 0.4rem;
+    }
+
+    .gallery-section-title {
+      font-size: 0.95rem;
+      gap: 0.4rem;
+    }
+
+    .video-caption {
+      font-size: 0.78rem;
+    }
+
+    /* Lightbox: shift nav buttons to bottom row so image has full width */
+    .lightbox-prev,
+    .lightbox-next {
+      top: auto;
+      bottom: clamp(0.75rem, 3vw, 1rem);
+      transform: none;
+      width: 42px;
+      height: 42px;
+    }
+
+    .lightbox-prev {
+      left: 50%;
+      transform: translateX(-140%);
+    }
+
+    .lightbox-next {
+      right: 50%;
+      transform: translateX(140%);
+    }
+
+    .lightbox-inner img {
+      max-height: 58vh;
+      max-height: 58dvh;
+    }
+
+    .lightbox-inner p {
+      font-size: 0.74rem;
+      margin-top: 0.5rem;
+      margin-bottom: 3.5rem; /* space for the bottom nav */
+    }
+  }
+
+  /* ── ≤ 380px : iPhone SE / small Android ───────────────────────────────── */
+  @media (max-width: 380px) {
+    .gallery-hero {
+      padding: calc(var(--nav-h, 72px) + 1.2rem) 0.75rem 1.5rem;
+    }
+
+    .gallery-hero h1 {
+      font-size: 1.4rem;
+      letter-spacing: 0.01em;
+    }
+
+    .gallery-hero-sub {
+      font-size: 0.78rem;
+    }
+
+    .gallery-section .container {
+      padding: 0 0.75rem;
+    }
+
+    .gallery-tabs {
+      padding: 0.2rem;
+      border-radius: 12px;
+      gap: 0.25rem;
+    }
+
+    .gtab {
+      padding: 0.35rem 0.55rem;
+      font-size: 0.72rem;
+      gap: 0.25rem;
+    }
+
+    .gtab i {
+      font-size: 0.7rem;
+    }
+
+    .gtab-count {
+      font-size: 0.58rem;
+      padding: 0.05rem 0.32rem;
+    }
+
+    .gallery-masonry {
+      grid-auto-rows: clamp(100px, 33vw, 130px);
+      gap: 0.4rem;
+    }
+
+    .gal-item {
+      border-radius: 8px;
+    }
+
+    .gal-overlay i {
+      font-size: 0.9rem;
+    }
+
+    .gal-overlay span {
+      font-size: 0.62rem;
+      bottom: 0.35rem;
+      padding: 0 0.35rem;
+    }
+
+    .gallery-section-title {
+      font-size: 0.88rem;
+    }
+
+    .video-caption {
+      font-size: 0.74rem;
+      padding: 0.6rem 0.7rem;
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+      width: 38px;
+      height: 38px;
+      font-size: 0.85rem;
+    }
+
+    .lightbox-inner img {
+      max-height: 54vh;
+      max-height: 54dvh;
+    }
+
+    .lightbox-inner p {
+      font-size: 0.7rem;
+    }
+
+    .lightbox-close {
+      width: 36px;
+      height: 36px;
+      font-size: 0.95rem;
+    }
+  }
+
+  /* ── ≤ 320px : ultra-small / foldables ─────────────────────────────────── */
+  @media (max-width: 320px) {
+    .gallery-hero {
+      padding: calc(var(--nav-h, 72px) + 1rem) 0.65rem 1.25rem;
+    }
+
+    .gallery-hero h1 {
+      font-size: 1.28rem;
+    }
+
+    .gallery-hero-sub {
+      font-size: 0.74rem;
+    }
+
+    .gallery-section .container {
+      padding: 0 0.65rem;
+    }
+
+    .gallery-tabs {
+      gap: 0.2rem;
+    }
+
+    .gtab {
+      padding: 0.3rem 0.45rem;
+      font-size: 0.68rem;
+    }
+
+    .gtab-count {
+      display: none;
+    }
+
+    .gallery-masonry {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: clamp(180px, 55vw, 220px);
+      gap: 0.4rem;
+    }
+
+    .gallery-section-title {
+      font-size: 0.85rem;
+    }
+
+    .video-link-thumb {
+      height: 130px;
+    }
+
+    .video-link-thumb i {
+      font-size: 2.2rem;
+    }
+
+    .video-caption {
+      font-size: 0.7rem;
+    }
+
+    .lightbox-inner img {
+      max-height: 50vh;
+      max-height: 50dvh;
+    }
+  }
+
+  /* ── Landscape phones (short viewport) ─────────────────────────────────── */
+  @media (max-height: 520px) and (orientation: landscape) {
+    .gallery-hero {
+      padding: calc(var(--nav-h, 72px) + 1rem) 1rem 1.5rem;
+    }
+
+    .gallery-hero h1 {
+      font-size: clamp(1.5rem, 5vw, 2.25rem);
+    }
+
+    .gallery-section {
+      padding: 1.25rem 0 2rem;
+    }
+
+    .gallery-masonry {
+      grid-auto-rows: 140px;
+    }
+
+    .lightbox-inner img {
+      max-height: 70vh;
+      max-height: 70dvh;
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+      top: 50%;
+      bottom: auto;
+      transform: translateY(-50%);
+    }
+
+    .lightbox-prev {
+      left: 0.5rem;
+    }
+
+    .lightbox-next {
+      right: 0.5rem;
+    }
+
+    .lightbox-inner p {
+      margin-bottom: 0;
+    }
+  }
+
+  /* ── Touch devices: neutralize hover-only effects ──────────────────────── */
+  @media (hover: none) {
+    .gal-item:hover img {
+      transform: none;
+    }
+
+    .gal-item:hover {
+      box-shadow: none;
+      border-color: var(--border);
+    }
+
+    .gal-item.gal-float.visible {
+      animation: none;
+    }
+
+    .gal-item:hover .gal-overlay {
+      opacity: 1;
+    }
+
+    .video-card:hover,
+    .video-card.visible:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: var(--border);
+    }
+
+    .video-link-card:hover .video-link-thumb {
+      background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+    }
+
+    .video-link-card:hover .video-link-thumb i {
+      transform: none;
+    }
+
+    .gtab:hover {
+      color: var(--text2);
+    }
+
+    .gtab.active:hover {
+      color: #000;
+    }
+  }
+
+  /* ── Focus visibility (keyboard accessibility) ─────────────────────────── */
+  .gtab:focus-visible,
+  .gal-item:focus-visible,
+  .lightbox-close:focus-visible,
+  .lightbox-prev:focus-visible,
+  .lightbox-next:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* ── Reduced motion ────────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+
+    .gal-item,
+    .video-card {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    .gal-item.gal-float.visible {
+      animation: none;
+    }
+
+    .gal-item:hover img {
+      transform: none;
+    }
+  }
+
+  /* ── Print ─────────────────────────────────────────────────────────────── */
+  @media print {
+    .gallery-hero::before,
+    .gallery-tabs,
+    .lightbox,
+    .gallery-section-title i {
+      display: none !important;
+    }
+
+    body {
+      background: #fff;
+      color: #000;
+    }
+
+    .gallery-hero {
+      background: #fff;
+      border-bottom: 1px solid #ccc;
+      padding: 1rem 0;
+    }
+
+    .gallery-hero h1 {
+      color: #000;
+    }
+
+    .gallery-masonry {
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 150px;
+      gap: 6px;
+    }
+
+    .gal-item,
+    .video-card {
+      border: 1px solid #ccc;
+      box-shadow: none;
+      opacity: 1 !important;
+      transform: none !important;
+      break-inside: avoid;
+    }
+
+    .gal-overlay {
+      display: none;
+    }
+
+    .video-embed-wrap {
+      display: none;
+    }
+
+    .video-link-thumb {
+      height: 100px;
+      background: #f5f5f5;
+    }
+  }
+</style>
+
+<script>
+  // ── FILTER ────────────────────────────────────────────────────────────────────
+  function filterGallery(filter, btn) {
+    document
+      .querySelectorAll(".gtab")
+      .forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    const pb = document.getElementById("block-photos");
+    const vb = document.getElementById("block-videos");
+    if (pb) pb.classList.toggle("hidden", filter === "videos");
+    if (vb) vb.classList.toggle("hidden", filter === "photos");
+  }
+
+  // ── LIGHTBOX ──────────────────────────────────────────────────────────────────
+  let _lbItems = [],
+    _lbIdx = 0;
+
+  function openLightbox(el) {
+    _lbItems = Array.from(document.querySelectorAll("#photoGrid .gal-item"));
+    _lbIdx = _lbItems.indexOf(el);
+    _showLightbox(_lbIdx);
+    document.getElementById("lightbox").classList.add("open");
+    document.addEventListener("keydown", _lbKey);
+  }
+
+  function _showLightbox(idx) {
+    const el = _lbItems[idx];
+    if (!el) return;
+    document.getElementById("lightboxImg").src = el.dataset.url;
+    document.getElementById("lightboxCaption").textContent =
+      el.dataset.caption || "";
+  }
+
+  function lightboxNav(dir) {
+    _lbIdx = (_lbIdx + dir + _lbItems.length) % _lbItems.length;
+    _showLightbox(_lbIdx);
+  }
+
+  function closeLightbox() {
+    document.getElementById("lightbox").classList.remove("open");
+    document.removeEventListener("keydown", _lbKey);
+  }
+
+  function _lbKey(e) {
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") lightboxNav(1);
+    if (e.key === "ArrowLeft") lightboxNav(-1);
+  }
+
+  // ── SCROLL REVEAL ─────────────────────────────────────────────────────────────
+  const _revObs = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add("visible"), i * 60);
+          _revObs.unobserve(e.target);
+        }
+      });
+    },
+    { threshold: 0.08 },
+  );
+
+  document
+    .querySelectorAll(".gal-item, .video-card")
+    .forEach((el) => _revObs.observe(el));
+</script>
+{% endblock %}

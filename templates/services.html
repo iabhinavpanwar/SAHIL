@@ -1,0 +1,1627 @@
+{% extends "base.html" %} {% block title %}Services — {{
+cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
+<style>
+  /* ══════════════════════════════════════════════════════════════════════════
+   SERVICES PAGE — FULLY RESPONSIVE STYLESHEET
+   Breakpoints: 1400 · 1200 · 1024 · 900 · 768 · 640 · 560 · 480 · 380 · 320
+   ══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── PAGE HERO ─────────────────────────────────────────────────────────── */
+  .services-hero {
+    position: relative;
+    padding: calc(var(--nav-h, 72px) + clamp(2.25rem, 6vw, 4rem))
+      clamp(1rem, 4vw, 1.5rem) clamp(2.25rem, 6vw, 4rem);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .services-hero::before {
+    content: "";
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: clamp(260px, 45vw, 600px);
+    height: clamp(260px, 45vw, 600px);
+    background: radial-gradient(
+      circle,
+      rgba(232, 255, 0, 0.06) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .services-hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40%;
+    left: -10%;
+    width: clamp(200px, 36vw, 450px);
+    height: clamp(200px, 36vw, 450px);
+    background: radial-gradient(
+      circle,
+      rgba(232, 255, 0, 0.04) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .services-hero .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .services-hero .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: clamp(0.7rem, 1.7vw, 0.85rem);
+  }
+
+  .services-hero .section-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 12px var(--primary);
+    animation: svc-pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes svc-pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.3);
+    }
+  }
+
+  .services-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 7.5vw, 4.5rem);
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    margin-top: 0.5rem;
+    animation: svc-fade-up 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    overflow-wrap: break-word;
+  }
+
+  .services-hero h1 .accent {
+    color: var(--primary);
+    position: relative;
+    display: inline-block;
+  }
+
+  .services-hero h1 .accent::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: svc-underline 0.9s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      forwards;
+  }
+
+  @keyframes svc-underline {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes svc-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .services-hero p.lead {
+    color: var(--text2);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    max-width: 620px;
+    margin-top: 1rem;
+    line-height: 1.7;
+  }
+
+  /* ── PRICING SECTION ───────────────────────────────────────────────────── */
+  .pricing-section {
+    padding: clamp(2.5rem, 7vw, 5rem) 0;
+    position: relative;
+    width: 100%;
+  }
+
+  .pricing-section .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .pricing-section .billing-note {
+    text-align: center;
+    color: var(--text3);
+    font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+    margin-bottom: clamp(1.75rem, 4.5vw, 2.5rem);
+    line-height: 1.55;
+    padding: 0 0.5rem;
+  }
+
+  .pricing-section .billing-note strong {
+    color: var(--primary);
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(290px, 100%), 1fr));
+    gap: clamp(1rem, 2.5vw, 1.5rem);
+    align-items: stretch;
+  }
+
+  /* ── PRICING CARD ──────────────────────────────────────────────────────── */
+  .pricing-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(1.75rem, 4.4vw, 2.5rem) clamp(1.25rem, 3vw, 1.75rem)
+      clamp(1.5rem, 3.6vw, 2rem);
+    position: relative;
+    transition: all var(--transition);
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    animation: svc-fade-up 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    min-width: 0;
+  }
+
+  .pricing-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 50% 0%,
+      rgba(232, 255, 0, 0.04) 0%,
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity var(--transition);
+    pointer-events: none;
+  }
+
+  .pricing-card:hover {
+    border-color: rgba(232, 255, 0, 0.35);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .pricing-card:hover::before {
+    opacity: 1;
+  }
+
+  .pricing-card.featured {
+    border-color: var(--primary);
+    box-shadow:
+      0 0 0 1px var(--primary),
+      0 20px 60px rgba(232, 255, 0, 0.12);
+    background:
+      linear-gradient(180deg, rgba(232, 255, 0, 0.05) 0%, transparent 40%),
+      var(--card);
+  }
+
+  .pricing-card.featured:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow:
+      0 0 0 1px var(--primary),
+      0 28px 70px rgba(232, 255, 0, 0.2);
+  }
+
+  /* ── FEATURED BADGE ────────────────────────────────────────────────────── */
+  .pricing-badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: #000;
+    font-size: clamp(0.62rem, 1.4vw, 0.72rem);
+    font-weight: 700;
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    box-shadow: 0 8px 24px rgba(232, 255, 0, 0.35);
+    z-index: 2;
+    max-width: calc(100% - 1rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pricing-badge::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    border: 1px solid rgba(232, 255, 0, 0.4);
+    animation: svc-badge-ring 2.5s ease-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes svc-badge-ring {
+    0% {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.15);
+    }
+  }
+
+  /* ── PRICING HEADER ────────────────────────────────────────────────────── */
+  .pricing-header {
+    padding-bottom: clamp(1.1rem, 2.6vw, 1.5rem);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: clamp(1.1rem, 2.6vw, 1.5rem);
+  }
+
+  .pricing-icon {
+    width: clamp(44px, 10vw, 52px);
+    height: clamp(44px, 10vw, 52px);
+    border-radius: 14px;
+    background: rgba(232, 255, 0, 0.08);
+    border: 1px solid rgba(232, 255, 0, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: clamp(0.85rem, 2vw, 1.1rem);
+    transition: all var(--transition);
+  }
+
+  .pricing-icon i {
+    font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+    color: var(--primary);
+    transition: color var(--transition);
+  }
+
+  .pricing-card:hover .pricing-icon {
+    background: var(--primary);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .pricing-card:hover .pricing-icon i {
+    color: #000;
+  }
+
+  .pricing-header h3 {
+    font-size: clamp(1.1rem, 2.6vw, 1.3rem);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.4rem;
+    overflow-wrap: break-word;
+  }
+
+  .pricing-header p.subtitle {
+    color: var(--text2);
+    font-size: clamp(0.8rem, 1.8vw, 0.88rem);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .pricing-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-size: clamp(1.5rem, 4.2vw, 2rem);
+    font-weight: 800;
+    color: var(--primary);
+    margin-top: clamp(0.85rem, 2vw, 1.1rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    flex-wrap: wrap;
+    overflow-wrap: break-word;
+  }
+
+  .pricing-price .suffix {
+    font-size: clamp(0.72rem, 1.6vw, 0.85rem);
+    font-weight: 500;
+    color: var(--text3);
+    letter-spacing: 0;
+  }
+
+  /* ── FEATURES LIST ─────────────────────────────────────────────────────── */
+  .pricing-features {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.55rem, 1.6vw, 0.75rem);
+    margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+    flex: 1;
+    list-style: none;
+    padding: 0;
+  }
+
+  .pricing-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    font-size: clamp(0.82rem, 1.9vw, 0.9rem);
+    color: var(--text2);
+    line-height: 1.55;
+    transition: color var(--transition);
+    min-width: 0;
+  }
+
+  .pricing-features li:hover {
+    color: var(--text);
+  }
+
+  .pricing-features li i {
+    color: var(--primary);
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+    font-size: clamp(0.82rem, 1.8vw, 0.9rem);
+  }
+
+  .pricing-features li span {
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+
+  /* ── CTA BUTTON ────────────────────────────────────────────────────────── */
+  .pricing-card .btn {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: clamp(0.75rem, 2vw, 0.85rem) 1.25rem;
+    font-weight: 700;
+    width: 100%;
+    transition: all var(--transition);
+    text-align: center;
+  }
+
+  .pricing-card.featured .btn-primary::after {
+    opacity: 0;
+  }
+
+  /* ── TRUST STRIP ───────────────────────────────────────────────────────── */
+  .trust-strip {
+    margin-top: clamp(2.25rem, 5.5vw, 3.5rem);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 2rem);
+    flex-wrap: wrap;
+    padding: clamp(1rem, 2.6vw, 1.5rem) 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text2);
+    font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .trust-item i {
+    color: var(--primary);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    flex-shrink: 0;
+  }
+
+  /* ── FAQ SECTION ───────────────────────────────────────────────────────── */
+  .faq-section {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: clamp(2.5rem, 7vw, 5rem) 0;
+    width: 100%;
+  }
+
+  .faq-section .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .faq-container {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .faq-section .section-header {
+    text-align: center;
+    margin-bottom: clamp(1.75rem, 4.5vw, 3rem);
+  }
+
+  .faq-section .section-header h2 {
+    font-size: clamp(1.3rem, 3.4vw, 2.25rem);
+    letter-spacing: -0.02em;
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .faq-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: all var(--transition);
+    animation: svc-fade-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  .faq-item:hover {
+    border-color: rgba(232, 255, 0, 0.2);
+  }
+
+  .faq-item.open {
+    border-color: rgba(232, 255, 0, 0.4);
+    background:
+      linear-gradient(180deg, rgba(232, 255, 0, 0.03) 0%, transparent 50%),
+      var(--card);
+  }
+
+  .faq-q {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: clamp(0.6rem, 2vw, 1rem);
+    padding: clamp(1rem, 2.6vw, 1.25rem) clamp(1rem, 3vw, 1.5rem);
+    font-size: clamp(0.88rem, 2vw, 1rem);
+    font-weight: 600;
+    color: var(--text);
+    text-align: left;
+    transition: all var(--transition);
+    line-height: 1.5;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--font);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .faq-q span {
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+
+  .faq-q:hover {
+    color: var(--primary);
+  }
+
+  .faq-item.open .faq-q {
+    color: var(--primary);
+  }
+
+  .faq-q i {
+    flex-shrink: 0;
+    width: clamp(24px, 6vw, 28px);
+    height: clamp(24px, 6vw, 28px);
+    border-radius: 50%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--text3);
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .faq-item.open .faq-q i {
+    transform: rotate(180deg);
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #000;
+  }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .faq-item.open .faq-a {
+    max-height: 900px;
+  }
+
+  .faq-a p {
+    padding: 0 clamp(1rem, 3vw, 1.5rem) clamp(1rem, 2.6vw, 1.35rem);
+    color: var(--text2);
+    line-height: 1.75;
+    font-size: clamp(0.85rem, 1.9vw, 0.95rem);
+    white-space: pre-line;
+    overflow-wrap: break-word;
+  }
+
+  /* ── CTA BANNER (bottom) ───────────────────────────────────────────────── */
+  .services-cta {
+    background: var(--primary);
+    padding: clamp(2.5rem, 7vw, 5rem) clamp(1rem, 4vw, 1.5rem);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .services-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(0, 0, 0, 0.04) 0px,
+      rgba(0, 0, 0, 0.04) 1px,
+      transparent 1px,
+      transparent 12px
+    );
+    pointer-events: none;
+  }
+
+  .services-cta .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .services-cta h2 {
+    color: #000;
+    font-size: clamp(1.25rem, 3.8vw, 2.5rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+    overflow-wrap: break-word;
+  }
+
+  .services-cta p {
+    color: rgba(0, 0, 0, 0.68);
+    font-size: clamp(0.9rem, 2.1vw, 1.05rem);
+    margin-bottom: clamp(1.5rem, 3.6vw, 2rem);
+  }
+
+  .services-cta .btn-cta-dark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #000;
+    color: var(--primary);
+    padding: clamp(0.85rem, 2.2vw, 1rem) clamp(1.5rem, 4vw, 2.25rem);
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: clamp(0.88rem, 2vw, 1rem);
+    border: 2px solid #000;
+    transition: all var(--transition);
+    white-space: nowrap;
+    min-height: 46px;
+  }
+
+  .services-cta .btn-cta-dark:hover {
+    background: #111;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  /* ── EMPTY STATE ───────────────────────────────────────────────────────── */
+  .services-empty {
+    text-align: center;
+    padding: clamp(2.5rem, 7vw, 4rem) clamp(1rem, 3vw, 1.5rem);
+    background: var(--bg2);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+
+  .services-empty img.empty-logo {
+    width: clamp(56px, 14vw, 72px);
+    height: clamp(56px, 14vw, 72px);
+    object-fit: contain;
+    margin: 0 auto 1rem;
+    display: block;
+    opacity: 0.5;
+  }
+
+  .services-empty p {
+    color: var(--text2);
+    margin-bottom: 1.25rem;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+  }
+
+  .services-empty .btn {
+    width: fit-content;
+    min-width: 180px;
+  }
+
+  /* ── SCROLL REVEAL ────────────────────────────────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
+    transition-delay: var(--delay, 0s);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── ≤ 1200px : tighter grids ─────────────────────────────────────────── */
+  @media (max-width: 1200px) {
+    .pricing-grid {
+      gap: 1.25rem;
+    }
+  }
+
+  /* ── ≤ 1024px : tablets landscape ─────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .pricing-grid {
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: 1rem;
+    }
+
+    .trust-strip {
+      gap: 1.25rem;
+    }
+  }
+
+  /* ── ≤ 900px : disable featured scale ─────────────────────────────────── */
+  @media (max-width: 900px) {
+    .pricing-card.featured {
+      transform: none;
+      box-shadow:
+        0 0 0 1px var(--primary),
+        0 12px 40px rgba(232, 255, 0, 0.1);
+    }
+
+    .pricing-card.featured:hover {
+      transform: translateY(-6px);
+    }
+  }
+
+  /* ── ≤ 768px : tablet portrait ────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .services-hero {
+      padding: calc(var(--nav-h, 72px) + 2.25rem) clamp(1rem, 4vw, 1.5rem)
+        2.5rem;
+    }
+
+    .services-hero h1 {
+      font-size: clamp(1.75rem, 8vw, 2.5rem);
+    }
+
+    .pricing-section {
+      padding: 2.5rem 0 3.5rem;
+    }
+
+    .pricing-card {
+      padding: 2rem 1.5rem 1.75rem;
+    }
+
+    .trust-strip {
+      justify-content: flex-start;
+      gap: 1rem 1.5rem;
+    }
+
+    .faq-section {
+      padding: 2.5rem 0 3.5rem;
+    }
+
+    .services-cta {
+      padding: 3rem 1.25rem;
+    }
+  }
+
+  /* ── ≤ 640px : large phones ────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    :root {
+      --radius: 14px;
+      --radius-sm: 9px;
+    }
+
+    .services-hero {
+      padding: calc(var(--nav-h, 72px) + 1.75rem) clamp(1rem, 4vw, 1.25rem) 2rem;
+    }
+
+    .services-hero h1 {
+      font-size: clamp(1.6rem, 8.5vw, 2.1rem);
+      line-height: 1.1;
+    }
+
+    .services-hero p.lead {
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    .pricing-section .container,
+    .faq-section .container {
+      padding: 0 clamp(0.9rem, 3.4vw, 1.15rem);
+    }
+
+    .pricing-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .pricing-card {
+      padding: 2rem 1.35rem 1.75rem;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .pricing-card.featured:hover {
+      transform: translateY(-3px);
+    }
+
+    .pricing-price {
+      font-size: 1.75rem;
+    }
+
+    .pricing-price .suffix {
+      font-size: 0.78rem;
+    }
+
+    /* Badge slightly lower so it doesn't overlap card top */
+    .pricing-badge {
+      top: -12px;
+      font-size: 0.66rem;
+      padding: 0.3rem 0.85rem;
+    }
+
+    /* Trust strip stacks two-per-row */
+    .trust-strip {
+      gap: 0.75rem 1.25rem;
+      padding: 1.25rem 0;
+      justify-content: center;
+    }
+
+    .trust-item {
+      font-size: 0.78rem;
+      white-space: normal;
+    }
+
+    .faq-q {
+      padding: 1rem 1.15rem;
+      font-size: 0.92rem;
+    }
+
+    .faq-a p {
+      padding: 0 1.15rem 1.1rem;
+      font-size: 0.87rem;
+    }
+
+    .services-cta .btn-cta-dark {
+      width: 100%;
+      max-width: 340px;
+      justify-content: center;
+    }
+  }
+
+  /* ── ≤ 560px : small phones ───────────────────────────────────────────── */
+  @media (max-width: 560px) {
+    .services-hero h1 {
+      font-size: clamp(1.5rem, 9vw, 1.85rem);
+    }
+
+    .services-hero .section-eyebrow {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+    }
+
+    .services-hero p.lead {
+      font-size: 0.85rem;
+    }
+
+    .pricing-section .billing-note {
+      font-size: 0.78rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pricing-card {
+      padding: 1.75rem 1.15rem 1.5rem;
+    }
+
+    .pricing-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      margin-bottom: 0.85rem;
+    }
+
+    .pricing-icon i {
+      font-size: 1.05rem;
+    }
+
+    .pricing-header h3 {
+      font-size: 1.1rem;
+    }
+
+    .pricing-header p.subtitle {
+      font-size: 0.82rem;
+    }
+
+    .pricing-price {
+      font-size: 1.6rem;
+    }
+
+    .pricing-features li {
+      font-size: 0.84rem;
+      gap: 0.6rem;
+    }
+
+    .trust-strip {
+      gap: 0.65rem 1rem;
+    }
+
+    .trust-item {
+      font-size: 0.76rem;
+      gap: 0.45rem;
+    }
+
+    .services-cta h2 {
+      font-size: 1.35rem;
+      line-height: 1.25;
+    }
+
+    .services-cta p {
+      font-size: 0.88rem;
+    }
+  }
+
+  /* ── ≤ 480px : standard mobile ─────────────────────────────────────────── */
+  @media (max-width: 480px) {
+    :root {
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    .services-hero {
+      padding: calc(var(--nav-h, 72px) + 1.4rem) 0.9rem 1.75rem;
+    }
+
+    .services-hero h1 {
+      font-size: clamp(1.4rem, 9.5vw, 1.75rem);
+      line-height: 1.15;
+    }
+
+    .services-hero p.lead {
+      font-size: 0.82rem;
+      line-height: 1.6;
+      margin-top: 0.8rem;
+    }
+
+    .pricing-section .container,
+    .faq-section .container {
+      padding: 0 0.9rem;
+    }
+
+    .pricing-section {
+      padding: 1.75rem 0 2.5rem;
+    }
+
+    .pricing-grid {
+      gap: 1.25rem;
+    }
+
+    .pricing-card {
+      padding: 1.6rem 1rem 1.35rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .pricing-card:hover,
+    .pricing-card.featured:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .pricing-card.featured {
+      box-shadow:
+        0 0 0 1px var(--primary),
+        0 8px 24px rgba(232, 255, 0, 0.08);
+    }
+
+    .pricing-badge {
+      top: -11px;
+      font-size: 0.6rem;
+      padding: 0.28rem 0.75rem;
+      letter-spacing: 0.06em;
+    }
+
+    .pricing-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+    }
+
+    .pricing-icon i {
+      font-size: 1rem;
+    }
+
+    .pricing-header {
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .pricing-header h3 {
+      font-size: 1.05rem;
+    }
+
+    .pricing-price {
+      font-size: 1.5rem;
+    }
+
+    .pricing-price .suffix {
+      font-size: 0.72rem;
+    }
+
+    .pricing-features {
+      gap: 0.55rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .pricing-features li {
+      font-size: 0.8rem;
+    }
+
+    .pricing-card .btn {
+      padding: 0.7rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .trust-strip {
+      margin-top: 1.75rem;
+      padding: 1rem 0;
+      gap: 0.6rem 0.9rem;
+    }
+
+    .trust-item {
+      font-size: 0.72rem;
+    }
+
+    .trust-item i {
+      font-size: 0.85rem;
+    }
+
+    .faq-section {
+      padding: 1.75rem 0 2.5rem;
+    }
+
+    .faq-section .section-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .faq-section .section-header h2 {
+      font-size: 1.2rem;
+    }
+
+    .faq-list {
+      gap: 0.5rem;
+    }
+
+    .faq-q {
+      padding: 0.85rem 0.9rem;
+      font-size: 0.85rem;
+      gap: 0.6rem;
+    }
+
+    .faq-q i {
+      width: 24px;
+      height: 24px;
+      font-size: 0.68rem;
+    }
+
+    .faq-a p {
+      padding: 0 0.9rem 0.9rem;
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .services-cta {
+      padding: 2.5rem 1rem;
+    }
+
+    .services-cta h2 {
+      font-size: 1.2rem;
+    }
+
+    .services-cta p {
+      font-size: 0.84rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .services-cta .btn-cta-dark {
+      max-width: 100%;
+      padding: 0.8rem 1.25rem;
+      font-size: 0.85rem;
+    }
+
+    .services-empty {
+      padding: 2rem 1rem;
+    }
+
+    .services-empty .btn {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
+  /* ── ≤ 380px : iPhone SE / small Android ──────────────────────────────── */
+  @media (max-width: 380px) {
+    .services-hero {
+      padding: calc(var(--nav-h, 72px) + 1.2rem) 0.75rem 1.5rem;
+    }
+
+    .services-hero h1 {
+      font-size: 1.3rem;
+      letter-spacing: 0.01em;
+    }
+
+    .services-hero p.lead {
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+
+    .pricing-section .container,
+    .faq-section .container {
+      padding: 0 0.75rem;
+    }
+
+    .pricing-section .billing-note {
+      font-size: 0.72rem;
+    }
+
+    .pricing-card {
+      padding: 1.5rem 0.9rem 1.25rem;
+    }
+
+    .pricing-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+    }
+
+    .pricing-icon i {
+      font-size: 0.95rem;
+    }
+
+    .pricing-header h3 {
+      font-size: 1rem;
+    }
+
+    .pricing-header p.subtitle {
+      font-size: 0.78rem;
+    }
+
+    .pricing-price {
+      font-size: 1.35rem;
+    }
+
+    .pricing-features li {
+      font-size: 0.76rem;
+      gap: 0.5rem;
+    }
+
+    .pricing-features li i {
+      font-size: 0.75rem;
+    }
+
+    .pricing-card .btn {
+      padding: 0.65rem 0.85rem;
+      font-size: 0.82rem;
+    }
+
+    .trust-item {
+      font-size: 0.7rem;
+      gap: 0.4rem;
+    }
+
+    .trust-item i {
+      font-size: 0.8rem;
+    }
+
+    .faq-q {
+      padding: 0.75rem 0.8rem;
+      font-size: 0.82rem;
+    }
+
+    .faq-q i {
+      width: 22px;
+      height: 22px;
+      font-size: 0.62rem;
+    }
+
+    .faq-a p {
+      padding: 0 0.8rem 0.8rem;
+      font-size: 0.78rem;
+    }
+
+    .services-cta h2 {
+      font-size: 1.1rem;
+    }
+
+    .services-cta p {
+      font-size: 0.8rem;
+    }
+
+    .services-cta .btn-cta-dark {
+      font-size: 0.82rem;
+      padding: 0.7rem 1rem;
+    }
+  }
+
+  /* ── ≤ 320px : ultra-small / foldables ────────────────────────────────── */
+  @media (max-width: 320px) {
+    .services-hero {
+      padding: calc(var(--nav-h, 72px) + 1rem) 0.65rem 1.25rem;
+    }
+
+    .services-hero h1 {
+      font-size: 1.15rem;
+    }
+
+    .services-hero p.lead {
+      font-size: 0.74rem;
+    }
+
+    .pricing-section .container,
+    .faq-section .container {
+      padding: 0 0.65rem;
+    }
+
+    .pricing-card {
+      padding: 1.35rem 0.8rem 1.15rem;
+    }
+
+    .pricing-header h3 {
+      font-size: 0.95rem;
+    }
+
+    .pricing-price {
+      font-size: 1.25rem;
+    }
+
+    .pricing-features li {
+      font-size: 0.72rem;
+    }
+
+    .trust-item {
+      font-size: 0.66rem;
+    }
+
+    .faq-q {
+      padding: 0.7rem 0.7rem;
+      font-size: 0.78rem;
+      gap: 0.5rem;
+    }
+
+    .faq-a p {
+      padding: 0 0.7rem 0.75rem;
+      font-size: 0.74rem;
+    }
+
+    .services-cta h2 {
+      font-size: 1rem;
+    }
+
+    .services-cta p {
+      font-size: 0.76rem;
+    }
+  }
+
+  /* ── Landscape phones (short viewport) ────────────────────────────────── */
+  @media (max-height: 520px) and (orientation: landscape) {
+    .services-hero {
+      padding: calc(var(--nav-h, 72px) + 1rem) 1rem 1.5rem;
+    }
+
+    .services-hero h1 {
+      font-size: clamp(1.4rem, 4.5vw, 2rem);
+    }
+
+    .pricing-section {
+      padding: 1.5rem 0 2rem;
+    }
+
+    .pricing-grid {
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: 1rem;
+    }
+
+    .faq-section {
+      padding: 1.5rem 0 2rem;
+    }
+
+    .services-cta {
+      padding: 1.75rem 1.25rem;
+    }
+  }
+
+  /* ── Touch devices: neutralize hover-only effects ─────────────────────── */
+  @media (hover: none) {
+    .pricing-card:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: var(--border);
+    }
+
+    .pricing-card:hover::before {
+      opacity: 0;
+    }
+
+    .pricing-card.featured:hover {
+      transform: none;
+      box-shadow:
+        0 0 0 1px var(--primary),
+        0 12px 40px rgba(232, 255, 0, 0.12);
+    }
+
+    .pricing-card:hover .pricing-icon {
+      background: rgba(232, 255, 0, 0.08);
+      border-color: rgba(232, 255, 0, 0.18);
+      transform: none;
+    }
+
+    .pricing-card:hover .pricing-icon i {
+      color: var(--primary);
+    }
+
+    .pricing-features li:hover {
+      color: var(--text2);
+    }
+
+    .faq-item:hover {
+      border-color: var(--border);
+    }
+
+    .faq-q:hover {
+      color: var(--text);
+    }
+
+    .faq-item.open .faq-q:hover {
+      color: var(--primary);
+    }
+
+    .services-cta .btn-cta-dark:hover {
+      transform: none;
+      box-shadow: none;
+      background: #000;
+    }
+  }
+
+  /* ── Focus visibility (keyboard accessibility) ────────────────────────── */
+  .faq-q:focus-visible,
+  .pricing-card .btn:focus-visible,
+  .services-cta .btn-cta-dark:focus-visible,
+  .services-empty .btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* ── Reduced motion ───────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+
+    .services-hero h1 .accent::after {
+      transform: scaleX(1);
+    }
+
+    .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+
+  /* ── Print ────────────────────────────────────────────────────────────── */
+  @media print {
+    .services-hero::before,
+    .services-hero::after,
+    .services-cta::before {
+      display: none;
+    }
+
+    body {
+      background: #fff;
+      color: #000;
+    }
+
+    .services-hero {
+      background: #fff;
+      border-bottom: 1px solid #ccc;
+      padding: 1rem 0;
+    }
+
+    .services-hero h1 {
+      color: #000;
+    }
+
+    .services-hero h1 .accent {
+      color: #333;
+    }
+
+    .services-hero p.lead {
+      color: #333;
+    }
+
+    .pricing-card,
+    .faq-item {
+      border: 1px solid #ccc;
+      box-shadow: none;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    .pricing-card.featured {
+      box-shadow: none;
+      border: 2px solid #000;
+    }
+
+    .pricing-badge {
+      background: #333;
+      color: #fff;
+    }
+
+    .faq-a {
+      max-height: none !important;
+    }
+
+    .services-cta {
+      background: #f5f5f5;
+      border-top: 1px solid #ccc;
+    }
+
+    .services-cta h2,
+    .services-cta p {
+      color: #000;
+    }
+
+    .services-cta .btn-cta-dark {
+      background: #fff;
+      color: #000;
+      border: 2px solid #000;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+
+<!-- ══ PAGE HERO ══════════════════════════════════════════════════════════ -->
+<section class="services-hero">
+  <div class="container">
+    <p class="section-eyebrow">Training Programs</p>
+    <h1>Services &amp; <span class="accent">Pricing</span></h1>
+    <p class="lead">
+      Choose the program that fits your goals — from one-on-one coaching to
+      fully managed transformation plans. Every package is tailored to you.
+    </p>
+  </div>
+</section>
+
+<!-- ══ PRICING ════════════════════════════════════════════════════════════ -->
+<section class="pricing-section">
+  <div class="container">
+    {% if services %}
+    <p class="billing-note">
+      <i
+        class="fas fa-info-circle"
+        style="color: var(--primary); margin-right: 0.35rem"
+      ></i>
+      All plans include a <strong>free consultation</strong> &amp; personalized
+      onboarding.
+    </p>
+
+    <div class="pricing-grid">
+      {% set svc_icons = ['fa-dumbbell', 'fa-fire-alt', 'fa-crown',
+      'fa-running', 'fa-heartbeat', 'fa-medal'] %} {% for svc in services %}
+      <div
+        class="pricing-card reveal {% if svc.get('badge') %}featured{% endif %}"
+        style="--delay:{{ loop.index0 * 0.08 }}s"
+      >
+        {% if svc.get('badge') %}
+        <div class="pricing-badge">{{ svc.badge }}</div>
+        {% endif %}
+
+        <div class="pricing-header">
+          <div class="pricing-icon">
+            <i class="fas {{ svc_icons[loop.index0 % svc_icons|length] }}"></i>
+          </div>
+          <h3>{{ svc.title }}</h3>
+          {% if svc.get('subtitle') %}
+          <p class="subtitle">{{ svc.subtitle }}</p>
+          {% endif %} {% if svc.get('price') %}
+          <div class="pricing-price">
+            {{ svc.price }}
+            <span class="suffix">/ plan</span>
+          </div>
+          {% endif %}
+        </div>
+
+        {% if svc.get('features') %}
+        <ul class="pricing-features">
+          {% for f in svc.features %}
+          <li><i class="fas fa-check-circle"></i> <span>{{ f }}</span></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+
+        <a
+          href="{{ url_for('contact') }}"
+          class="btn {% if svc.get('badge') %}btn-primary{% else %}btn-outline{% endif %}"
+        >
+          {{ svc.get('cta','Get Started') }}
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- trust strip -->
+    <div class="trust-strip">
+      <div class="trust-item">
+        <i class="fas fa-shield-alt"></i> Money-back guarantee
+      </div>
+      <div class="trust-item"><i class="fas fa-clock"></i> Cancel anytime</div>
+      <div class="trust-item">
+        <i class="fas fa-comments"></i> 24/7 WhatsApp support
+      </div>
+      <div class="trust-item">
+        <i class="fas fa-star"></i> 200+ happy clients
+      </div>
+    </div>
+
+    {% else %}
+    <div class="services-empty">
+      <img
+        src="{{ url_for('static', filename='IMAGE/logo.png') }}"
+        alt="Logo"
+        class="empty-logo"
+      />
+      <p>
+        Programs are being updated. Get in touch for current availability and
+        pricing.
+      </p>
+      <a href="{{ url_for('contact') }}" class="btn btn-primary">
+        Contact Me
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ══ FAQ ════════════════════════════════════════════════════════════════ -->
+{% if faqs %}
+<section class="faq-section">
+  <div class="container faq-container">
+    <div class="section-header">
+      <p class="section-eyebrow">Questions</p>
+      <h2>Frequently Asked</h2>
+    </div>
+    <div class="faq-list" id="faqList">
+      {% for f in faqs %}
+      <div class="faq-item" style="animation-delay:{{ loop.index0 * 0.05 }}s">
+        <button class="faq-q" type="button" aria-expanded="false">
+          <span>{{ f.question | e }}</span>
+          <i class="fas fa-chevron-down" aria-hidden="true"></i>
+        </button>
+        <div class="faq-a"><p>{{ f.answer | e }}</p></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ══ CTA BANNER ═════════════════════════════════════════════════════════ -->
+<section class="services-cta">
+  <div class="container">
+    <h2>Not Sure Which Plan Is Right For You?</h2>
+    <p>
+      Book a free consultation and I'll help you choose the perfect program for
+      your goals.
+    </p>
+    <a href="{{ url_for('contact') }}" class="btn-cta-dark">
+      <i class="fas fa-bolt"></i>
+      {{ cfg.get('hero_cta','Book Free Consultation') }}
+    </a>
+  </div>
+</section>
+
+{% endblock %} {% block scripts %}
+<script>
+  /* ── SCROLL REVEAL ────────────────────────────────────────────────────── */
+  (function () {
+    if (!("IntersectionObserver" in window)) {
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => el.classList.add("visible"));
+      return;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("visible");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" },
+    );
+    document.querySelectorAll(".reveal").forEach((el) => obs.observe(el));
+  })();
+
+  /* ── FAQ ACCORDION (event-delegated, keyboard accessible) ─────────────── */
+  (function () {
+    const list = document.getElementById("faqList");
+    if (!list) return;
+
+    list.addEventListener("click", (e) => {
+      const btn = e.target.closest(".faq-q");
+      if (!btn) return;
+      toggleFaq(btn);
+    });
+
+    // Close others when opening one (accordion behavior)
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains("open");
+
+      // Close all open items
+      list.querySelectorAll(".faq-item.open").forEach((el) => {
+        el.classList.remove("open");
+        const q = el.querySelector(".faq-q");
+        if (q) q.setAttribute("aria-expanded", "false");
+      });
+
+      // Open this one if it was closed
+      if (!isOpen) {
+        item.classList.add("open");
+        btn.setAttribute("aria-expanded", "true");
+      }
+    }
+  })();
+</script>
+{% endblock %}
