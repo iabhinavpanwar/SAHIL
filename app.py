@@ -246,7 +246,7 @@ def _pdf_header(c, title, subtitle=''):
     c.rect(0, h - 80, 5, 80, fill=1, stroke=0)
     c.setFillColor(HexColor('#e8ff00'))
     c.setFont('Helvetica-Bold', 20)
-    c.drawString(22, h - 32, 'SAHIL PANWAR FITNESS')
+    c.drawString(22, h - 32, 'Sahil Panwar')
     c.setFillColor(HexColor('#aaaaaa'))
     c.setFont('Helvetica', 9)
     c.drawString(22, h - 50, 'Personal Training & Nutrition Coaching')
@@ -351,7 +351,7 @@ def _send_session_reminders():
             f"This is a reminder that your {sess.get('session_type','session')} is scheduled for:\n"
             f"{dt_ist}\n\n"
             f"{('Notes: ' + sess['notes']) if sess.get('notes') else ''}\n\n"
-            "See you soon!\n— Sahil Panwar Fitness"
+            "See you soon!\n— Sahil Panwar"
         )
         if sent:
             sessions_col.update_one({'_id': sess['_id']}, {'$set': {'reminder_sent': True}})
@@ -624,10 +624,10 @@ def register():
             _send_whatsapp(f"New client registered: {name} ({email})")
             _send_email(
                 email,
-                'Welcome to Sahil Panwar Fitness!',
+                'Welcome to Sahil Panwar!',
                 f'Hi {name},\n\nWelcome aboard! Your client account has been created.\n\n'
                 f'Login here: {url_for("client_login", _external=True)}\n\n'
-                'Your trainer will be in touch soon.\n\u2014 Sahil Panwar Fitness'
+                'Your trainer will be in touch soon.\n\u2014 Sahil Panwar'
             )
             return redirect(url_for('client_login', registered='1'))
     return render_template('register.html', error=error)
@@ -1404,7 +1404,7 @@ def admin_checkin_feedback(cid):
                 'Your trainer left feedback on your check-in',
                 f'Hi {fb_client.get("name", "there")},\n\n'
                 f'Your trainer reviewed your check-in and left feedback:\n\n"{feedback}"\n\n'
-                f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar Fitness'
+                f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
             )
     return jsonify({'status': 'ok'})
 
@@ -1550,10 +1550,10 @@ def admin_reply_message(client_id):
     if client and client.get('email') and text:
         _send_email(
             client['email'],
-            'New message from your trainer \u2014 Sahil Panwar Fitness',
+            'New message from your trainer \u2014 Sahil Panwar',
             f'Hi {client.get("name", "there")},\n\n'
             f'Your trainer sent you a message:\n\n"{text[:300]}"\n\n'
-            f'Login to reply: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar Fitness'
+            f'Login to reply: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
         )
     return jsonify({'status': 'sent', '_id': str(result.inserted_id)})
 
@@ -1800,10 +1800,10 @@ def admin_assign_program(pid):
     if prog_client and prog_client.get('email'):
         _send_email(
             prog_client['email'],
-            'New workout program assigned \u2014 Sahil Panwar Fitness',
+            'New workout program assigned \u2014 Sahil Panwar',
             f'Hi {prog_client.get("name", "there")},\n\n'
             f'Your trainer assigned you a new workout program: "{program["name"]}"\n\n'
-            f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar Fitness'
+            f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
         )
     return jsonify({'status': 'assigned'})
 
@@ -1956,10 +1956,10 @@ def admin_assign_meal_plan(pid):
     if meal_client and meal_client.get('email'):
         _send_email(
             meal_client['email'],
-            'New meal plan assigned \u2014 Sahil Panwar Fitness',
+            'New meal plan assigned \u2014 Sahil Panwar',
             f'Hi {meal_client.get("name", "there")},\n\n'
             f'Your trainer assigned you a new meal plan: "{plan["name"]}"\n\n'
-            f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar Fitness'
+            f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
         )
     return jsonify({'status': 'assigned'})
 
@@ -2042,7 +2042,7 @@ def client_program_pdf():
             y -= 8
         c.setFillColor(HexColor('#999999'))
         c.setFont('Helvetica', 8)
-        c.drawString(36, 28, 'For gym use — Sahil Panwar Fitness')
+        c.drawString(36, 28, 'For gym use — Sahil Panwar')
 
     return _pdf_canvas((program.get('name') or 'workout') + '.pdf', draw)
 
@@ -2099,7 +2099,7 @@ def client_meal_plan_pdf():
             y -= 8
         c.setFillColor(HexColor('#999999'))
         c.setFont('Helvetica', 8)
-        c.drawString(36, 28, 'For gym use — Sahil Panwar Fitness')
+        c.drawString(36, 28, 'For gym use — Sahil Panwar')
 
     return _pdf_canvas((plan.get('name') or 'meal-plan') + '.pdf', draw)
 
@@ -2301,10 +2301,10 @@ def admin_update_session_status(sid):
             dt_ist = to_ist(sess_doc.get('datetime'))
             _send_email(
                 sess_client['email'],
-                f'Your session has been {status_val} \u2014 Sahil Panwar Fitness',
+                f'Your session has been {status_val} \u2014 Sahil Panwar',
                 f'Hi {sess_client.get("name", "there")},\n\n'
                 f'Your {sess_doc.get("session_type", "session")} scheduled for {dt_ist} has been {status_val}.\n\n'
-                f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar Fitness'
+                f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
             )
     return jsonify({'status': 'updated'})
 
@@ -2359,11 +2359,11 @@ def admin_create_invoice():
         if inv_client and inv_client.get('email'):
             _send_email(
                 inv_client['email'],
-                'New invoice from Sahil Panwar Fitness',
+                'New invoice from Sahil Panwar',
                 f'Hi {inv_client.get("name", "there")},\n\n'
                 f'A new invoice has been raised:\n\n'
                 'Description: ' + (description or '—') + '\nAmount: Rs.' + f'{float(amount):.2f}' + '\nDue: ' + (due_date or '—') + '\n\n'
-                f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar Fitness'
+                f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
             )
     return jsonify(doc), 201
 
@@ -2388,11 +2388,11 @@ def admin_mark_paid(iid):
         if paid_client and paid_client.get('email'):
             _send_email(
                 paid_client['email'],
-                'Payment confirmed \u2014 Sahil Panwar Fitness',
+                'Payment confirmed \u2014 Sahil Panwar',
                 f'Hi {paid_client.get("name", "there")},\n\n'
                 f'Your payment of Rs.{paid_inv.get("amount", 0):.2f} has been received. Thank you!\n\n'
                 'Method: ' + b.get('method', 'UPI') + '\nRef: ' + (b.get('ref') or '—') + '\n\n'
-                f'Login to view receipt: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar Fitness'
+                f'Login to view receipt: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
             )
     return jsonify({'status': 'updated'})
 
@@ -2798,7 +2798,7 @@ def client_invoice_pdf(iid):
         c.line(36, 60, w - 36, 60)
         c.setFillColor(HexColor('#9ca3af'))
         c.setFont('Helvetica', 8)
-        c.drawString(36, 46, 'Thank you for your trust in Sahil Panwar Fitness.')
+        c.drawString(36, 46, 'Thank you for your trust in Sahil Panwar.')
         c.drawRightString(w - 36, 46, 'This is a computer-generated receipt.')
 
     filename = f"invoice-{str(inv['_id'])[-6:]}.pdf"
@@ -2853,7 +2853,7 @@ def admin_add_announcement():
                     ann_u['email'],
                     f'Announcement: {title}',
                     f'Hi {ann_u.get("name", "there")},\n\n{title}\n\n{body}\n\n'
-                    f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar Fitness'
+                    f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
                 )
     return jsonify({'status': 'added', '_id': str(result.inserted_id)})
 
@@ -3134,7 +3134,7 @@ def _push_notify(client_id, title, body, url='/client/dashboard', tag='spf'):
 def admin_send_push():
     """Admin sends push to one client or all clients."""
     d = request.json or {}
-    title   = s(d.get('title', 'Sahil Panwar Fitness'), 100)
+    title   = s(d.get('title', 'Sahil Panwar'), 100)
     body    = s(d.get('body', ''), 200)
     cid     = d.get('client_id', 'all')
     url     = s(d.get('url', '/client/dashboard'), 200)
@@ -3302,11 +3302,11 @@ def admin_update_goal(gid):
                 note = update.get('trainer_note', '')
                 _send_email(
                     goal_client['email'],
-                    f'Your goal has been {status_word} \u2014 Sahil Panwar Fitness',
+                    f'Your goal has been {status_word} \u2014 Sahil Panwar',
                     f'Hi {goal_client.get("name", "there")},\n\n'
                     f'Your goal "{goal.get("title", "")}" has been {status_word}.\n\n'
                     + (f'Trainer note: {note}\n\n' if note else '') +
-                    f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar Fitness'
+                    f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
                 )
     return jsonify({'status': 'updated'})
 
@@ -3336,7 +3336,7 @@ def admin_create_report_card():
     if client and client.get('email'):
         _send_email(
             client['email'],
-            'Your weekly report card is ready \u2014 Sahil Panwar Fitness',
+            'Your weekly report card is ready \u2014 Sahil Panwar',
             f'Hi {client.get("name", "there")},\n\n'
             f'Your trainer sent your weekly report card:\n\n'
             f'Overall Score:  {d.get("score", 7)}/10\n'
@@ -3344,7 +3344,7 @@ def admin_create_report_card():
             f'Nutrition:      {d.get("nutrition", 7)}/10\n'
             f'Progress:       {d.get("progress", 7)}/10\n\n'
             + (f'Comment: {d.get("comment")}\n\n' if d.get('comment') else '') +
-            f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar Fitness'
+            f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
         )
     return jsonify({'status': 'created', '_id': str(result.inserted_id)})
 
