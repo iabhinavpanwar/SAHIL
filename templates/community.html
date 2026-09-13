@@ -690,6 +690,7 @@
     justify-content: center;
     padding: 1rem;
     backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
   #postLightbox.open { display: flex; animation: fadeIn .25s ease; }
   #postLightbox img { max-width: 94vw; max-height: 88vh; object-fit: contain; border-radius: var(--radius-sm); }
@@ -743,566 +744,161 @@
      RESPONSIVE BREAKPOINTS
      ══════════════════════════════════════════════════════════════════════════ */
 
-  /* ── ≤ 900px : tablet portrait ────────────────────────────────────────── */
   @media (max-width: 900px) {
-    .community-wrap {
-      max-width: 680px;
-    }
-
-    .comm-hero h1 {
-      font-size: clamp(1.5rem, 5.5vw, 2.35rem);
-    }
+    .community-wrap { max-width: 680px; }
+    .comm-hero h1 { font-size: clamp(1.5rem, 5.5vw, 2.35rem); }
   }
 
-  /* ── ≤ 768px : tablets ────────────────────────────────────────────────── */
   @media (max-width: 768px) {
-    .community-wrap {
-      max-width: 100%;
-    }
-
-    .post-card:hover {
-      border-color: var(--border);
-    }
-
-    .av-chip:hover {
-      border-color: var(--border);
-    }
-
-    /* slightly bigger touch targets */
-    .action-btn {
-      padding: 0.45rem 0.9rem;
-      min-height: 36px;
-    }
-
-    .comment-submit {
-      padding: 0.5rem 0.95rem;
-      min-height: 40px;
-    }
+    .community-wrap { max-width: 100%; }
+    .post-card:hover { border-color: var(--border); }
+    .av-chip:hover { border-color: var(--border); }
+    .action-btn { padding: 0.45rem 0.9rem; min-height: 36px; }
+    .comment-submit { padding: 0.5rem 0.95rem; min-height: 40px; }
   }
 
-  /* ── ≤ 640px : large phones ───────────────────────────────────────────── */
   @media (max-width: 640px) {
     :root {
       --radius: 14px;
       --radius-sm: 9px;
     }
-
     .comm-hero {
       padding:
         calc(var(--nav-h, 72px) + 1.5rem)
         clamp(1rem, 4vw, 1.25rem)
         1.5rem;
     }
-
-    .comm-hero h1 {
-      font-size: clamp(1.4rem, 6.5vw, 1.9rem);
-      line-height: 1.15;
-    }
-
-    .comm-hero p {
-      font-size: 0.85rem;
-      line-height: 1.6;
-    }
-
-    .comm-stats {
-      gap: 1.5rem;
-      margin-top: 1.1rem;
-    }
-
-    .avatar-wall {
-      gap: 0.4rem;
-      margin-top: 1.1rem;
-    }
-
-    .av-chip {
-      padding: 0.22rem 0.55rem 0.22rem 0.22rem;
-      font-size: 0.72rem;
-    }
-
-    .av-chip img,
-    .av-chip .av-init {
-      width: 22px;
-      height: 22px;
-    }
-
-    .community-wrap {
-      padding: 0 clamp(0.9rem, 3.4vw, 1.15rem) 3rem;
-    }
-
-    .compose-card {
-      padding: 1rem;
-      margin-top: 1.25rem;
-    }
-
-    .compose-footer {
-      padding-left: 0;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .post-card {
-      padding: 1rem;
-    }
-
-    .post-body {
-      font-size: 0.9rem;
-    }
-
-    .comment-bubble p {
-      font-size: 0.82rem;
-    }
+    .comm-hero h1 { font-size: clamp(1.4rem, 6.5vw, 1.9rem); line-height: 1.15; }
+    .comm-hero p { font-size: 0.85rem; line-height: 1.6; }
+    .comm-stats { gap: 1.5rem; margin-top: 1.1rem; }
+    .avatar-wall { gap: 0.4rem; margin-top: 1.1rem; }
+    .av-chip { padding: 0.22rem 0.55rem 0.22rem 0.22rem; font-size: 0.72rem; }
+    .av-chip img, .av-chip .av-init { width: 22px; height: 22px; }
+    .community-wrap { padding: 0 clamp(0.9rem, 3.4vw, 1.15rem) 3rem; }
+    .compose-card { padding: 1rem; margin-top: 1.25rem; }
+    .compose-footer { padding-left: 0; justify-content: space-between; align-items: center; }
+    .post-card { padding: 1rem; }
+    .post-body { font-size: 0.9rem; }
+    .comment-bubble p { font-size: 0.82rem; }
   }
 
-  /* ── ≤ 560px : small phones ───────────────────────────────────────────── */
   @media (max-width: 560px) {
-    .comm-hero h1 {
-      font-size: clamp(1.3rem, 7vw, 1.75rem);
-    }
-
-    .comm-stat strong {
-      font-size: 1.4rem;
-    }
-
-    .comm-stat span {
-      font-size: 0.62rem;
-    }
-
-    .compose-avatar img,
-    .compose-avatar .av-init {
-      width: 34px;
-      height: 34px;
-    }
-
-    .compose-top {
-      gap: 0.6rem;
-    }
-
-    .post-avatar img,
-    .post-avatar .av-init {
-      width: 36px;
-      height: 36px;
-    }
-
-    .comment-item img,
-    .comment-item .av-init {
-      width: 26px;
-      height: 26px;
-    }
+    .comm-hero h1 { font-size: clamp(1.3rem, 7vw, 1.75rem); }
+    .comm-stat strong { font-size: 1.4rem; }
+    .comm-stat span { font-size: 0.62rem; }
+    .compose-avatar img, .compose-avatar .av-init { width: 34px; height: 34px; }
+    .compose-top { gap: 0.6rem; }
+    .post-avatar img, .post-avatar .av-init { width: 36px; height: 36px; }
+    .comment-item img, .comment-item .av-init { width: 26px; height: 26px; }
   }
 
-  /* ── ≤ 480px : standard mobile ────────────────────────────────────────── */
   @media (max-width: 480px) {
     :root {
       --radius: 12px;
       --radius-sm: 8px;
     }
-
     .comm-hero {
       padding:
         calc(var(--nav-h, 72px) + 1.25rem)
         0.9rem
         1.25rem;
     }
-
-    .comm-hero h1 {
-      font-size: clamp(1.2rem, 8vw, 1.6rem);
-      line-height: 1.2;
-    }
-
-    .comm-hero p {
-      font-size: 0.82rem;
-      line-height: 1.55;
-    }
-
-    .comm-stats {
-      gap: 1.25rem;
-      margin-top: 0.9rem;
-    }
-
-    .comm-stat strong {
-      font-size: 1.3rem;
-    }
-
-    .comm-stat span {
-      font-size: 0.6rem;
-      letter-spacing: 0.08em;
-    }
-
-    .avatar-wall {
-      gap: 0.35rem;
-      margin-top: 0.9rem;
-    }
-
-    .av-chip {
-      padding: 0.2rem 0.5rem 0.2rem 0.2rem;
-      font-size: 0.68rem;
-      gap: 0.35rem;
-    }
-
-    .av-chip img,
-    .av-chip .av-init {
-      width: 20px;
-      height: 20px;
-    }
-
-    .av-chip .av-init {
-      font-size: 0.6rem;
-    }
-
-    .av-more {
-      padding: 0.2rem 0.6rem;
-      font-size: 0.66rem;
-    }
-
-    .community-wrap {
-      padding: 0 0.9rem 2.5rem;
-    }
-
-    .compose-card {
-      padding: 0.9rem;
-      margin-top: 1rem;
-      border-radius: var(--radius-sm);
-    }
-
-    .compose-avatar img,
-    .compose-avatar .av-init {
-      width: 32px;
-      height: 32px;
-    }
-
-    .compose-avatar .av-init {
-      font-size: 0.78rem;
-    }
-
-    #postText {
-      padding: 0.55rem 0.75rem;
-      min-height: 68px;
-    }
-
-    .compose-footer {
-      margin-top: 0.6rem;
-      gap: 0.4rem;
-    }
-
-    .compose-footer .btn {
-      padding: 0.4rem 0.85rem;
-      font-size: 0.78rem;
-    }
-
-    .post-card {
-      padding: 0.9rem;
-      border-radius: var(--radius-sm);
-    }
-
-    .post-header {
-      gap: 0.55rem;
-      margin-bottom: 0.7rem;
-    }
-
-    .post-avatar img,
-    .post-avatar .av-init {
-      width: 34px;
-      height: 34px;
-    }
-
-    .post-avatar .av-init {
-      font-size: 0.82rem;
-    }
-
-    .post-meta strong {
-      font-size: 0.88rem;
-    }
-
-    .post-body {
-      font-size: 0.88rem;
-      line-height: 1.6;
-      margin-bottom: 0.75rem;
-    }
-
-    .post-actions {
-      gap: 0.4rem;
-      padding-top: 0.65rem;
-    }
-
-    .action-btn {
-      padding: 0.4rem 0.75rem;
-      font-size: 0.76rem;
-      min-height: 34px;
-      gap: 0.35rem;
-    }
-
-    .comment-item img,
-    .comment-item .av-init {
-      width: 24px;
-      height: 24px;
-    }
-
-    .comment-bubble {
-      padding: 0.4rem 0.6rem;
-    }
-
-    .comment-bubble strong {
-      font-size: 0.74rem;
-    }
-
-    .comment-bubble p {
-      font-size: 0.8rem;
-    }
-
-    .comment-bubble time {
-      font-size: 0.62rem;
-    }
-
-    .comment-input {
-      min-height: 36px;
-      padding: 0.45rem 0.65rem;
-    }
-
-    .comment-submit {
-      padding: 0.45rem 0.8rem;
-      font-size: 0.76rem;
-      min-height: 36px;
-    }
-
-    .login-nudge {
-      padding: 1.1rem 0.9rem;
-    }
-
-    .login-nudge p {
-      font-size: 0.85rem;
-    }
-
-    .load-more-wrap .btn {
-      padding: 0.5rem 1rem;
-      font-size: 0.82rem;
-    }
-
-    .feed-empty {
-      padding: 1.75rem 0.9rem;
-    }
-
-    .feed-empty i {
-      font-size: 1.9rem;
-    }
-
-    .feed-empty p {
-      font-size: 0.84rem;
-    }
+    .comm-hero h1 { font-size: clamp(1.2rem, 8vw, 1.6rem); line-height: 1.2; }
+    .comm-hero p { font-size: 0.82rem; line-height: 1.55; }
+    .comm-stats { gap: 1.25rem; margin-top: 0.9rem; }
+    .comm-stat strong { font-size: 1.3rem; }
+    .comm-stat span { font-size: 0.6rem; letter-spacing: 0.08em; }
+    .avatar-wall { gap: 0.35rem; margin-top: 0.9rem; }
+    .av-chip { padding: 0.2rem 0.5rem 0.2rem 0.2rem; font-size: 0.68rem; gap: 0.35rem; }
+    .av-chip img, .av-chip .av-init { width: 20px; height: 20px; }
+    .av-chip .av-init { font-size: 0.6rem; }
+    .av-more { padding: 0.2rem 0.6rem; font-size: 0.66rem; }
+    .community-wrap { padding: 0 0.9rem 2.5rem; }
+    .compose-card { padding: 0.9rem; margin-top: 1rem; border-radius: var(--radius-sm); }
+    .compose-avatar img, .compose-avatar .av-init { width: 32px; height: 32px; }
+    .compose-avatar .av-init { font-size: 0.78rem; }
+    #postText { padding: 0.55rem 0.75rem; min-height: 68px; }
+    .compose-footer { margin-top: 0.6rem; gap: 0.4rem; }
+    .compose-footer .btn { padding: 0.4rem 0.85rem; font-size: 0.78rem; }
+    .post-card { padding: 0.9rem; border-radius: var(--radius-sm); }
+    .post-header { gap: 0.55rem; margin-bottom: 0.7rem; }
+    .post-avatar img, .post-avatar .av-init { width: 34px; height: 34px; }
+    .post-avatar .av-init { font-size: 0.82rem; }
+    .post-meta strong { font-size: 0.88rem; }
+    .post-body { font-size: 0.88rem; line-height: 1.6; margin-bottom: 0.75rem; }
+    .post-actions { gap: 0.4rem; padding-top: 0.65rem; }
+    .action-btn { padding: 0.4rem 0.75rem; font-size: 0.76rem; min-height: 34px; gap: 0.35rem; }
+    .comment-item img, .comment-item .av-init { width: 24px; height: 24px; }
+    .comment-bubble { padding: 0.4rem 0.6rem; }
+    .comment-bubble strong { font-size: 0.74rem; }
+    .comment-bubble p { font-size: 0.8rem; }
+    .comment-bubble time { font-size: 0.62rem; }
+    .comment-input { min-height: 36px; padding: 0.45rem 0.65rem; }
+    .comment-submit { padding: 0.45rem 0.8rem; font-size: 0.76rem; min-height: 36px; }
+    .login-nudge { padding: 1.1rem 0.9rem; }
+    .login-nudge p { font-size: 0.85rem; }
+    .load-more-wrap .btn { padding: 0.5rem 1rem; font-size: 0.82rem; }
+    .feed-empty { padding: 1.75rem 0.9rem; }
+    .feed-empty i { font-size: 1.9rem; }
+    .feed-empty p { font-size: 0.84rem; }
   }
 
-  /* ── ≤ 380px : iPhone SE / small Android ──────────────────────────────── */
   @media (max-width: 380px) {
-    .comm-hero {
-      padding: calc(var(--nav-h, 72px) + 1rem) 0.75rem 1rem;
-    }
-
-    .comm-hero h1 {
-      font-size: 1.15rem;
-      letter-spacing: 0.01em;
-    }
-
-    .comm-hero p {
-      font-size: 0.78rem;
-      line-height: 1.5;
-    }
-
-    .comm-hero .section-eyebrow {
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-    }
-
-    .comm-stats {
-      gap: 1rem;
-      margin-top: 0.75rem;
-    }
-
-    .comm-stat strong {
-      font-size: 1.2rem;
-    }
-
-    .comm-stat span {
-      font-size: 0.56rem;
-    }
-
-    .avatar-wall {
-      gap: 0.3rem;
-      margin-top: 0.75rem;
-    }
-
-    .av-chip {
-      padding: 0.18rem 0.45rem 0.18rem 0.18rem;
-      font-size: 0.64rem;
-    }
-
-    .av-chip img,
-    .av-chip .av-init {
-      width: 18px;
-      height: 18px;
-    }
-
-    .community-wrap {
-      padding: 0 0.75rem 2rem;
-    }
-
-    .compose-card {
-      padding: 0.8rem;
-    }
-
-    #postText {
-      min-height: 62px;
-      font-size: 16px;
-    }
-
-    .post-card {
-      padding: 0.8rem;
-    }
-
-    .post-body {
-      font-size: 0.84rem;
-    }
-
-    .action-btn {
-      padding: 0.35rem 0.65rem;
-      font-size: 0.72rem;
-      min-height: 32px;
-    }
-
-    .comment-input {
-      font-size: 16px;
-    }
-
-    .comment-submit {
-      padding: 0.4rem 0.7rem;
-      font-size: 0.72rem;
-    }
+    .comm-hero { padding: calc(var(--nav-h, 72px) + 1rem) 0.75rem 1rem; }
+    .comm-hero h1 { font-size: 1.15rem; letter-spacing: 0.01em; }
+    .comm-hero p { font-size: 0.78rem; line-height: 1.5; }
+    .comm-hero .section-eyebrow { font-size: 0.6rem; letter-spacing: 0.1em; }
+    .comm-stats { gap: 1rem; margin-top: 0.75rem; }
+    .comm-stat strong { font-size: 1.2rem; }
+    .comm-stat span { font-size: 0.56rem; }
+    .avatar-wall { gap: 0.3rem; margin-top: 0.75rem; }
+    .av-chip { padding: 0.18rem 0.45rem 0.18rem 0.18rem; font-size: 0.64rem; }
+    .av-chip img, .av-chip .av-init { width: 18px; height: 18px; }
+    .community-wrap { padding: 0 0.75rem 2rem; }
+    .compose-card { padding: 0.8rem; }
+    #postText { min-height: 62px; font-size: 16px; }
+    .post-card { padding: 0.8rem; }
+    .post-body { font-size: 0.84rem; }
+    .action-btn { padding: 0.35rem 0.65rem; font-size: 0.72rem; min-height: 32px; }
+    .comment-input { font-size: 16px; }
+    .comment-submit { padding: 0.4rem 0.7rem; font-size: 0.72rem; }
   }
 
-  /* ── ≤ 320px : ultra-small / foldables ────────────────────────────────── */
   @media (max-width: 320px) {
-    .comm-hero {
-      padding: calc(var(--nav-h, 72px) + 0.85rem) 0.65rem 0.85rem;
-    }
-
-    .comm-hero h1 {
-      font-size: 1.05rem;
-    }
-
-    .comm-hero p {
-      font-size: 0.72rem;
-    }
-
-    .comm-stats {
-      gap: 0.85rem;
-    }
-
-    .comm-stat strong {
-      font-size: 1.1rem;
-    }
-
-    .comm-stat span {
-      font-size: 0.52rem;
-    }
-
-    .community-wrap {
-      padding: 0 0.65rem 1.75rem;
-    }
-
-    .compose-card,
-    .post-card {
-      padding: 0.7rem;
-    }
-
-    .post-body {
-      font-size: 0.82rem;
-    }
-
-    .comment-bubble p {
-      font-size: 0.76rem;
-    }
-
-    .action-btn {
-      padding: 0.3rem 0.55rem;
-      font-size: 0.68rem;
-      min-height: 30px;
-    }
-
-    .comment-submit {
-      padding: 0.35rem 0.6rem;
-      font-size: 0.68rem;
-      min-height: 34px;
-    }
-
-    .feed-empty {
-      padding: 1.5rem 0.75rem;
-    }
-
-    .feed-empty i {
-      font-size: 1.6rem;
-    }
-
-    .feed-empty p {
-      font-size: 0.78rem;
-    }
+    .comm-hero { padding: calc(var(--nav-h, 72px) + 0.85rem) 0.65rem 0.85rem; }
+    .comm-hero h1 { font-size: 1.05rem; }
+    .comm-hero p { font-size: 0.72rem; }
+    .comm-stats { gap: 0.85rem; }
+    .comm-stat strong { font-size: 1.1rem; }
+    .comm-stat span { font-size: 0.52rem; }
+    .community-wrap { padding: 0 0.65rem 1.75rem; }
+    .compose-card, .post-card { padding: 0.7rem; }
+    .post-body { font-size: 0.82rem; }
+    .comment-bubble p { font-size: 0.76rem; }
+    .action-btn { padding: 0.3rem 0.55rem; font-size: 0.68rem; min-height: 30px; }
+    .comment-submit { padding: 0.35rem 0.6rem; font-size: 0.68rem; min-height: 34px; }
+    .feed-empty { padding: 1.5rem 0.75rem; }
+    .feed-empty i { font-size: 1.6rem; }
+    .feed-empty p { font-size: 0.78rem; }
   }
 
-  /* ── Landscape phones (short viewport) ────────────────────────────────── */
   @media (max-height: 520px) and (orientation: landscape) {
-    .comm-hero {
-      padding: calc(var(--nav-h, 72px) + 0.85rem) 1rem 1rem;
-    }
-
-    .comm-hero h1 {
-      font-size: clamp(1.25rem, 4vw, 1.75rem);
-    }
-
-    .avatar-wall {
-      margin-top: 0.75rem;
-    }
-
-    .community-wrap {
-      padding-bottom: 2rem;
-    }
-
-    .compose-card {
-      margin-top: 1rem;
-    }
+    .comm-hero { padding: calc(var(--nav-h, 72px) + 0.85rem) 1rem 1rem; }
+    .comm-hero h1 { font-size: clamp(1.25rem, 4vw, 1.75rem); }
+    .avatar-wall { margin-top: 0.75rem; }
+    .community-wrap { padding-bottom: 2rem; }
+    .compose-card { margin-top: 1rem; }
   }
 
-  /* ── Touch devices: neutralize hover-only effects ─────────────────────── */
   @media (hover: none) {
-    .av-chip:hover {
-      border-color: var(--border);
-      color: var(--text2);
-    }
-
-    .post-card:hover {
-      border-color: var(--border);
-    }
-
-    .action-btn:hover:not(.liked) {
-      border-color: var(--border);
-      color: var(--text2);
-      background: none;
-    }
-
-    .action-btn.liked:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-      background: rgba(232, 255, 0, 0.08);
-    }
-
-    .post-delete-btn:hover {
-      color: var(--text3);
-      background: none;
-    }
-
-    .comment-submit:hover:not(:disabled) {
-      transform: none;
-      background: var(--primary);
-    }
+    .av-chip:hover { border-color: var(--border); color: var(--text2); }
+    .post-card:hover { border-color: var(--border); }
+    .action-btn:hover:not(.liked) { border-color: var(--border); color: var(--text2); background: none; }
+    .action-btn.liked:hover { border-color: var(--primary); color: var(--primary); background: rgba(232, 255, 0, 0.08); }
+    .post-delete-btn:hover { color: var(--text3); background: none; }
+    .comment-submit:hover:not(:disabled) { transform: none; background: var(--primary); }
   }
 
-  /* ── Focus visibility (keyboard accessibility) ────────────────────────── */
   .action-btn:focus-visible,
   .comment-submit:focus-visible,
   .post-delete-btn:focus-visible,
@@ -1312,23 +908,15 @@
     outline-offset: 2px;
   }
 
-  /* ── Reduced motion ───────────────────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
       animation-duration: 0.001ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
     }
-
-    .post-card {
-      animation: none;
-      opacity: 1;
-    }
+    .post-card { animation: none; opacity: 1; }
   }
 
-  /* ── Print ────────────────────────────────────────────────────────────── */
   @media print {
     .comm-hero::before,
     .compose-card,
@@ -1339,30 +927,11 @@
     .post-delete-btn {
       display: none !important;
     }
-
-    body {
-      background: #fff;
-      color: #000;
-    }
-
-    .comm-hero {
-      background: #fff;
-      border-bottom: 1px solid #ccc;
-      padding: 1rem 0;
-    }
-
-    .comm-hero h1 {
-      color: #000;
-    }
-
-    .comm-hero p {
-      color: #333;
-    }
-
-    .comm-stat strong {
-      color: #333;
-    }
-
+    body { background: #fff; color: #000; }
+    .comm-hero { background: #fff; border-bottom: 1px solid #ccc; padding: 1rem 0; }
+    .comm-hero h1 { color: #000; }
+    .comm-hero p { color: #333; }
+    .comm-stat strong { color: #333; }
     .post-card {
       border: 1px solid #ccc;
       box-shadow: none;
@@ -1371,15 +940,8 @@
       animation: none;
       opacity: 1;
     }
-
-    .comment-bubble {
-      border: 1px solid #ddd;
-      background: #f9f9f9;
-    }
-
-    .comments-section {
-      display: block !important;
-    }
+    .comment-bubble { border: 1px solid #ddd; background: #f9f9f9; }
+    .comments-section { display: block !important; }
   }
 </style>
 {% endblock %}
@@ -1502,15 +1064,9 @@
 
   // ── seed my avatar in compose ─────────────────────────────────────────────
   {% if session.get('client_id') %}
-  (async () => {
-    try {
-      const r = await fetch('/api/community/posts?skip=0&limit=1');
-    } catch {}
-    // fetch my profile for avatar
+  (function(){
     const el = document.getElementById('myAvatar');
-    if (!el) return;
-    // use first post by me if available, else initials
-    el.innerHTML = `<div class="av-init">{{ session.get('client_name','?')[0].upper() }}</div>`;
+    if (el) el.innerHTML = `<div class="av-init">{{ session.get('client_name','?')[0].upper() }}</div>`;
   })();
   {% endif %}
 
@@ -1559,7 +1115,6 @@
         body = new FormData();
         body.append('text', text);
         body.append('image', _pendingFile);
-        // no Content-Type header — browser sets multipart boundary
       } else {
         body = JSON.stringify({text});
         headers['Content-Type'] = 'application/json';
@@ -1649,6 +1204,7 @@
     if (wrap) wrap.innerHTML = '<button class="btn btn-outline btn-sm" disabled><span class="spin"></span> Loading…</button>';
     try {
       const r = await fetch(`/api/community/posts?skip=${_skip}`);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
       const posts = await r.json();
       const feed = document.getElementById('feed');
       if (_skip === 0) {
@@ -1669,6 +1225,9 @@
       }
     } catch(e) {
       console.error(e);
+      const feed = document.getElementById('feed');
+      feed.innerHTML = '<div class="feed-empty"><i class="fas fa-exclamation-triangle"></i><p>Could not load the feed. Please refresh the page.</p></div>';
+      if (wrap) wrap.style.display = 'none';
     } finally {
       _loading = false;
     }
@@ -1713,7 +1272,6 @@
       const list = document.getElementById(`clist-${pid}`);
       list.insertAdjacentHTML('beforeend', renderComment(d.comment));
       input.value = '';
-      // update comment count badge
       const countEl = document.querySelector(`#post-${pid} .cmt-count`);
       if (countEl) countEl.textContent = parseInt(countEl.textContent || 0) + 1;
     } finally { btn.disabled = false; }

@@ -3048,13 +3048,12 @@ ALLOWED_MIME = {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
 
 if db is not None:
+    community_col = db['community_posts']
     try:
         images_col = db['images']
         images_col.create_index('image_id', unique=True)
-        community_col = db['community_posts']
     except Exception:
         images_col = None
-        community_col = None
 else:
     images_col = None
     community_col = None
