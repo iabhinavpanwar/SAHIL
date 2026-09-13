@@ -3046,7 +3046,10 @@
           </div>
 
           <div class="tab-panel" id="tab-sessions">
-            <div class="panel-header"><h3>Session Bookings</h3></div>
+            <div class="panel-header">
+              <h3>Session Bookings</h3>
+              <button class="btn btn-primary" onclick="openModal('adminBookSessionModal')">+ Book Session</button>
+            </div>
             <div class="cal-wrap">
               <div class="cal-header">
                 <button class="cal-nav" onclick="adminCalMove(-1)"><i class="fas fa-chevron-left"></i></button>
@@ -4251,6 +4254,56 @@
           </button>
         </div>
         <p id="invMsg" class="form-msg"></p>
+      </div>
+    </div>
+
+    <!-- Admin Book Session Modal -->
+    <div class="modal" id="adminBookSessionModal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Book a Session</h3>
+          <button onclick="closeModal('adminBookSessionModal')">&times;</button>
+        </div>
+        <div class="form-group">
+          <label>Client Name (walk-in or name)</label>
+          <input type="text" id="absClientName" maxlength="200" placeholder="e.g. Rahul Sharma" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date *</label>
+            <input type="date" id="absDate" />
+          </div>
+          <div class="form-group">
+            <label>Time *</label>
+            <input type="time" id="absTime" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Session Type</label>
+            <select id="absType">
+              <option>In-Person</option>
+              <option>Online</option>
+              <option>Group</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="absStatus">
+              <option value="confirmed">Confirmed</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" id="absNotes" maxlength="500" placeholder="Optional notes" />
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('adminBookSessionModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="adminBookSession(this)">Book</button>
+        </div>
+        <p id="absMsg" class="form-msg"></p>
       </div>
     </div>
 
@@ -6449,6 +6502,26 @@
             </div>`).join('')}
         `;
         document.getElementById('adminCalPopup').style.display = 'flex';
+      }
+
+      async function adminBookSession(btnEl) {
+        const date = document.getElementById('absDate').value;
+        const time = document.getElementById('absTime').value;
+        if (!date || !time) { msg('absMsg', 'Date and time required', false); return; }
+        await act(btnEl, async () => {
+          const { ok } = await api('/api/admin/sessions', 'POST', {
+            client_name: document.getElementById('absClientName').value || 'Walk-in',
+            date, time,
+            session_type: document.getElementById('absType').value,
+            status: document.getElementById('absStatus').value,
+            notes: document.getElementById('absNotes').value,
+          });
+          if (ok) {
+            closeModal('adminBookSessionModal');
+            ['absClientName','absDate','absTime','absNotes'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+            await loadAdminSessions();
+          } else msg('absMsg', 'Failed to book session', false);
+        });
       }
 
       async function loadAdminSessions() {

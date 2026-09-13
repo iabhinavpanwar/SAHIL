@@ -1,4 +1,4 @@
-﻿from flask import Flask, request, jsonify, session, redirect, url_for, render_template, Response
+from flask import Flask, request, jsonify, session, redirect, url_for, render_template, Response
 from functools import wraps
 from dotenv import load_dotenv
 load_dotenv()
@@ -14,7 +14,7 @@ import bleach, atexit, os, logging, secrets, re, io, hashlib, smtplib, json
 
 app = Flask(__name__)
 
-# ── SESSION REMINDER SCHEDULER ──────────────────────────────────────────────────────────────────
+# -- SESSION REMINDER SCHEDULER ------------------------------------------------------------------
 try:
     from apscheduler.schedulers.background import BackgroundScheduler
     _scheduler = BackgroundScheduler(daemon=True)
@@ -303,7 +303,7 @@ def _pdf_wrap(c, text, x, y, max_width, font='Helvetica', size=10, leading=14, c
         y -= leading
     return y
 
-# â”€â”€ MONGODB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── MONGODB ───────────────────────────────────────────────────────────────────
 MONGO_URI     = os.environ.get('MONGO_URI', '')
 MONGO_DB_NAME = os.environ.get('MONGO_DB_NAME', 'sahil_fitness')
 
@@ -370,7 +370,7 @@ def _send_session_reminders():
             f"This is a reminder that your {sess.get('session_type','session')} is scheduled for:\n"
             f"{dt_ist}\n\n"
             f"{('Notes: ' + sess['notes']) if sess.get('notes') else ''}\n\n"
-            "See you soon!\n— Sahil Panwar"
+            "See you soon!\n� Sahil Panwar"
         )
         if sent:
             sessions_col.update_one({'_id': sess['_id']}, {'$set': {'reminder_sent': True}})
@@ -384,7 +384,7 @@ if _scheduler_available and _scheduler is not None and os.environ.get('SERVER_SO
     _scheduler.start()
     atexit.register(lambda: _scheduler.shutdown(wait=False) if _scheduler.running else None)
 
-# â”€â”€ SEED â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── SEED ──────────────────────────────────────────────────────────────────────
 def seed():
     if config_col is None:
         return
@@ -405,7 +405,7 @@ def seed():
         'contact_phone': '+91 9999999999',
         'contact_whatsapp': '+91 9999999999',
         'contact_address': 'New Delhi, India',
-        'contact_hours': 'Monâ€“Sat: 6amâ€“9pm',
+        'contact_hours': 'Mon–Sat: 6am–9pm',
         'contact_maps_embed': '',
         'social_instagram': '',
         'social_youtube': '',
@@ -416,14 +416,14 @@ def seed():
         'newsletter_active': True,
         'callmebot_phone': '',
         'callmebot_apikey': '',
-        'seo_title': 'Sahil Panwar â€” Personal Fitness Trainer',
+        'seo_title': 'Sahil Panwar — Personal Fitness Trainer',
         'seo_desc': 'Transform your body with expert personal training by Sahil Panwar.',
     })
     logger.info("Seeded site_config")
 
 seed()
 
-# â”€â”€ VISITOR LOGGING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── VISITOR LOGGING ───────────────────────────────────────────────────────────
 SKIP = {'/static', '/api', '/favicon'}
 
 @app.before_request
@@ -440,7 +440,7 @@ def log_visit():
         'ts':   datetime.now(timezone.utc),
     })
 
-# â”€â”€ PUBLIC PAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── PUBLIC PAGES ──────────────────────────────────────────────────────────────
 def get_config():
     return (config_col.find_one({'_id': 'main'}, {'_id': 0}) or {}) if config_col is not None else {}
 
@@ -579,7 +579,7 @@ def gallery():
             i['video_embed'] = youtube_embed(i['video_url'])
     return render_template('gallery.html', cfg=cfg, images=items)
 
-# â”€â”€ AUTH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── AUTH ──────────────────────────────────────────────────────────────────────
 @app.route('/login', methods=['GET', 'POST'])
 @limiter.limit('10 per minute')
 def login():
@@ -604,7 +604,7 @@ def logout():
 def admin():
     return render_template('admin.html')
 
-# â”€â”€ CLIENT AUTH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CLIENT AUTH ───────────────────────────────────────────────────────────────
 def client_login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -740,7 +740,7 @@ def client_dashboard():
     user['_id'] = str(user['_id'])
     return render_template('client_dashboard.html', cfg=cfg, user=user)
 
-# â”€â”€ PUBLIC APIs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── PUBLIC APIs ───────────────────────────────────────────────────────────────
 @app.route('/api/contact', methods=['POST'])
 @limiter.limit('5 per hour')
 def submit_contact():
@@ -805,7 +805,7 @@ def get_blogs():
         i.pop('body', None)
     return jsonify(items)
 
-# â”€â”€ ADMIN API â€” CONFIG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — CONFIG ────────────────────────────────────────────────────────
 @app.route('/api/admin/config', methods=['GET'])
 @login_required
 def admin_get_config():
@@ -834,7 +834,7 @@ def admin_update_config():
     config_col.update_one({'_id': 'main'}, {'$set': update}, upsert=True)
     return jsonify({'status': 'updated'})
 
-# â”€â”€ ADMIN API â€” SERVICES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — SERVICES ──────────────────────────────────────────────────────
 @app.route('/api/admin/services', methods=['GET'])
 @login_required
 def admin_get_services():
@@ -896,7 +896,7 @@ def admin_delete_service(sid):
     services_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ ADMIN API â€” TESTIMONIALS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — TESTIMONIALS ──────────────────────────────────────────────────
 @app.route('/api/admin/testimonials', methods=['GET'])
 @login_required
 def admin_get_testimonials():
@@ -959,7 +959,7 @@ def admin_delete_testimonial(tid):
     testimonials_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ ADMIN API â€” TRANSFORMATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — TRANSFORMATIONS ───────────────────────────────────────────────
 @app.route('/api/admin/transformations', methods=['GET'])
 @login_required
 def admin_get_transforms():
@@ -1024,7 +1024,7 @@ def admin_delete_transform(tid):
     transforms_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ ADMIN API â€” BLOG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — BLOG ──────────────────────────────────────────────────────────
 @app.route('/api/admin/blogs', methods=['GET'])
 @login_required
 def admin_get_blogs():
@@ -1089,7 +1089,7 @@ def admin_delete_blog(bid):
     blogs_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ ADMIN API â€” FAQs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — FAQs ──────────────────────────────────────────────────────────
 @app.route('/api/admin/faqs', methods=['GET'])
 @login_required
 def admin_get_faqs():
@@ -1145,7 +1145,7 @@ def admin_delete_faq(fid):
     faqs_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ ADMIN API â€” CERTIFICATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — CERTIFICATIONS ────────────────────────────────────────────────
 @app.route('/api/admin/certs', methods=['GET'])
 @login_required
 def admin_get_certs():
@@ -1203,7 +1203,7 @@ def admin_delete_cert(cid):
     certs_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ ADMIN API â€” GALLERY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — GALLERY ───────────────────────────────────────────────────────
 @app.route('/api/admin/gallery', methods=['GET'])
 @login_required
 def admin_get_gallery():
@@ -1269,7 +1269,7 @@ def admin_delete_gallery(gid):
     gallery_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ ADMIN API â€” LEADS & VISITS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — LEADS & VISITS ────────────────────────────────────────────────
 @app.route('/api/admin/leads')
 @login_required
 def admin_get_leads():
@@ -1334,7 +1334,7 @@ def admin_visit_stats():
         'checkins_pending': checkins_col.count_documents({'reviewed': False}) if checkins_col is not None else 0,
     })
 
-# â”€â”€ CLIENT API â€” STATS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CLIENT API — STATS ───────────────────────────────────────────────────────
 @app.route('/api/client/stats')
 @client_login_required
 def client_stats():
@@ -1351,7 +1351,7 @@ def client_stats():
         **adherence,
     })
 
-# â”€â”€ CLIENT API â€” CHECK-INS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CLIENT API — CHECK-INS ───────────────────────────────────────────────────
 @app.route('/api/client/checkins', methods=['GET'])
 @client_login_required
 def client_get_checkins():
@@ -1397,7 +1397,7 @@ def client_submit_checkin():
     })
     return jsonify({'status': 'submitted', '_id': str(result.inserted_id)})
 
-# â”€â”€ ADMIN API â€” CHECK-INS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — CHECK-INS ─────────────────────────────────────────────────────
 @app.route('/api/admin/checkins', methods=['GET'])
 @login_required
 def admin_get_checkins():
@@ -1443,7 +1443,7 @@ def admin_delete_checkin(cid):
     checkins_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ CLIENT API â€” MESSAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CLIENT API — MESSAGES ───────────────────────────────────────────────────
 @app.route('/api/client/messages', methods=['GET'])
 @client_login_required
 def client_get_messages():
@@ -1503,7 +1503,7 @@ def client_send_message():
     })
     return jsonify({'status': 'sent', '_id': str(result.inserted_id)})
 
-# â”€â”€ ADMIN API â€” MESSAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — MESSAGES ───────────────────────────────────────────────────
 @app.route('/api/admin/messages')
 @login_required
 def admin_get_message_threads():
@@ -1536,7 +1536,7 @@ def admin_get_thread(client_id):
         {'$set': {'read_by_trainer': True}}
     )
     # mark trainer messages as read by client when client opens their thread
-    # (admin opening thread = trainer side, not client side — no change needed here)
+    # (admin opening thread = trainer side, not client side � no change needed here)
     items = list(messages_col.find({'client_id': client_id}).sort('date', 1))
     for i in items:
         i['_id']  = str(i['_id'])
@@ -1603,7 +1603,7 @@ def admin_delete_message(mid):
     messages_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ CLIENT API â€” PROGRESS TRACKING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CLIENT API — PROGRESS TRACKING ─────────────────────────────────────────
 @app.route('/api/client/progress', methods=['GET'])
 @client_login_required
 def client_get_progress():
@@ -1650,7 +1650,7 @@ def client_delete_progress(pid):
     measurements_col.delete_one({'_id': oid, 'client_id': session['client_id']})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ ADMIN API â€” EXERCISES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — EXERCISES ────────────────────────────────────────────────────
 @app.route('/api/admin/exercises', methods=['GET'])
 @login_required
 def admin_get_exercises():
@@ -1709,7 +1709,7 @@ def admin_delete_exercise(eid):
     exercises_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ ADMIN API â€” WORKOUT PROGRAMS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — WORKOUT PROGRAMS ──────────────────────────────────────────────
 @app.route('/api/admin/programs', methods=['GET'])
 @login_required
 def admin_get_programs():
@@ -1831,7 +1831,7 @@ def admin_assign_program(pid):
         )
     return jsonify({'status': 'assigned'})
 
-# â”€â”€ CLIENT API â€” WORKOUT PROGRAM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CLIENT API — WORKOUT PROGRAM ──────────────────────────────────────────────
 @app.route('/api/client/program')
 @client_login_required
 def client_get_program():
@@ -1854,7 +1854,7 @@ def client_get_program():
                 ex['video_embed'] = embed
     return jsonify(program)
 
-# â”€â”€ ADMIN API â€” NUTRITION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — NUTRITION ────────────────────────────────────────────────────
 @app.route('/api/admin/meal_plans', methods=['GET'])
 @login_required
 def admin_get_meal_plans():
@@ -1987,7 +1987,7 @@ def admin_assign_meal_plan(pid):
         )
     return jsonify({'status': 'assigned'})
 
-# â”€â”€ CLIENT API â€” NUTRITION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CLIENT API — NUTRITION ────────────────────────────────────────────────────
 @app.route('/api/client/meal_plan')
 @client_login_required
 def client_get_meal_plan():
@@ -2059,14 +2059,14 @@ def client_program_pdf():
                     f"{ex.get('weight')} kg" if ex.get('weight') else '',
                     f"rest {ex.get('rest')}" if ex.get('rest') else '',
                 ] if b]
-                line = name + (('  —  ' + ', '.join(bits)) if bits else '')
+                line = name + (('  �  ' + ', '.join(bits)) if bits else '')
                 y = _pdf_wrap(c, line, 48, y, w - 84, font='Helvetica-Bold', size=10, color='#111111')
                 if ex.get('notes'):
                     y = _pdf_wrap(c, ex['notes'], 48, y, w - 84, size=9, color='#666666')
             y -= 8
         c.setFillColor(HexColor('#999999'))
         c.setFont('Helvetica', 8)
-        c.drawString(36, 28, 'For gym use — Sahil Panwar')
+        c.drawString(36, 28, 'For gym use � Sahil Panwar')
 
     return _pdf_canvas((program.get('name') or 'workout') + '.pdf', draw)
 
@@ -2085,7 +2085,7 @@ def client_meal_plan_pdf():
         w, h = _pdf_header(c, plan.get('name') or 'Meal Plan', client_name)
         y = h - 100
         macros = plan.get('macros') or {}
-        macro_line = '  ·  '.join([b for b in [
+        macro_line = '  �  '.join([b for b in [
             f"{macros.get('calories')} kcal" if macros.get('calories') else '',
             f"P {macros.get('protein')}g" if macros.get('protein') else '',
             f"C {macros.get('carbs')}g" if macros.get('carbs') else '',
@@ -2118,12 +2118,12 @@ def client_meal_plan_pdf():
                     f"C{item.get('carbs')}g" if item.get('carbs') else '',
                     f"F{item.get('fats')}g" if item.get('fats') else '',
                 ] if b]
-                line = name + (('  —  ' + ', '.join(bits)) if bits else '')
+                line = name + (('  �  ' + ', '.join(bits)) if bits else '')
                 y = _pdf_wrap(c, line, 48, y, w - 84, size=10, color='#111111')
             y -= 8
         c.setFillColor(HexColor('#999999'))
         c.setFont('Helvetica', 8)
-        c.drawString(36, 28, 'For gym use — Sahil Panwar')
+        c.drawString(36, 28, 'For gym use � Sahil Panwar')
 
     return _pdf_canvas((plan.get('name') or 'meal-plan') + '.pdf', draw)
 
@@ -2153,7 +2153,7 @@ def client_log_water():
     )
     return jsonify({'status': 'ok', 'glasses': glasses})
 
-# â”€â”€ ADMIN API â€” CLIENT PROGRESS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — CLIENT PROGRESS ───────────────────────────────────────────────
 @app.route('/api/admin/clients')
 @login_required
 def admin_get_clients():
@@ -2242,7 +2242,7 @@ def admin_client_progress(cid):
         i['date'] = i['date'].strftime('%d %b %Y') if i.get('date') else ''
     return jsonify(items)
 
-# â”€â”€ CLIENT API â€” SESSION BOOKING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CLIENT API — SESSION BOOKING ────────────────────────────────────────────
 @app.route('/api/client/sessions', methods=['GET'])
 @client_login_required
 def client_get_sessions():
@@ -2294,7 +2294,40 @@ def client_cancel_session(sid):
     sessions_col.delete_one({'_id': oid, 'client_id': session['client_id']})
     return jsonify({'status': 'cancelled'})
 
-# â”€â”€ ADMIN API â€” SESSIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — SESSIONS ──────────────────────────────────────────────────────
+@app.route('/api/admin/sessions', methods=['POST'])
+@login_required
+def admin_create_session():
+    if sessions_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    d = request.json or {}
+    date_str    = s(d.get('date', ''), 20)
+    time_str    = s(d.get('time', ''), 10)
+    stype       = s(d.get('session_type', 'In-Person'), 100)
+    notes       = s(d.get('notes', ''), 500)
+    client_name = s(d.get('client_name', 'Walk-in'), 200)
+    status      = s(d.get('status', 'confirmed'), 20)
+    if status not in ('confirmed', 'pending', 'completed'):
+        status = 'confirmed'
+    if not date_str or not time_str:
+        return jsonify({'error': 'Date and time required'}), 400
+    try:
+        dt = datetime.strptime(f'{date_str} {time_str}', '%Y-%m-%d %H:%M')
+        dt = dt.replace(tzinfo=timezone.utc)
+    except ValueError:
+        return jsonify({'error': 'Invalid date/time format'}), 400
+    result = sessions_col.insert_one({
+        'client_id':     None,
+        'client_name':   client_name,
+        'datetime':      dt,
+        'session_type':  stype,
+        'notes':         notes,
+        'status':        status,
+        'created':       datetime.now(timezone.utc),
+        'admin_created': True,
+    })
+    return jsonify({'status': 'created', '_id': str(result.inserted_id)})
+
 @app.route('/api/admin/sessions')
 @login_required
 def admin_get_sessions():
@@ -2346,7 +2379,7 @@ def admin_delete_session(sid):
     sessions_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ ADMIN API â€” PAYMENTS / INVOICES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── ADMIN API — PAYMENTS / INVOICES ─────────────────────────────────────────
 @app.route('/api/admin/invoices', methods=['GET'])
 @login_required
 def admin_get_invoices():
@@ -2389,7 +2422,7 @@ def admin_create_invoice():
                 'New invoice from Sahil Panwar',
                 f'Hi {inv_client.get("name", "there")},\n\n'
                 f'A new invoice has been raised:\n\n'
-                'Description: ' + (description or '—') + '\nAmount: Rs.' + f'{float(amount):.2f}' + '\nDue: ' + (due_date or '—') + '\n\n'
+                'Description: ' + (description or '�') + '\nAmount: Rs.' + f'{float(amount):.2f}' + '\nDue: ' + (due_date or '�') + '\n\n'
                 f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
             )
     return jsonify(doc), 201
@@ -2418,7 +2451,7 @@ def admin_mark_paid(iid):
                 'Payment confirmed \u2014 Sahil Panwar',
                 f'Hi {paid_client.get("name", "there")},\n\n'
                 f'Your payment of Rs.{paid_inv.get("amount", 0):.2f} has been received. Thank you!\n\n'
-                'Method: ' + b.get('method', 'UPI') + '\nRef: ' + (b.get('ref') or '—') + '\n\n'
+                'Method: ' + b.get('method', 'UPI') + '\nRef: ' + (b.get('ref') or '�') + '\n\n'
                 f'Login to view receipt: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
             )
     return jsonify({'status': 'updated'})
@@ -2434,7 +2467,7 @@ def admin_delete_invoice(iid):
     payments_col.delete_one({'_id': oid})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ CLIENT API â€” SELF PROGRESS PHOTOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CLIENT API — SELF PROGRESS PHOTOS ────────────────────────────────────────
 @app.route('/api/client/progress_photos', methods=['GET'])
 @client_login_required
 def client_get_progress_photos():
@@ -2475,7 +2508,7 @@ def client_delete_progress_photo(pid):
     db['client_self_photos'].delete_one({'_id': oid, 'client_id': session['client_id']})
     return jsonify({'status': 'deleted'})
 
-# â”€â”€ CLIENT API â€” INVOICES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CLIENT API — INVOICES ─────────────────────────────────────────────────────
 @app.route('/api/client/invoices', methods=['GET'])
 @client_login_required
 def client_get_invoices():
@@ -2487,7 +2520,7 @@ def client_get_invoices():
         d['_id'] = str(d['_id'])
     return jsonify(docs)
 
-# â”€â”€ RUN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── RUN ───────────────────────────────────────────────────────────────────────
 
 @app.route('/api/client/profile/avatar', methods=['POST'])
 @client_login_required
@@ -2513,7 +2546,7 @@ def client_update_profile():
     users_col.update_one({'_id': safe_oid(session['client_id'])}, {'$set': {'gender': gender}})
     return jsonify({'status': 'updated'})
 
-# ── CLIENT API – FITNESS PROFILE ─────────────────────────────────────────────
+# -- CLIENT API � FITNESS PROFILE ---------------------------------------------
 @app.route('/api/client/fitness_profile', methods=['GET'])
 @client_login_required
 def client_get_fitness_profile():
@@ -2552,7 +2585,7 @@ def client_save_fitness_profile():
     users_col.update_one({'_id': safe_oid(session['client_id'])}, {'$set': {'fitness_profile': profile}})
     return jsonify({'status': 'saved', 'profile': profile})
 
-# ── CLIENT API – WORKOUT COMPLETION LOG ─────────────────────────────────────
+# -- CLIENT API � WORKOUT COMPLETION LOG -------------------------------------
 @app.route('/api/client/workout_log', methods=['GET'])
 @client_login_required
 def client_get_workout_log():
@@ -2587,7 +2620,7 @@ def client_log_workout():
     )
     return jsonify({'status': 'logged'})
 
-# ── CLIENT API – DAILY LOG ────────────────────────────────────────────────────
+# -- CLIENT API � DAILY LOG ----------------------------------------------------
 @app.route('/api/client/daily_log', methods=['GET'])
 @client_login_required
 def client_get_daily_log():
@@ -2640,7 +2673,7 @@ def client_delete_daily_log(date_str):
     db['daily_log'].delete_one({'client_id': session['client_id'], 'date': date_str})
     return jsonify({'status': 'deleted'})
 
-# ── ADMIN API – INACTIVE CLIENTS (registered before /<cid> routes) ──────────
+# -- ADMIN API � INACTIVE CLIENTS (registered before /<cid> routes) ----------
 @app.route('/api/admin/clients/inactive')
 @login_required
 def admin_inactive_clients_early():
@@ -2670,7 +2703,7 @@ def admin_inactive_clients_early():
             })
     return jsonify(inactive)
 
-# ── ADMIN API – CLIENT NOTES ────────────────────────────────────────────────
+# -- ADMIN API � CLIENT NOTES ------------------------------------------------
 @app.route('/api/admin/clients/<cid>/notes', methods=['POST'])
 @login_required
 def admin_set_client_notes(cid):
@@ -2683,7 +2716,7 @@ def admin_set_client_notes(cid):
     users_col.update_one({'_id': oid}, {'$set': {'trainer_notes': notes}})
     return jsonify({'status': 'saved'})
 
-# ── ADMIN API – REVENUE STATS ─────────────────────────────────────────────────
+# -- ADMIN API � REVENUE STATS -------------------------------------------------
 @app.route('/api/admin/invoices/stats')
 @login_required
 def admin_invoice_stats():
@@ -2707,7 +2740,7 @@ def admin_invoice_stats():
         'unpaid_count':      unpaid_count,
     })
 
-# ── CLIENT API – INVOICE PDF ──────────────────────────────────────────────────
+# -- CLIENT API � INVOICE PDF --------------------------------------------------
 @app.route('/api/client/invoices/<iid>/pdf')
 @client_login_required
 def client_invoice_pdf(iid):
@@ -2831,7 +2864,7 @@ def client_invoice_pdf(iid):
     filename = f"invoice-{str(inv['_id'])[-6:]}.pdf"
     return _pdf_canvas(filename, draw)
 
-# ── ADMIN API – LEAD NOTES ────────────────────────────────────────────────────
+# -- ADMIN API � LEAD NOTES ----------------------------------------------------
 @app.route('/api/admin/leads/<lid>/notes', methods=['POST'])
 @login_required
 def admin_set_lead_notes(lid):
@@ -2844,7 +2877,7 @@ def admin_set_lead_notes(lid):
     leads_col.update_one({'_id': oid}, {'$set': {'notes': notes}})
     return jsonify({'status': 'saved'})
 
-# ── ADMIN API – ANNOUNCEMENTS ───────────────────────────────────────────────
+# -- ADMIN API � ANNOUNCEMENTS -----------------------------------------------
 @app.route('/api/admin/announcements', methods=['GET'])
 @login_required
 def admin_get_announcements():
@@ -2923,7 +2956,7 @@ def client_get_announcements():
         i['created'] = to_ist(i.get('created'))
     return jsonify(items)
 
-# ── ADMIN – CLIENT DETAIL PAGE ───────────────────────────────────────────────
+# -- ADMIN � CLIENT DETAIL PAGE -----------------------------------------------
 @app.route('/admin/client/<cid>')
 @login_required
 def admin_client_detail(cid):
@@ -3000,7 +3033,7 @@ def admin_save_muscle_assignments(client_id):
     users_col.update_one({'_id': oid}, {'$set': {'muscle_assignments': clean}})
     return jsonify({'status': 'saved'})
 
-# â”€â”€ IMAGE UPLOAD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── IMAGE UPLOAD ─────────────────────────────────────────────────────────────
 ALLOWED_MIME = {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
 
@@ -3073,7 +3106,7 @@ def client_upload_image():
         return jsonify({'error': err}), 400
     return jsonify({'url': url})
 
-# ── PWA MANIFEST ─────────────────────────────────────────────────────────────
+# -- PWA MANIFEST -------------------------------------------------------------
 @app.route('/manifest.json')
 def pwa_manifest():
     return app.send_static_file('manifest.json')
@@ -3085,7 +3118,7 @@ def service_worker():
     resp.headers['Cache-Control'] = 'no-cache'
     return resp
 
-# ── PUSH NOTIFICATIONS ────────────────────────────────────────────────────────
+# -- PUSH NOTIFICATIONS --------------------------------------------------------
 @app.route('/api/client/push/subscribe', methods=['POST'])
 @client_login_required
 def client_push_subscribe():
@@ -3183,7 +3216,7 @@ def admin_vapid_public_key():
 def client_vapid_public_key():
     return jsonify({'key': os.environ.get('VAPID_PUBLIC_KEY', '')})
 
-# ── DAILY TIPS ────────────────────────────────────────────────────────────────
+# -- DAILY TIPS ----------------------------------------------------------------
 @app.route('/api/admin/tips', methods=['GET'])
 @login_required
 def admin_get_tips():
@@ -3212,7 +3245,7 @@ def admin_add_tip():
     # push to all clients
     if users_col is not None:
         for u in users_col.find({'role': 'client', 'active': True}, {'_id': 1}):
-            _push_notify(str(u['_id']), '💡 Daily Tip', text[:80], '/client/dashboard', 'tip')
+            _push_notify(str(u['_id']), '?? Daily Tip', text[:80], '/client/dashboard', 'tip')
     return jsonify({'status': 'added', '_id': str(result.inserted_id)})
 
 @app.route('/api/admin/tips/<tid>', methods=['DELETE'])
@@ -3237,7 +3270,7 @@ def client_get_tips():
         i['date'] = to_ist(i.get('date'))
     return jsonify(items)
 
-# ── GOALS ─────────────────────────────────────────────────────────────────────
+# -- GOALS ---------------------------------------------------------------------
 @app.route('/api/client/goals', methods=['GET'])
 @client_login_required
 def client_get_goals():
@@ -3270,7 +3303,7 @@ def client_set_goal():
         'created':     datetime.now(timezone.utc),
     })
     # notify admin
-    _push_notify('admin', '🎯 New Client Goal', f"{session.get('client_name','')} set a goal: {title[:60]}", '/admin', 'goal')
+    _push_notify('admin', '?? New Client Goal', f"{session.get('client_name','')} set a goal: {title[:60]}", '/admin', 'goal')
     return jsonify({'status': 'added', '_id': str(result.inserted_id)})
 
 @app.route('/api/client/goals/<gid>', methods=['DELETE'])
@@ -3320,7 +3353,7 @@ def admin_update_goal(gid):
     goal = goals_col.find_one({'_id': oid})
     goals_col.update_one({'_id': oid}, {'$set': update})
     if goal and 'approved' in d:
-        msg = '✅ Goal approved!' if d['approved'] else '❌ Goal needs revision'
+        msg = '? Goal approved!' if d['approved'] else '? Goal needs revision'
         _push_notify(goal['client_id'], msg, goal.get('title', '')[:80], '/client/dashboard', 'goal')
         if users_col is not None:
             goal_client = users_col.find_one({'_id': safe_oid(goal['client_id'])}, {'email': 1, 'name': 1})
@@ -3337,7 +3370,7 @@ def admin_update_goal(gid):
                 )
     return jsonify({'status': 'updated'})
 
-# ── REPORT CARDS ──────────────────────────────────────────────────────────────
+# -- REPORT CARDS --------------------------------------------------------------
 @app.route('/api/admin/report_cards', methods=['POST'])
 @login_required
 def admin_create_report_card():
@@ -3359,7 +3392,7 @@ def admin_create_report_card():
         'comment':      s(d.get('comment', ''), 1000),
         'created':      datetime.now(timezone.utc),
     })
-    _push_notify(client_id, '📊 Weekly Report Card', 'Your trainer sent your weekly report!', '/client/dashboard', 'report')
+    _push_notify(client_id, '?? Weekly Report Card', 'Your trainer sent your weekly report!', '/client/dashboard', 'report')
     if client and client.get('email'):
         _send_email(
             client['email'],
@@ -3397,7 +3430,7 @@ def client_get_report_cards():
         i['created'] = to_ist(i.get('created'))
     return jsonify(items)
 
-# ── CHECKIN REACTIONS ─────────────────────────────────────────────────────────
+# -- CHECKIN REACTIONS ---------------------------------------------------------
 @app.route('/api/admin/checkins/<cid>/reaction', methods=['POST'])
 @login_required
 def admin_checkin_reaction(cid):
@@ -3407,7 +3440,7 @@ def admin_checkin_reaction(cid):
     if not oid:
         return jsonify({'error': 'Invalid id'}), 400
     reaction = s((request.json or {}).get('reaction', ''), 10)
-    VALID = ['👍','🔥','💪','❤️','🎉','⚡']
+    VALID = ['??','??','??','??','??','?']
     if reaction not in VALID:
         return jsonify({'error': 'Invalid reaction'}), 400
     checkin = checkins_col.find_one({'_id': oid})
@@ -3417,7 +3450,7 @@ def admin_checkin_reaction(cid):
                      'Keep it up!', '/client/dashboard', 'reaction')
     return jsonify({'status': 'ok', 'reaction': reaction})
 
-# ── SUPPLEMENTS ───────────────────────────────────────────────────────────────
+# -- SUPPLEMENTS ---------------------------------------------------------------
 @app.route('/api/admin/supplements/<client_id>', methods=['GET'])
 @login_required
 def admin_get_supplements(client_id):
@@ -3456,7 +3489,7 @@ def client_get_supplements():
     items = list(supplements_col.find({'client_id': session['client_id']}, {'_id': 0, 'client_id': 0}))
     return jsonify(items)
 
-# ── PERSONAL RECORDS (auto-computed) ─────────────────────────────────────────
+# -- PERSONAL RECORDS (auto-computed) -----------------------------------------
 @app.route('/api/client/personal_records')
 @client_login_required
 def client_personal_records():
@@ -3483,7 +3516,7 @@ def client_personal_records():
         records['_weight_pr'] = {'name': 'Heaviest Logged Weight', 'value': best.get('weight'), 'date': best.get('date'), 'source': 'log'}
     return jsonify(list(records.values())[:30])
 
-# ── BADGES / MILESTONES ───────────────────────────────────────────────────────
+# -- BADGES / MILESTONES -------------------------------------------------------
 @app.route('/api/client/badges')
 @client_login_required
 def client_get_badges():
@@ -3499,21 +3532,21 @@ def client_get_badges():
     streak = adherence.get('streak', 0)
 
     BADGE_DEFS = [
-        ('first_checkin',  '🏁', 'First Check-In',    'Submitted your first check-in',         checkin_count >= 1),
-        ('checkin_5',      '📋', '5 Check-Ins',        'Submitted 5 check-ins',                  checkin_count >= 5),
-        ('checkin_10',     '🏆', '10 Check-Ins',       'Submitted 10 check-ins',                 checkin_count >= 10),
-        ('first_log',      '📅', 'First Log',          'Logged your first training day',         log_count >= 1),
-        ('log_7',          '🔥', '7-Day Streak',       'Trained 7 days in a row',                streak >= 7),
-        ('log_30',         '💎', '30-Day Streak',      'Trained 30 days in a row',               streak >= 30),
-        ('first_photo',    '📸', 'Progress Photo',     'Uploaded your first progress photo',     photo_count >= 1),
-        ('photo_4',        '🌟', 'Photo Journey',      'Uploaded 4 progress photos',             photo_count >= 4),
-        ('log_14',         '⚡', '2-Week Streak',      'Trained 14 days in a row',               streak >= 14),
+        ('first_checkin',  '??', 'First Check-In',    'Submitted your first check-in',         checkin_count >= 1),
+        ('checkin_5',      '??', '5 Check-Ins',        'Submitted 5 check-ins',                  checkin_count >= 5),
+        ('checkin_10',     '??', '10 Check-Ins',       'Submitted 10 check-ins',                 checkin_count >= 10),
+        ('first_log',      '??', 'First Log',          'Logged your first training day',         log_count >= 1),
+        ('log_7',          '??', '7-Day Streak',       'Trained 7 days in a row',                streak >= 7),
+        ('log_30',         '??', '30-Day Streak',      'Trained 30 days in a row',               streak >= 30),
+        ('first_photo',    '??', 'Progress Photo',     'Uploaded your first progress photo',     photo_count >= 1),
+        ('photo_4',        '??', 'Photo Journey',      'Uploaded 4 progress photos',             photo_count >= 4),
+        ('log_14',         '?', '2-Week Streak',      'Trained 14 days in a row',               streak >= 14),
     ]
     for bid, icon, name, desc, earned in BADGE_DEFS:
         badges.append({'id': bid, 'icon': icon, 'name': name, 'desc': desc, 'earned': earned})
     return jsonify(badges)
 
-# ── MEAL CHECKLIST ────────────────────────────────────────────────────────────
+# -- MEAL CHECKLIST ------------------------------------------------------------
 @app.route('/api/client/meal_checklist', methods=['GET'])
 @client_login_required
 def client_get_meal_checklist():
