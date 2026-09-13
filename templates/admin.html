@@ -4304,6 +4304,20 @@
         const res = await fetch(url, opts);
         return { ok: res.ok, data: await res.json() };
       };
+
+      // Wrap any async action: disables btn, shows spinner, re-enables after
+      async function act(btnEl, fn) {
+        if (!btnEl) return fn();
+        const orig = btnEl.innerHTML;
+        btnEl.disabled = true;
+        btnEl.style.opacity = '0.6';
+        btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        try { await fn(); } finally {
+          btnEl.disabled = false;
+          btnEl.style.opacity = '';
+          btnEl.innerHTML = orig;
+        }
+      }
       const esc = (s) =>
         String(s || "")
           .replace(/&/g, "&amp;")
@@ -4709,7 +4723,7 @@
       </div>
       <div class="item-actions">
         <button class="btn btn-sm btn-outline" onclick="editService('${s._id}','${esc(s.title)}','${esc(s.subtitle || "")}','${esc(s.price || "")}','${esc(s.badge || "")}','${esc(s.cta || "")}',\`${(s.features || []).join("\n")}\`)">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteService('${s._id}')">Del</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteService('${s._id}',this)">Del</button>
       </div>
     </div>`,
               )
@@ -4772,10 +4786,12 @@
           "Add Service";
       }
 
-      async function deleteService(id) {
+      async function deleteService(id, btnEl) {
         if (!confirm("Delete this service?")) return;
-        await api(`/api/admin/services/${id}`, "DELETE");
-        loadServices();
+        await act(btnEl, async () => {
+          await api(`/api/admin/services/${id}`, "DELETE");
+          await loadServices();
+        });
       }
 
       // ── TESTIMONIALS ──────────────────────────────────────────────────────────────
@@ -4795,7 +4811,7 @@
       <span class="item-badge ${t.active ? "active" : "inactive"}">${t.active ? "Visible" : "Hidden"}</span>
       <div class="item-actions">
         <button class="btn btn-sm btn-outline" onclick="editTestimonial(${JSON.stringify(t).replace(/"/g, "&quot;")})">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteTestimonial('${t._id}')">Del</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteTestimonial('${t._id}',this)">Del</button>
       </div>
     </div>`,
               )
@@ -4879,10 +4895,12 @@
         if (p) p.style.display = "none";
       }
 
-      async function deleteTestimonial(id) {
+      async function deleteTestimonial(id, btnEl) {
         if (!confirm("Delete?")) return;
-        await api(`/api/admin/testimonials/${id}`, "DELETE");
-        loadTestimonials();
+        await act(btnEl, async () => {
+          await api(`/api/admin/testimonials/${id}`, "DELETE");
+          await loadTestimonials();
+        });
       }
 
       // ── TRANSFORMATIONS ───────────────────────────────────────────────────────────
@@ -4914,7 +4932,7 @@
           info.innerHTML = `<strong>${esc(t.client_name || "Client")}</strong><span>${esc(t.goal || "")} ${t.timeframe ? "· " + esc(t.timeframe) : ""}</span>`;
           const actions = document.createElement("div");
           actions.className = "item-actions";
-          actions.innerHTML = `<button class="btn btn-sm btn-outline" onclick="editTransformById('${t._id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteTransform('${t._id}')">Del</button>`;
+          actions.innerHTML = `<button class="btn btn-sm btn-outline" onclick="editTransformById('${t._id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteTransform('${t._id}',this)">Del</button>`;
           row.appendChild(img);
           row.appendChild(info);
           row.appendChild(actions);
@@ -5040,10 +5058,12 @@
           "Add Transformation";
       }
 
-      async function deleteTransform(id) {
+      async function deleteTransform(id, btnEl) {
         if (!confirm("Delete?")) return;
-        await api(`/api/admin/transformations/${id}`, "DELETE");
-        loadTransforms();
+        await act(btnEl, async () => {
+          await api(`/api/admin/transformations/${id}`, "DELETE");
+          await loadTransforms();
+        });
       }
 
       // ── GALLERY ───────────────────────────────────────────────────────────────────
@@ -5091,7 +5111,7 @@
           const btn = document.createElement("button");
           btn.className = "del-btn";
           btn.innerHTML = '<i class="fas fa-trash"></i>';
-          btn.onclick = () => deleteGallery(g._id);
+          btn.onclick = function() { deleteGallery(g._id, this); };
           const editBtn = document.createElement("button");
           editBtn.className = "edit-btn";
           editBtn.innerHTML = '<i class="fas fa-pen"></i>';
@@ -5185,10 +5205,12 @@
         } else msg("galEditMsg", "Failed", false);
       }
 
-      async function deleteGallery(id) {
+      async function deleteGallery(id, btnEl) {
         if (!confirm("Delete image?")) return;
-        await api(`/api/admin/gallery/${id}`, "DELETE");
-        loadGallery();
+        await act(btnEl, async () => {
+          await api(`/api/admin/gallery/${id}`, "DELETE");
+          await loadGallery();
+        });
       }
 
       // ── BLOG ──────────────────────────────────────────────────────────────────────
@@ -5233,7 +5255,7 @@
       <span class="item-badge ${b.published ? "published" : "draft"}">${b.published ? "Published" : "Draft"}</span>
       <div class="item-actions">
         <button class="btn btn-sm btn-outline" onclick="editBlogById('${b._id}')">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteBlog('${b._id}')">Del</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteBlog('${b._id}',this)">Del</button>
       </div>`,
           );
           list.appendChild(row);
@@ -5329,10 +5351,12 @@
         if (p) p.style.display = "none";
       }
 
-      async function deleteBlog(id) {
+      async function deleteBlog(id, btnEl) {
         if (!confirm("Delete post?")) return;
-        await api(`/api/admin/blogs/${id}`, "DELETE");
-        loadBlogs();
+        await act(btnEl, async () => {
+          await api(`/api/admin/blogs/${id}`, "DELETE");
+          await loadBlogs();
+        });
       }
 
       // ── FAQs ──────────────────────────────────────────────────────────────────────
@@ -5350,7 +5374,7 @@
       </div>
       <div class="item-actions">
         <button class="btn btn-sm btn-outline" onclick="editFaq(${JSON.stringify(f).replace(/"/g, "&quot;")})">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteFaq('${f._id}')">Del</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteFaq('${f._id}',this)">Del</button>
       </div>
     </div>`,
               )
@@ -5395,10 +5419,12 @@
         document.getElementById("faqModalTitle").textContent = "Add FAQ";
       }
 
-      async function deleteFaq(id) {
+      async function deleteFaq(id, btnEl) {
         if (!confirm("Delete FAQ?")) return;
-        await api(`/api/admin/faqs/${id}`, "DELETE");
-        loadFaqs();
+        await act(btnEl, async () => {
+          await api(`/api/admin/faqs/${id}`, "DELETE");
+          await loadFaqs();
+        });
       }
 
       // ── CERTIFICATIONS ────────────────────────────────────────────────────────────
@@ -5417,7 +5443,7 @@
       </div>
       <div class="item-actions">
         <button class="btn btn-sm btn-outline" onclick="editCert(${JSON.stringify(c).replace(/"/g, "&quot;")})">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteCert('${c._id}')">Del</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteCert('${c._id}',this)">Del</button>
       </div>
     </div>`,
               )
@@ -5467,10 +5493,12 @@
           "Add Certification";
       }
 
-      async function deleteCert(id) {
+      async function deleteCert(id, btnEl) {
         if (!confirm("Delete?")) return;
-        await api(`/api/admin/certs/${id}`, "DELETE");
-        loadCerts();
+        await act(btnEl, async () => {
+          await api(`/api/admin/certs/${id}`, "DELETE");
+          await loadCerts();
+        });
       }
 
       // ── LEADS ─────────────────────────────────────────────────────────────────────
@@ -5515,9 +5543,9 @@
           </select>
           ${l.notes ? `<div style="font-size:0.75rem;color:var(--text2);margin-top:0.35rem;font-style:italic">${esc(l.notes.substring(0, 80))}</div>` : ""}
           <div class="lead-actions">
-            ${!l.read ? `<button class="btn btn-sm btn-outline" onclick="markRead('${l._id}')">Read</button>` : ""}
+            ${!l.read ? `<button class="btn btn-sm btn-outline" onclick="markRead('${l._id}',this)">Read</button>` : ""}
             <button class="btn btn-sm btn-outline" onclick="editLeadNotes('${l._id}',\`${esc(l.notes || "")}\`)" title="Notes"><i class="fas fa-sticky-note"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="deleteLead('${l._id}')">Del</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteLead('${l._id}',this)">Del</button>
           </div>
         </div>`,
         )
@@ -5538,8 +5566,8 @@
         ${l.message ? `<span style="color:var(--text2);font-size:0.85rem;display:block;margin-top:0.25rem">${esc(l.message.substring(0, 120))}${l.message.length > 120 ? "…" : ""}</span>` : ""}
       </div>
       <div class="item-actions">
-        ${!l.read && l.type === "contact" ? `<button class="btn btn-sm btn-outline" onclick="markRead('${l._id}')">Mark Read</button>` : ""}
-        <button class="btn btn-sm btn-danger" onclick="deleteLead('${l._id}')">Del</button>
+        ${!l.read && l.type === "contact" ? `<button class="btn btn-sm btn-outline" onclick="markRead('${l._id}',this)">Mark Read</button>` : ""}
+        <button class="btn btn-sm btn-danger" onclick="deleteLead('${l._id}',this)">Del</button>
       </div>
     </div>`,
               )
@@ -5562,15 +5590,19 @@
         else loadLeads();
       }
 
-      async function markRead(id) {
-        await api(`/api/admin/leads/${id}/read`, "POST");
-        loadLeads();
+      async function markRead(id, btnEl) {
+        await act(btnEl, async () => {
+          await api(`/api/admin/leads/${id}/read`, "POST");
+          await loadLeads();
+        });
       }
 
-      async function deleteLead(id) {
+      async function deleteLead(id, btnEl) {
         if (!confirm("Delete this lead?")) return;
-        await api(`/api/admin/leads/${id}`, "DELETE");
-        loadLeads();
+        await act(btnEl, async () => {
+          await api(`/api/admin/leads/${id}`, "DELETE");
+          await loadLeads();
+        });
       }
 
       // ── CHECK-INS ─────────────────────────────────────────────────────────────────
@@ -5593,7 +5625,7 @@
         <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
           <span class="item-badge ${c.reviewed ? "active" : "draft"}">${c.reviewed ? "Reviewed" : "Pending"}</span>
           <button class="btn btn-sm btn-outline" onclick="openFeedback('${c._id}',${JSON.stringify(c).replace(/"/g, "&quot;")})">Reply</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteCheckin('${c._id}')">Del</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteCheckin('${c._id}',this)">Del</button>
         </div>
       </div>
       <div style="display:flex;gap:1.5rem;flex-wrap:wrap;font-size:0.85rem;color:var(--text2)">
@@ -5620,22 +5652,24 @@
         openModal("feedbackModal");
       }
 
-      async function saveFeedback() {
+      async function saveFeedback(btnEl) {
         const id = document.getElementById("fbCheckinId").value;
         const feedback = document.getElementById("fbText").value;
-        const { ok } = await api(`/api/admin/checkins/${id}/feedback`, "POST", {
-          feedback,
+        await act(btnEl, async () => {
+          const { ok } = await api(`/api/admin/checkins/${id}/feedback`, "POST", { feedback });
+          if (ok) {
+            closeModal("feedbackModal");
+            await loadCheckins();
+          } else msg("fbMsg", "Failed to save", false);
         });
-        if (ok) {
-          closeModal("feedbackModal");
-          loadCheckins();
-        } else msg("fbMsg", "Failed to save", false);
       }
 
-      async function deleteCheckin(id) {
+      async function deleteCheckin(id, btnEl) {
         if (!confirm("Delete this check-in?")) return;
-        await api(`/api/admin/checkins/${id}`, "DELETE");
-        loadCheckins();
+        await act(btnEl, async () => {
+          await api(`/api/admin/checkins/${id}`, "DELETE");
+          await loadCheckins();
+        });
       }
 
       // ── CLIENTS ───────────────────────────────────────────────────────────────────
@@ -5661,7 +5695,7 @@
         <option value="female" ${c.gender === "female" ? "selected" : ""}>&#9792; Female</option>
       </select>
       <span class="item-badge ${c.active ? "active" : "inactive"}">${c.active ? "Active" : "Inactive"}</span>
-      <button class="btn btn-sm ${c.active ? "btn-danger" : "btn-outline"}" onclick="toggleClientActive('${c._id}', ${!c.active})">
+      <button class="btn btn-sm ${c.active ? "btn-danger" : "btn-outline"}" onclick="toggleClientActive('${c._id}', ${!c.active}, this)">
         ${c.active ? "Deactivate" : "Activate"}
       </button>
       <button class="btn btn-sm btn-outline" onclick="viewClientProgress('${c._id}','${esc(c.name)}')">
@@ -5695,17 +5729,12 @@
         await api(`/api/admin/clients/${cid}/gender`, "POST", { gender });
       }
 
-      async function toggleClientActive(cid, active) {
-        if (
-          !confirm(
-            active
-              ? "Activate this client?"
-              : "Deactivate this client? They will not be able to log in.",
-          )
-        )
-          return;
-        await api(`/api/admin/clients/${cid}/active`, "POST", { active });
-        loadClients();
+      async function toggleClientActive(cid, active, btnEl) {
+        if (!confirm(active ? "Activate this client?" : "Deactivate this client? They will not be able to log in.")) return;
+        await act(btnEl, async () => {
+          await api(`/api/admin/clients/${cid}/active`, "POST", { active });
+          await loadClients();
+        });
       }
 
       async function viewClientProgress(cid, name) {
@@ -5902,7 +5931,7 @@
       </div>
       <div class="item-actions">
         <button class="btn btn-sm btn-outline" onclick="editExercise(${JSON.stringify(e).replace(/"/g, "&quot;")})">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteExercise('${e._id}')">Del</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteExercise('${e._id}',this)">Del</button>
       </div>
     </div>`,
               )
@@ -5988,10 +6017,12 @@
         document.getElementById("exModalTitle").textContent = "Add Exercise";
       }
 
-      async function deleteExercise(id) {
+      async function deleteExercise(id, btnEl) {
         if (!confirm("Delete this exercise?")) return;
-        await api(`/api/admin/exercises/${id}`, "DELETE");
-        loadExercises();
+        await act(btnEl, async () => {
+          await api(`/api/admin/exercises/${id}`, "DELETE");
+          await loadExercises();
+        });
       }
 
       // ── PROGRAMS ────────────────────────────────────────────────────────────────
@@ -6011,7 +6042,7 @@
       <div class="item-actions">
         <button class="btn btn-sm btn-outline" onclick="openAssign('${p._id}')"><i class="fas fa-user-plus"></i> Assign</button>
         <button class="btn btn-sm btn-outline" onclick="editProgram(${JSON.stringify(p).replace(/"/g, "&quot;")})">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteProgram('${p._id}')">Del</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteProgram('${p._id}',this)">Del</button>
       </div>
     </div>`,
               )
@@ -6132,10 +6163,12 @@
         } else msg("pgMsg", "Save failed", false);
       }
 
-      async function deleteProgram(id) {
+      async function deleteProgram(id, btnEl) {
         if (!confirm("Delete this program?")) return;
-        await api(`/api/admin/programs/${id}`, "DELETE");
-        loadPrograms();
+        await act(btnEl, async () => {
+          await api(`/api/admin/programs/${id}`, "DELETE");
+          await loadPrograms();
+        });
       }
 
       async function openAssign(programId) {
@@ -6206,7 +6239,7 @@
       <div class="item-actions">
         <button class="btn btn-sm btn-outline" onclick="openAssignMeal('${p._id}')"><i class="fas fa-user-plus"></i> Assign</button>
         <button class="btn btn-sm btn-outline" onclick="editMealPlan(${JSON.stringify(p).replace(/"/g, "&quot;")})">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteMealPlan('${p._id}')">Del</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteMealPlan('${p._id}',this)">Del</button>
       </div>
     </div>`,
               )
@@ -6286,10 +6319,12 @@
         } else msg("mpMsg", "Save failed", false);
       }
 
-      async function deleteMealPlan(id) {
+      async function deleteMealPlan(id, btnEl) {
         if (!confirm("Delete this meal plan?")) return;
-        await api(`/api/admin/meal_plans/${id}`, "DELETE");
-        loadMealPlans();
+        await act(btnEl, async () => {
+          await api(`/api/admin/meal_plans/${id}`, "DELETE");
+          await loadMealPlans();
+        });
       }
 
       async function openAssignMeal(planId) {
@@ -6407,10 +6442,10 @@
               <div style="font-size:0.82rem;color:var(--text2)">${esc(s.session_type||'')}${s.notes?' · '+esc(s.notes):''}</div>
               ${s.status==='pending'?`
                 <div style="display:flex;gap:0.4rem;margin-top:0.5rem">
-                  <button class="btn btn-sm btn-outline" onclick="updateSession('${s._id}','confirmed');closeAdminCalPopup()">Confirm</button>
-                  <button class="btn btn-sm btn-danger" onclick="updateSession('${s._id}','cancelled');closeAdminCalPopup()">Cancel</button>
+                  <button class="btn btn-sm btn-outline" onclick="updateSession('${s._id}','confirmed',this).then(closeAdminCalPopup)">Confirm</button>
+                  <button class="btn btn-sm btn-danger" onclick="updateSession('${s._id}','cancelled',this).then(closeAdminCalPopup)">Cancel</button>
                 </div>`:''}
-              ${s.status==='confirmed'?`<button class="btn btn-sm btn-outline" style="margin-top:0.5rem" onclick="updateSession('${s._id}','completed');closeAdminCalPopup()">Mark Done</button>`:''}
+              ${s.status==='confirmed'?`<button class="btn btn-sm btn-outline" style="margin-top:0.5rem" onclick="updateSession('${s._id}','completed',this).then(closeAdminCalPopup)">Mark Done</button>`:''}
             </div>`).join('')}
         `;
         document.getElementById('adminCalPopup').style.display = 'flex';
@@ -6446,12 +6481,12 @@
           ${
             s.status === "pending"
               ? `
-            <button class="btn btn-sm btn-outline" onclick="updateSession('${s._id}','confirmed')">Confirm</button>
-            <button class="btn btn-sm btn-danger" onclick="updateSession('${s._id}','cancelled')">Cancel</button>`
+            <button class="btn btn-sm btn-outline" onclick="updateSession('${s._id}','confirmed',this)">Confirm</button>
+            <button class="btn btn-sm btn-danger" onclick="updateSession('${s._id}','cancelled',this)">Cancel</button>`
               : ""
           }
-          ${s.status === "confirmed" ? `<button class="btn btn-sm btn-outline" onclick="updateSession('${s._id}','completed')">Mark Done</button>` : ""}
-          <button class="btn btn-sm btn-danger" onclick="deleteAdminSession('${s._id}')"><i class="fas fa-trash"></i></button>
+          ${s.status === "confirmed" ? `<button class="btn btn-sm btn-outline" onclick="updateSession('${s._id}','completed',this)">Mark Done</button>` : ""}
+          <button class="btn btn-sm btn-danger" onclick="deleteAdminSession('${s._id}',this)"><i class="fas fa-trash"></i></button>
         </div>
       </div>
       <div style="font-size:0.85rem;color:var(--text2)">${esc(s.session_type || "")}${s.notes ? " &middot; " + esc(s.notes) : ""}</div>
@@ -6460,15 +6495,19 @@
           .join("");
       }
 
-      async function updateSession(id, status) {
-        await api(`/api/admin/sessions/${id}`, "POST", { status });
-        loadAdminSessions();
+      async function updateSession(id, status, btnEl) {
+        await act(btnEl, async () => {
+          await api(`/api/admin/sessions/${id}`, "POST", { status });
+          await loadAdminSessions();
+        });
       }
 
-      async function deleteAdminSession(id) {
+      async function deleteAdminSession(id, btnEl) {
         if (!confirm("Delete this session?")) return;
-        await api(`/api/admin/sessions/${id}`, "DELETE");
-        loadAdminSessions();
+        await act(btnEl, async () => {
+          await api(`/api/admin/sessions/${id}`, "DELETE");
+          await loadAdminSessions();
+        });
       }
 
       // ── PAYMENTS ─────────────────────────────────────────────────────────────────────
@@ -6496,7 +6535,7 @@
         <span style="font-size:1.1rem;font-weight:700;color:var(--primary)">₹${esc(String(inv.amount))}</span>
         <span class="item-badge ${sc[inv.status] || "draft"}">${esc(inv.status)}</span>
         ${inv.status === "unpaid" ? `<button class="btn btn-sm btn-outline" onclick="openMarkPaid('${inv._id}')">Mark Paid</button>` : ""}
-        <button class="btn btn-sm btn-danger" onclick="deleteInvoice('${inv._id}')"><i class="fas fa-trash"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="deleteInvoice('${inv._id}',this)"><i class="fas fa-trash"></i></button>
       </div>
     </div>`,
           )
@@ -6555,25 +6594,25 @@
         openModal("markPaidModal");
       }
 
-      async function doMarkPaid() {
-        const { ok } = await api(
-          `/api/admin/invoices/${_markPaidId}/mark_paid`,
-          "POST",
-          {
+      async function doMarkPaid(btnEl) {
+        await act(btnEl, async () => {
+          const { ok } = await api(`/api/admin/invoices/${_markPaidId}/mark_paid`, "POST", {
             method: document.getElementById("invPayMethod").value || "UPI",
             ref: document.getElementById("invPayRef").value,
-          },
-        );
-        if (ok) {
-          closeModal("markPaidModal");
-          loadAdminInvoices();
-        } else msg("markPaidMsg", "Failed", false);
+          });
+          if (ok) {
+            closeModal("markPaidModal");
+            await loadAdminInvoices();
+          } else msg("markPaidMsg", "Failed", false);
+        });
       }
 
-      async function deleteInvoice(id) {
+      async function deleteInvoice(id, btnEl) {
         if (!confirm("Delete this invoice?")) return;
-        await api(`/api/admin/invoices/${id}`, "DELETE");
-        loadAdminInvoices();
+        await act(btnEl, async () => {
+          await api(`/api/admin/invoices/${id}`, "DELETE");
+          await loadAdminInvoices();
+        });
       }
 
       // ── MUSCLE MAP ────────────────────────────────────────────────────────────────
@@ -6771,7 +6810,7 @@
       </div>
       <div class="item-actions">
         <button class="btn btn-sm btn-outline" onclick="editAnn(${JSON.stringify(a).replace(/"/g, "&quot;")})">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAnn('${a._id}')">Del</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAnn('${a._id}',this)">Del</button>
       </div>
     </div>`,
               )
@@ -6825,10 +6864,12 @@
           "New Announcement";
       }
 
-      async function deleteAnn(id) {
+      async function deleteAnn(id, btnEl) {
         if (!confirm("Delete this announcement?")) return;
-        await api(`/api/admin/announcements/${id}`, "DELETE");
-        loadAnnouncements();
+        await act(btnEl, async () => {
+          await api(`/api/admin/announcements/${id}`, "DELETE");
+          await loadAnnouncements();
+        });
       }
     </script>
   </body>
