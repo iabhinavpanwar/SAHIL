@@ -2253,29 +2253,195 @@
       }
 
       /* ── CALENDAR (sessions tab) ──────────────────────────────────────────── */
-      .cal-wrap { background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:2rem;box-shadow:0 4px 24px rgba(0,0,0,0.18) }
-      .cal-header { display:flex;align-items:center;gap:0.75rem;padding:1rem 1.25rem;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap }
-      .cal-title { flex:1 1 auto;font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;color:var(--text) }
-      .cal-nav { width:34px;height:34px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:0.78rem;cursor:pointer;transition:all var(--transition);flex-shrink:0 }
-      .cal-nav:hover { background:var(--primary);border-color:var(--primary);color:#000 }
-      .cal-today-btn { padding:0.35rem 0.9rem;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text2);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all var(--transition) }
-      .cal-today-btn:hover { border-color:var(--primary);color:var(--primary) }
-      .cal-dow { display:grid;grid-template-columns:repeat(7,1fr);background:var(--bg2);border-bottom:1px solid var(--border) }
-      .cal-dow span { text-align:center;padding:0.55rem 0;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3) }
-      .cal-grid { display:grid;grid-template-columns:repeat(7,1fr);background:var(--bg3);gap:1px }
-      .cal-cell { min-height:70px;background:var(--card);padding:0.4rem 0.45rem 0.3rem;cursor:pointer;transition:background var(--transition);display:flex;flex-direction:column;gap:0.22rem;position:relative;min-width:0 }
-      .cal-cell:hover { background:var(--bg2) }
-      .cal-cell.cal-empty { cursor:default;background:var(--bg3);opacity:0.4 }
-      .cal-cell.cal-past { opacity:0.5 }
-      .cal-cell.cal-past:hover { background:var(--card) }
-      .cal-day-num { font-size:0.82rem;font-weight:600;color:var(--text3);line-height:1;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;transition:all var(--transition) }
-      .cal-cell.cal-today .cal-day-num { background:var(--primary);color:#000;font-weight:800 }
-      .cal-dot { font-size:0.6rem;font-weight:700;padding:0.15rem 0.4rem;border-radius:5px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;line-height:1.4 }
-      .cal-dot-more { font-size:0.6rem;color:var(--text3);font-weight:700;padding-left:0.1rem }
-      .cal-popup { position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem }
-      .cal-popup-inner { background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;width:100%;max-width:400px;position:relative;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5) }
-      .cal-popup-close { position:absolute;top:0.9rem;right:0.9rem;width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--transition) }
-      .cal-popup-close:hover { background:#e53935;border-color:#e53935;color:#fff }
+      .cal-wrap {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+      }
+      .cal-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+      }
+      .cal-title {
+        flex: 1 1 auto;
+        font-weight: 800;
+        font-size: 1.05rem;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+      .cal-nav {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        color: var(--text2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition: all var(--transition);
+        flex-shrink: 0;
+      }
+      .cal-nav:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #000;
+      }
+      .cal-today-btn {
+        padding: 0.35rem 0.9rem;
+        border-radius: 10px;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text2);
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition);
+      }
+      .cal-today-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .cal-dow {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+      }
+      .cal-dow span {
+        text-align: center;
+        padding: 0.55rem 0;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text3);
+      }
+      .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        background: var(--bg3);
+        gap: 1px;
+      }
+      .cal-cell {
+        min-height: 70px;
+        background: var(--card);
+        padding: 0.4rem 0.45rem 0.3rem;
+        cursor: pointer;
+        transition: background var(--transition);
+        display: flex;
+        flex-direction: column;
+        gap: 0.22rem;
+        position: relative;
+        min-width: 0;
+      }
+      .cal-cell:hover {
+        background: var(--bg2);
+      }
+      .cal-cell.cal-empty {
+        cursor: default;
+        background: var(--bg3);
+        opacity: 0.4;
+      }
+      .cal-cell.cal-past {
+        opacity: 0.5;
+      }
+      .cal-cell.cal-past:hover {
+        background: var(--card);
+      }
+      .cal-day-num {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text3);
+        line-height: 1;
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+        transition: all var(--transition);
+      }
+      .cal-cell.cal-today .cal-day-num {
+        background: var(--primary);
+        color: #000;
+        font-weight: 800;
+      }
+      .cal-dot {
+        font-size: 0.6rem;
+        font-weight: 700;
+        padding: 0.15rem 0.4rem;
+        border-radius: 5px;
+        color: #000;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        line-height: 1.4;
+      }
+      .cal-dot-more {
+        font-size: 0.6rem;
+        color: var(--text3);
+        font-weight: 700;
+        padding-left: 0.1rem;
+      }
+      .cal-popup {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 300;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .cal-popup-inner {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        width: 100%;
+        max-width: 400px;
+        position: relative;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+      .cal-popup-close {
+        position: absolute;
+        top: 0.9rem;
+        right: 0.9rem;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        color: var(--text2);
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all var(--transition);
+      }
+      .cal-popup-close:hover {
+        background: #e53935;
+        border-color: #e53935;
+        color: #fff;
+      }
 
       /* ── Print ────────────────────────────────────────────────────────────── */
       @media print {
@@ -3048,25 +3214,51 @@
           <div class="tab-panel" id="tab-sessions">
             <div class="panel-header">
               <h3>Session Bookings</h3>
-              <button class="btn btn-primary" onclick="openModal('adminBookSessionModal')">+ Book Session</button>
+              <button
+                class="btn btn-primary"
+                onclick="openModal('adminBookSessionModal')"
+              >
+                + Book Session
+              </button>
             </div>
             <div class="cal-wrap">
               <div class="cal-header">
-                <button class="cal-nav" onclick="adminCalMove(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="cal-nav" onclick="adminCalMove(-1)">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
                 <span class="cal-title" id="adminCalTitle"></span>
-                <button class="cal-nav" onclick="adminCalMove(1)"><i class="fas fa-chevron-right"></i></button>
-                <button class="cal-today-btn" onclick="adminCalToday()">Today</button>
+                <button class="cal-nav" onclick="adminCalMove(1)">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="cal-today-btn" onclick="adminCalToday()">
+                  Today
+                </button>
               </div>
-              <div class="cal-dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+              <div class="cal-dow">
+                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span
+                ><span>Thu</span><span>Fri</span><span>Sat</span>
+              </div>
               <div class="cal-grid" id="adminCalGrid"></div>
             </div>
-            <div class="cal-popup" id="adminCalPopup" style="display:none">
+            <div class="cal-popup" id="adminCalPopup" style="display: none">
               <div class="cal-popup-inner">
-                <button class="cal-popup-close" onclick="closeAdminCalPopup()">&times;</button>
+                <button class="cal-popup-close" onclick="closeAdminCalPopup()">
+                  &times;
+                </button>
                 <div id="adminCalPopupContent"></div>
               </div>
             </div>
-            <h4 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin:1.5rem 0 0.75rem">All Sessions</h4>
+            <h4
+              style="
+                font-size: 0.85rem;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                color: var(--text3);
+                margin: 1.5rem 0 0.75rem;
+              "
+            >
+              All Sessions
+            </h4>
             <div class="items-list" id="adminSessionsList"></div>
           </div>
 
@@ -4173,9 +4365,18 @@
             ><input type="number" id="mpFats" placeholder="60" />
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:0.75rem">
-          <div id="mpMeals" style="display:flex;flex-direction:column;gap:0.75rem"></div>
-          <button class="btn btn-outline btn-sm" style="align-self:flex-start" onclick="addMealRow()">+ Add Meal</button>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem">
+          <div
+            id="mpMeals"
+            style="display: flex; flex-direction: column; gap: 0.75rem"
+          ></div>
+          <button
+            class="btn btn-outline btn-sm"
+            style="align-self: flex-start"
+            onclick="addMealRow()"
+          >
+            + Add Meal
+          </button>
         </div>
         <div class="modal-footer">
           <button class="btn btn-outline" onclick="closeModal('mealPlanModal')">
@@ -4266,7 +4467,12 @@
         </div>
         <div class="form-group">
           <label>Client Name (walk-in or name)</label>
-          <input type="text" id="absClientName" maxlength="200" placeholder="e.g. Rahul Sharma" />
+          <input
+            type="text"
+            id="absClientName"
+            maxlength="200"
+            placeholder="e.g. Rahul Sharma"
+          />
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -4297,11 +4503,23 @@
         </div>
         <div class="form-group">
           <label>Notes</label>
-          <input type="text" id="absNotes" maxlength="500" placeholder="Optional notes" />
+          <input
+            type="text"
+            id="absNotes"
+            maxlength="500"
+            placeholder="Optional notes"
+          />
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline" onclick="closeModal('adminBookSessionModal')">Cancel</button>
-          <button class="btn btn-primary" onclick="adminBookSession(this)">Book</button>
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('adminBookSessionModal')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="adminBookSession(this)">
+            Book
+          </button>
         </div>
         <p id="absMsg" class="form-msg"></p>
       </div>
@@ -4345,7 +4563,344 @@
         <p id="markPaidMsg" class="form-msg"></p>
       </div>
     </div>
+    <!-- ══════════════════════════════════════════════════════════════════════
+     THEME COLOR FEATURE — HTML + CSS + JS
+     Paste this entire block right BEFORE the closing </body> tag in admin.html
+     (i.e. just after the existing <script>...</script> block)
+     ══════════════════════════════════════════════════════════════════════ -->
 
+    <!-- ── HTML: Theme Color section (rendered into Site Settings tab) ───── -->
+    <template id="themeColorSectionTemplate">
+      <div class="form-section" id="themeColorSection">
+        <h4>Theme Color</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Primary Accent Color</label>
+
+            <div class="theme-color-controls">
+              <input
+                type="color"
+                id="cfg_theme_color"
+                class="theme-color-picker"
+                value="#e8ff00"
+                oninput="onThemeColorInput(this.value)"
+                aria-label="Pick primary theme color"
+              />
+
+              <input
+                type="text"
+                id="cfg_theme_color_hex"
+                class="theme-color-hex"
+                value="#e8ff00"
+                maxlength="7"
+                spellcheck="false"
+                oninput="onThemeHexInput(this.value)"
+                aria-label="Hex color value"
+              />
+
+              <button
+                type="button"
+                class="btn btn-sm btn-outline"
+                onclick="resetThemeColor()"
+                title="Reset to default (#e8ff00)"
+              >
+                <i class="fas fa-rotate-left"></i> Reset
+              </button>
+            </div>
+
+            <div class="theme-color-preview-row">
+              <div id="cfg_theme_preview" class="theme-color-preview">
+                Preview
+              </div>
+              <span
+                id="cfg_theme_status"
+                class="theme-color-status"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <p class="theme-color-hint">
+              Applies to buttons, links, highlights, and other accent elements
+              across the public site.
+            </p>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- ── CSS ───────────────────────────────────────────────────────────── -->
+    <style>
+      /* ── THEME COLOR PICKER ──────────────────────────────────────────── */
+      .theme-color-controls {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .theme-color-picker {
+        width: 64px;
+        height: 44px;
+        padding: 3px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition);
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      .theme-color-picker::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+      .theme-color-picker::-webkit-color-swatch {
+        border: none;
+        border-radius: 6px;
+      }
+      .theme-color-picker::-moz-color-swatch {
+        border: none;
+        border-radius: 6px;
+      }
+      .theme-color-picker:hover,
+      .theme-color-picker:focus-visible {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(232, 255, 0, 0.12);
+        outline: none;
+      }
+
+      .theme-color-hex {
+        width: 110px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        padding: 0.65rem 0.75rem;
+        font-size: 0.9rem;
+        font-family: "SF Mono", "Monaco", "Consolas", monospace;
+        letter-spacing: 0.05em;
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition);
+      }
+      .theme-color-hex:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(232, 255, 0, 0.1);
+      }
+
+      .theme-color-preview-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .theme-color-preview {
+        padding: 0.5rem 1.1rem;
+        border-radius: var(--radius-sm);
+        background: #e8ff00;
+        color: #000;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.02em;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        transition:
+          background 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+
+      .theme-color-status {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text3);
+        transition: color 0.25s ease;
+      }
+      .theme-color-status.saving {
+        color: #ffb74d;
+      }
+      .theme-color-status.saved {
+        color: var(--success);
+      }
+      .theme-color-status.error {
+        color: var(--danger);
+      }
+
+      .theme-color-hint {
+        font-size: 0.78rem;
+        color: var(--text3);
+        margin-top: 0.5rem;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 480px) {
+        .theme-color-hex {
+          width: 100px;
+          font-size: 0.85rem;
+        }
+        .theme-color-picker {
+          width: 56px;
+          height: 40px;
+        }
+        .theme-color-preview {
+          font-size: 0.8rem;
+          padding: 0.45rem 0.9rem;
+        }
+      }
+    </style>
+
+    <!-- ── JS ───────────────────────────────────────────────────────────── -->
+    <script>
+      /* ── THEME COLOR LOGIC ─────────────────────────────────────────────── */
+      (function () {
+        const DEFAULT_THEME_COLOR = "#e8ff00";
+        const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+        let _saveTimer = null;
+
+        // Inject the theme color form-section into the Site Settings tab
+        function injectThemeSection() {
+          const target = document.querySelector("#tab-config .form-sections");
+          if (!target || document.getElementById("themeColorSection")) return;
+          const tpl = document.getElementById("themeColorSectionTemplate");
+          if (!tpl) return;
+          target.appendChild(tpl.content.cloneNode(true));
+        }
+
+        // Public: called by the color picker's `oninput`
+        window.onThemeColorInput = function (hex) {
+          const hexEl = document.getElementById("cfg_theme_color_hex");
+          const prev = document.getElementById("cfg_theme_preview");
+          if (hexEl) hexEl.value = hex;
+          if (prev) prev.style.background = hex;
+          scheduleSave(hex);
+        };
+
+        // Public: called by the hex text input's `oninput`
+        window.onThemeHexInput = function (hex) {
+          hex = (hex || "").trim();
+          if (!HEX_RE.test(hex)) return;
+          const pickerEl = document.getElementById("cfg_theme_color");
+          const prev = document.getElementById("cfg_theme_preview");
+          if (pickerEl) pickerEl.value = hex;
+          if (prev) prev.style.background = hex;
+          scheduleSave(hex);
+        };
+
+        // Public: reset to default
+        window.resetThemeColor = async function () {
+          const pickerEl = document.getElementById("cfg_theme_color");
+          const hexEl = document.getElementById("cfg_theme_color_hex");
+          const prev = document.getElementById("cfg_theme_preview");
+          if (pickerEl) pickerEl.value = DEFAULT_THEME_COLOR;
+          if (hexEl) hexEl.value = DEFAULT_THEME_COLOR;
+          if (prev) prev.style.background = DEFAULT_THEME_COLOR;
+          await saveThemeColor(DEFAULT_THEME_COLOR);
+        };
+
+        // Debounced save
+        function scheduleSave(hex) {
+          const statusEl = document.getElementById("cfg_theme_status");
+          if (statusEl) {
+            statusEl.textContent = "Saving…";
+            statusEl.className = "theme-color-status saving";
+          }
+          clearTimeout(_saveTimer);
+          _saveTimer = setTimeout(() => saveThemeColor(hex), 500);
+        }
+
+        async function saveThemeColor(hex) {
+          const statusEl = document.getElementById("cfg_theme_status");
+          if (!HEX_RE.test(hex)) {
+            if (statusEl) {
+              statusEl.textContent = "✗ Invalid hex";
+              statusEl.className = "theme-color-status error";
+            }
+            return;
+          }
+          try {
+            const res = await fetch("/api/admin/theme_color", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ color: hex }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+              document.documentElement.style.setProperty("--primary", hex);
+              if (statusEl) {
+                statusEl.textContent = "✓ Saved";
+                statusEl.className = "theme-color-status saved";
+                setTimeout(() => {
+                  if (statusEl.textContent === "✓ Saved") {
+                    statusEl.textContent = "";
+                    statusEl.className = "theme-color-status";
+                  }
+                }, 2500);
+              }
+            } else {
+              if (statusEl) {
+                statusEl.textContent = "✗ " + (data.error || "Save failed");
+                statusEl.className = "theme-color-status error";
+              }
+            }
+          } catch (e) {
+            if (statusEl) {
+              statusEl.textContent = "✗ Network error";
+              statusEl.className = "theme-color-status error";
+            }
+          }
+        }
+
+        // Load current theme color into the picker
+        async function loadThemeColor() {
+          try {
+            const res = await fetch("/api/admin/theme_color");
+            const data = await res.json().catch(() => ({}));
+            const color = (data && data.color) || DEFAULT_THEME_COLOR;
+            const pickerEl = document.getElementById("cfg_theme_color");
+            const hexEl = document.getElementById("cfg_theme_color_hex");
+            const prev = document.getElementById("cfg_theme_preview");
+            if (pickerEl) pickerEl.value = color;
+            if (hexEl) hexEl.value = color;
+            if (prev) prev.style.background = color;
+            document.documentElement.style.setProperty("--primary", color);
+          } catch (e) {
+            /* silent */
+          }
+        }
+
+        // Hook into the existing loadConfig() so the picker refreshes
+        // whenever the admin opens the Site Settings tab.
+        function hookLoadConfig() {
+          if (typeof window.loadConfig !== "function") return;
+          if (window.loadConfig.__themeHooked) return;
+          const original = window.loadConfig;
+          window.loadConfig = async function () {
+            injectThemeSection();
+            const r = await original.apply(this, arguments);
+            await loadThemeColor();
+            return r;
+          };
+          window.loadConfig.__themeHooked = true;
+        }
+
+        // Run once DOM is ready
+        function boot() {
+          injectThemeSection();
+          hookLoadConfig();
+          // If the config tab is already open, load the color immediately.
+          const panel = document.getElementById("tab-config");
+          if (panel && panel.classList.contains("active")) loadThemeColor();
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", boot);
+        } else {
+          boot();
+        }
+      })();
+    </script>
     <script>
       // ── SCRIPT (unchanged, keep as is) ──────────────────────────────────────────
       const api = async (url, method = "GET", body = null) => {
@@ -4363,11 +4918,13 @@
         if (!btnEl) return fn();
         const orig = btnEl.innerHTML;
         btnEl.disabled = true;
-        btnEl.style.opacity = '0.6';
+        btnEl.style.opacity = "0.6";
         btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        try { await fn(); } finally {
+        try {
+          await fn();
+        } finally {
           btnEl.disabled = false;
-          btnEl.style.opacity = '';
+          btnEl.style.opacity = "";
           btnEl.innerHTML = orig;
         }
       }
@@ -5164,7 +5721,9 @@
           const btn = document.createElement("button");
           btn.className = "del-btn";
           btn.innerHTML = '<i class="fas fa-trash"></i>';
-          btn.onclick = function() { deleteGallery(g._id, this); };
+          btn.onclick = function () {
+            deleteGallery(g._id, this);
+          };
           const editBtn = document.createElement("button");
           editBtn.className = "edit-btn";
           editBtn.innerHTML = '<i class="fas fa-pen"></i>';
@@ -5709,7 +6268,11 @@
         const id = document.getElementById("fbCheckinId").value;
         const feedback = document.getElementById("fbText").value;
         await act(btnEl, async () => {
-          const { ok } = await api(`/api/admin/checkins/${id}/feedback`, "POST", { feedback });
+          const { ok } = await api(
+            `/api/admin/checkins/${id}/feedback`,
+            "POST",
+            { feedback },
+          );
           if (ok) {
             closeModal("feedbackModal");
             await loadCheckins();
@@ -5783,7 +6346,14 @@
       }
 
       async function toggleClientActive(cid, active, btnEl) {
-        if (!confirm(active ? "Activate this client?" : "Deactivate this client? They will not be able to log in.")) return;
+        if (
+          !confirm(
+            active
+              ? "Activate this client?"
+              : "Deactivate this client? They will not be able to log in.",
+          )
+        )
+          return;
         await act(btnEl, async () => {
           await api(`/api/admin/clients/${cid}/active`, "POST", { active });
           await loadClients();
@@ -6421,8 +6991,14 @@
 
       function adminCalMove(dir) {
         _adminCalMonth += dir;
-        if (_adminCalMonth > 11) { _adminCalMonth = 0; _adminCalYear++; }
-        if (_adminCalMonth < 0)  { _adminCalMonth = 11; _adminCalYear--; }
+        if (_adminCalMonth > 11) {
+          _adminCalMonth = 0;
+          _adminCalYear++;
+        }
+        if (_adminCalMonth < 0) {
+          _adminCalMonth = 11;
+          _adminCalYear--;
+        }
         renderAdminCal();
       }
       function adminCalToday() {
@@ -6432,95 +7008,176 @@
         renderAdminCal();
       }
       function closeAdminCalPopup() {
-        document.getElementById('adminCalPopup').style.display = 'none';
+        document.getElementById("adminCalPopup").style.display = "none";
       }
 
       function renderAdminCal() {
-        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-        document.getElementById('adminCalTitle').textContent = months[_adminCalMonth] + ' ' + _adminCalYear;
-        const grid = document.getElementById('adminCalGrid');
+        const months = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ];
+        document.getElementById("adminCalTitle").textContent =
+          months[_adminCalMonth] + " " + _adminCalYear;
+        const grid = document.getElementById("adminCalGrid");
         const today = new Date();
         const firstDay = new Date(_adminCalYear, _adminCalMonth, 1).getDay();
-        const daysInMonth = new Date(_adminCalYear, _adminCalMonth + 1, 0).getDate();
+        const daysInMonth = new Date(
+          _adminCalYear,
+          _adminCalMonth + 1,
+          0,
+        ).getDate();
         const sessMap = {};
-        _adminSessions.forEach(s => {
-          const raw = s.datetime || '';
+        _adminSessions.forEach((s) => {
+          const raw = s.datetime || "";
           const d = new Date(raw);
           if (!isNaN(d)) {
-            const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+            const key =
+              d.getFullYear() +
+              "-" +
+              String(d.getMonth() + 1).padStart(2, "0") +
+              "-" +
+              String(d.getDate()).padStart(2, "0");
             if (!sessMap[key]) sessMap[key] = [];
             sessMap[key].push(s);
           }
         });
-        let html = '';
-        for (let i = 0; i < firstDay; i++) html += '<div class="cal-cell cal-empty"></div>';
+        let html = "";
+        for (let i = 0; i < firstDay; i++)
+          html += '<div class="cal-cell cal-empty"></div>';
         for (let d = 1; d <= daysInMonth; d++) {
-          const key = _adminCalYear + '-' + String(_adminCalMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          const key =
+            _adminCalYear +
+            "-" +
+            String(_adminCalMonth + 1).padStart(2, "0") +
+            "-" +
+            String(d).padStart(2, "0");
           const daySess = sessMap[key] || [];
-          const isToday = d === today.getDate() && _adminCalMonth === today.getMonth() && _adminCalYear === today.getFullYear();
-          const isPast = new Date(_adminCalYear, _adminCalMonth, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-          html += `<div class="cal-cell${isToday?' cal-today':''}${isPast?' cal-past':''}" onclick="adminCalDayClick('${key}')">`;
+          const isToday =
+            d === today.getDate() &&
+            _adminCalMonth === today.getMonth() &&
+            _adminCalYear === today.getFullYear();
+          const isPast =
+            new Date(_adminCalYear, _adminCalMonth, d) <
+            new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          html += `<div class="cal-cell${isToday ? " cal-today" : ""}${isPast ? " cal-past" : ""}" onclick="adminCalDayClick('${key}')">`;
           html += `<span class="cal-day-num">${d}</span>`;
-          const colors = { confirmed:'#44cc88', pending:'#ffb74d', cancelled:'var(--danger)', completed:'#4fc3f7' };
-          daySess.slice(0,2).forEach(s => {
-            const c = colors[s.status] || '#aaa';
-            html += `<div class="cal-dot" style="background:${c}" title="${esc(s.client_name||'')}">${esc((s.session_type||'').split(' ')[0])}</div>`;
+          const colors = {
+            confirmed: "#44cc88",
+            pending: "#ffb74d",
+            cancelled: "var(--danger)",
+            completed: "#4fc3f7",
+          };
+          daySess.slice(0, 2).forEach((s) => {
+            const c = colors[s.status] || "#aaa";
+            html += `<div class="cal-dot" style="background:${c}" title="${esc(s.client_name || "")}">${esc((s.session_type || "").split(" ")[0])}</div>`;
           });
-          if (daySess.length > 2) html += `<div class="cal-dot-more">+${daySess.length-2}</div>`;
-          html += '</div>';
+          if (daySess.length > 2)
+            html += `<div class="cal-dot-more">+${daySess.length - 2}</div>`;
+          html += "</div>";
         }
         grid.innerHTML = html;
       }
 
       function adminCalDayClick(key) {
-        const daySess = _adminSessions.filter(s => {
+        const daySess = _adminSessions.filter((s) => {
           const d = new Date(s.datetime);
           if (isNaN(d)) return false;
-          const k = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+          const k =
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0");
           return k === key;
         });
         if (!daySess.length) return;
-        const colors = { confirmed:'#44cc88', pending:'#ffb74d', cancelled:'var(--danger)', completed:'#4fc3f7' };
-        const [y,m,d] = key.split('-');
-        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-        document.getElementById('adminCalPopupContent').innerHTML = `
-          <h4 style="margin-bottom:1rem;font-size:1rem">${parseInt(d)} ${months[parseInt(m)-1]} ${y}</h4>
-          ${daySess.map(s => `
+        const colors = {
+          confirmed: "#44cc88",
+          pending: "#ffb74d",
+          cancelled: "var(--danger)",
+          completed: "#4fc3f7",
+        };
+        const [y, m, d] = key.split("-");
+        const months = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ];
+        document.getElementById("adminCalPopupContent").innerHTML = `
+          <h4 style="margin-bottom:1rem;font-size:1rem">${parseInt(d)} ${months[parseInt(m) - 1]} ${y}</h4>
+          ${daySess
+            .map(
+              (s) => `
             <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.6rem">
               <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap">
-                <strong style="font-size:0.9rem">${esc(s.client_name||'Client')}</strong>
-                <span style="background:${colors[s.status]||'#aaa'}22;color:${colors[s.status]||'#aaa'};padding:0.15rem 0.5rem;border-radius:20px;font-size:0.75rem;font-weight:700">${s.status}</span>
+                <strong style="font-size:0.9rem">${esc(s.client_name || "Client")}</strong>
+                <span style="background:${colors[s.status] || "#aaa"}22;color:${colors[s.status] || "#aaa"};padding:0.15rem 0.5rem;border-radius:20px;font-size:0.75rem;font-weight:700">${s.status}</span>
               </div>
               <div style="font-size:0.82rem;color:var(--text2);margin-top:0.3rem">${esc(s.datetime)}</div>
-              <div style="font-size:0.82rem;color:var(--text2)">${esc(s.session_type||'')}${s.notes?' · '+esc(s.notes):''}</div>
-              ${s.status==='pending'?`
+              <div style="font-size:0.82rem;color:var(--text2)">${esc(s.session_type || "")}${s.notes ? " · " + esc(s.notes) : ""}</div>
+              ${
+                s.status === "pending"
+                  ? `
                 <div style="display:flex;gap:0.4rem;margin-top:0.5rem">
                   <button class="btn btn-sm btn-outline" onclick="updateSession('${s._id}','confirmed',this).then(closeAdminCalPopup)">Confirm</button>
                   <button class="btn btn-sm btn-danger" onclick="updateSession('${s._id}','cancelled',this).then(closeAdminCalPopup)">Cancel</button>
-                </div>`:''}
-              ${s.status==='confirmed'?`<button class="btn btn-sm btn-outline" style="margin-top:0.5rem" onclick="updateSession('${s._id}','completed',this).then(closeAdminCalPopup)">Mark Done</button>`:''}
-            </div>`).join('')}
+                </div>`
+                  : ""
+              }
+              ${s.status === "confirmed" ? `<button class="btn btn-sm btn-outline" style="margin-top:0.5rem" onclick="updateSession('${s._id}','completed',this).then(closeAdminCalPopup)">Mark Done</button>` : ""}
+            </div>`,
+            )
+            .join("")}
         `;
-        document.getElementById('adminCalPopup').style.display = 'flex';
+        document.getElementById("adminCalPopup").style.display = "flex";
       }
 
       async function adminBookSession(btnEl) {
-        const date = document.getElementById('absDate').value;
-        const time = document.getElementById('absTime').value;
-        if (!date || !time) { msg('absMsg', 'Date and time required', false); return; }
+        const date = document.getElementById("absDate").value;
+        const time = document.getElementById("absTime").value;
+        if (!date || !time) {
+          msg("absMsg", "Date and time required", false);
+          return;
+        }
         await act(btnEl, async () => {
-          const { ok } = await api('/api/admin/sessions', 'POST', {
-            client_name: document.getElementById('absClientName').value || 'Walk-in',
-            date, time,
-            session_type: document.getElementById('absType').value,
-            status: document.getElementById('absStatus').value,
-            notes: document.getElementById('absNotes').value,
+          const { ok } = await api("/api/admin/sessions", "POST", {
+            client_name:
+              document.getElementById("absClientName").value || "Walk-in",
+            date,
+            time,
+            session_type: document.getElementById("absType").value,
+            status: document.getElementById("absStatus").value,
+            notes: document.getElementById("absNotes").value,
           });
           if (ok) {
-            closeModal('adminBookSessionModal');
-            ['absClientName','absDate','absTime','absNotes'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+            closeModal("adminBookSessionModal");
+            ["absClientName", "absDate", "absTime", "absNotes"].forEach(
+              (id) => {
+                const el = document.getElementById(id);
+                if (el) el.value = "";
+              },
+            );
             await loadAdminSessions();
-          } else msg('absMsg', 'Failed to book session', false);
+          } else msg("absMsg", "Failed to book session", false);
         });
       }
 
@@ -6669,10 +7326,14 @@
 
       async function doMarkPaid(btnEl) {
         await act(btnEl, async () => {
-          const { ok } = await api(`/api/admin/invoices/${_markPaidId}/mark_paid`, "POST", {
-            method: document.getElementById("invPayMethod").value || "UPI",
-            ref: document.getElementById("invPayRef").value,
-          });
+          const { ok } = await api(
+            `/api/admin/invoices/${_markPaidId}/mark_paid`,
+            "POST",
+            {
+              method: document.getElementById("invPayMethod").value || "UPI",
+              ref: document.getElementById("invPayRef").value,
+            },
+          );
           if (ok) {
             closeModal("markPaidModal");
             await loadAdminInvoices();
@@ -6947,4 +7608,3 @@
     </script>
   </body>
 </html>
-
