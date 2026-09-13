@@ -3040,12 +3040,9 @@ MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
 try:
     images_col = db['images']
     images_col.create_index('image_id', unique=True)
+    community_col = db['community_posts']
 except Exception:
     images_col = None
-
-try:
-    community_col = db['community_posts'] if db is not None else None
-except Exception:
     community_col = None
 
 def _compress_image(data, mime):
@@ -3592,19 +3589,27 @@ def community():
 @app.route('/api/community/posts', methods=['GET'])
 def community_get_posts():
     if community_col is None:
-        return jsonify([]), 500
-    skip = max(0, int(request.args.get('skip', 0)))
-    posts = list(community_col.find({}).sort('created', -1).skip(skip).limit(10))
-    cid = session.get('client_id', '')
-    for p in posts:
-        p['_id'] = str(p['_id'])
-        p['created'] = to_ist(p.get('created'))
-        p['liked'] = cid in (p.get('likes') or [])
-        p['like_count'] = len(p.get('likes') or [])
-        p.pop('likes', None)
-        for c in p.get('comments') or []:
-            c['_id'] = str(c['_id'])
-    return jsonify(posts)
+        return jsonify({'error': 'DB unavailable'}), 500
+    try:
+        skip = max(0, int(request.args.get('skip', 0)))
+    except (ValueError, TypeError):
+        skip = 0
+    try:
+        posts = list(community_col.find({}).sort('created', -1).skip(skip).limit(10))
+        cid = session.get('client_id', '')
+        for p in posts:
+            p['_id'] = str(p['_id'])
+            p['created'] = to_ist(p.get('created'))
+            p['liked'] = cid in (p.get('likes') or [])
+            p['like_count'] = len(p.get('likes') or [])
+            p.pop('likes', None)
+            for c in p.get('comments') or []:
+                c['_id'] = str(c['_id'])
+                c['created'] = to_ist(c.get('created'))
+        return jsonify(posts)
+    except Exception as e:
+        logger.error('community_get_posts error: %s', e)
+        return jsonify({'error': 'Server error'}), 500
 
 @app.route('/api/community/posts', methods=['POST'])
 @client_login_required
