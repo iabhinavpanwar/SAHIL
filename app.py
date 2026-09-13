@@ -78,6 +78,17 @@ def to_ist(dt):
     """Convert UTC datetime to IST and format with AM/PM."""
     if not dt:
         return ''
+    if isinstance(dt, str):
+        for fmt in ('%Y-%m-%d %H:%M', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M:%S.%f'):
+            try:
+                dt = datetime.strptime(dt[:19], fmt[:len(fmt)])
+                break
+            except ValueError:
+                continue
+        else:
+            return dt  # return as-is if unparseable
+    if not isinstance(dt, datetime):
+        return str(dt)
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     ist = dt + _IST
@@ -207,12 +218,20 @@ def _compute_adherence(cid):
     today = _ist_today()
     week_dates = [(today - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
     trained_week = sum(1 for d in week_dates if d in trained)
-    start = today if today.strftime('%Y-%m-%d') in trained else today - timedelta(days=1)
+    today_str = today.strftime('%Y-%m-%d')
+    yesterday_str = (today - timedelta(days=1)).strftime('%Y-%m-%d')
     streak = 0
-    d = start
-    while d.strftime('%Y-%m-%d') in trained:
-        streak += 1
-        d -= timedelta(days=1)
+    if today_str in trained:
+        start = today
+    elif yesterday_str in trained:
+        start = today - timedelta(days=1)
+    else:
+        start = None
+    if start:
+        d = start
+        while d.strftime('%Y-%m-%d') in trained:
+            streak += 1
+            d -= timedelta(days=1)
     return {
         'trained_this_week': trained_week,
         'streak': streak,
@@ -1323,7 +1342,7 @@ def client_stats():
     checkin_count  = checkins_col.count_documents({'client_id': cid}) if checkins_col is not None else 0
     latest = measurements_col.find_one({'client_id': cid, 'weight': {'$exists': True}}, sort=[('date', -1)]) if measurements_col is not None else None
     latest_weight  = latest['weight'] if latest else None
-    pending_feedback = checkins_col.count_documents({'client_id': cid, 'reviewed': True, 'feedback': {'$ne': ''}}) if checkins_col is not None else 0
+    pending_feedback = checkins_col.count_documents({'client_id': cid, 'reviewed': True, 'feedback': {'$ne': ''}, 'feedback_seen': {'$ne': True}}) if checkins_col is not None else 0
     adherence = _compute_adherence(cid)
     return jsonify({
         'checkins':        checkin_count,
@@ -1341,7 +1360,12 @@ def client_get_checkins():
     items = list(checkins_col.find({'client_id': session['client_id']}).sort('date', -1))
     for i in items:
         i['_id']  = str(i['_id'])
-        i['date'] = i['date'].strftime('%d %b %Y') if i.get('date') else ''
+        i['date'] = (i['date'].replace(tzinfo=timezone.utc) + _IST).strftime('%d %b %Y') if i.get('date') else ''
+    # mark all reviewed feedback as seen
+    checkins_col.update_many(
+        {'client_id': session['client_id'], 'reviewed': True, 'feedback': {'$ne': ''}, 'feedback_seen': {'$ne': True}},
+        {'$set': {'feedback_seen': True}}
+    )
     return jsonify(items)
 
 @app.route('/api/client/checkins', methods=['POST'])
@@ -1588,7 +1612,7 @@ def client_get_progress():
     items = list(measurements_col.find({'client_id': session['client_id']}).sort('date', -1).limit(60))
     for i in items:
         i['_id']  = str(i['_id'])
-        i['date'] = i['date'].strftime('%d %b %Y') if i.get('date') else ''
+        i['date'] = (i['date'].replace(tzinfo=timezone.utc) + _IST).strftime('%d %b %Y') if i.get('date') else ''
     return jsonify(items)
 
 @app.route('/api/client/progress', methods=['POST'])
@@ -2276,10 +2300,13 @@ def client_cancel_session(sid):
 def admin_get_sessions():
     if sessions_col is None:
         return jsonify([]), 500
-    items = list(sessions_col.find({}).sort('datetime', 1))
+    items = list(sessions_col.find({}).sort('created', -1))
     for i in items:
         i['_id']      = str(i['_id'])
-        i['datetime'] = to_ist(i.get('datetime'))
+        try:
+            i['datetime'] = to_ist(i.get('datetime'))
+        except Exception:
+            i['datetime'] = str(i.get('datetime', ''))
     return jsonify(items)
 
 @app.route('/api/admin/sessions/<sid>', methods=['POST'])
