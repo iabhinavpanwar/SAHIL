@@ -778,6 +778,16 @@ def newsletter_signup():
     if leads_col.find_one({'email': email, 'type': 'newsletter'}):
         return jsonify({'status': 'already_subscribed'})
     leads_col.insert_one({'email': email, 'type': 'newsletter', 'date': datetime.now(timezone.utc)})
+    pdf_url = cfg.get('lead_magnet_pdf', '').strip()
+    title = cfg.get('lead_magnet_title', 'Free 7-Day Workout Plan')
+    trainer = cfg.get('hero_name', 'Sahil Panwar')
+    body = (
+        f'Hi there,\n\n'
+        f'Thanks for signing up! Here is your {title}:\n\n'
+        + (f'{pdf_url}\n\n' if pdf_url else '')
+        + f'Stay consistent and keep pushing!\n\u2014 {trainer}'
+    )
+    _send_email(email, f'Your {title} — {trainer}', body)
     return jsonify({'status': 'subscribed'})
 
 @app.route('/api/testimonials')
