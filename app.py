@@ -3612,9 +3612,19 @@ def community_get_posts():
 def community_create_post():
     if community_col is None:
         return jsonify({'error': 'DB unavailable'}), 500
-    d = request.json or {}
-    text = s(d.get('text', ''), 1000)
-    if not text:
+    # support both multipart (with image) and plain JSON
+    if request.content_type and 'multipart' in request.content_type:
+        text = s((request.form.get('text') or ''), 1000)
+        image_url = None
+        file = request.files.get('image')
+        if file and file.filename:
+            image_url, err = _handle_upload(file)
+            if err:
+                return jsonify({'error': err}), 400
+    else:
+        text = s((request.json or {}).get('text', ''), 1000)
+        image_url = None
+    if not text and not image_url:
         return jsonify({'error': 'Post cannot be empty'}), 400
     cid = session['client_id']
     user = users_col.find_one({'_id': safe_oid(cid)}, {'name': 1, 'avatar_url': 1}) if users_col else None
@@ -3623,6 +3633,7 @@ def community_create_post():
         'author_name': (user or {}).get('name', session.get('client_name', 'Member')),
         'avatar_url':  (user or {}).get('avatar_url', ''),
         'text':        text,
+        'image_url':   image_url,
         'likes':       [],
         'comments':    [],
         'created':     datetime.now(timezone.utc),

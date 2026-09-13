@@ -614,6 +614,101 @@
     margin: 0;
   }
 
+  /* ── IMAGE PICKER ────────────────────────────────────────────────────── */
+  .img-pick-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .35rem .75rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: clamp(.72rem,1.6vw,.8rem);
+    color: var(--text2);
+    cursor: pointer;
+    background: none;
+    transition: all var(--transition);
+    font-family: var(--font);
+    min-height: 30px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .img-pick-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(232,255,0,.05); }
+  .img-pick-btn i { font-size: .75rem; }
+
+  .img-preview-wrap {
+    margin-top: .65rem;
+    padding-left: calc(clamp(34px,8vw,38px) + clamp(.6rem,2vw,.75rem));
+    position: relative;
+    display: none;
+  }
+  .img-preview-wrap img {
+    max-width: 100%;
+    max-height: 260px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    object-fit: cover;
+    display: block;
+  }
+  .img-remove-btn {
+    position: absolute;
+    top: .35rem;
+    left: calc(clamp(34px,8vw,38px) + clamp(.6rem,2vw,.75rem) + .35rem);
+    background: rgba(0,0,0,.65);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: .7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition);
+  }
+  .img-remove-btn:hover { background: var(--danger); }
+
+  /* ── POST IMAGE ─────────────────────────────────────────────────────────── */
+  .post-img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    display: block;
+    margin-bottom: clamp(.75rem,2vw,1rem);
+    cursor: zoom-in;
+  }
+
+  /* ── LIGHTBOX ───────────────────────────────────────────────────────────── */
+  #postLightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.92);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    backdrop-filter: blur(6px);
+  }
+  #postLightbox.open { display: flex; animation: fadeIn .25s ease; }
+  #postLightbox img { max-width: 94vw; max-height: 88vh; object-fit: contain; border-radius: var(--radius-sm); }
+  #postLightbox button {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background var(--transition);
+  }
+  #postLightbox button:hover { background: var(--danger); }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
   /* ── INLINE SPINNER ────────────────────────────────────────────────────── */
   .spin {
     display: inline-block;
@@ -1337,8 +1432,19 @@
       <div class="compose-avatar" id="myAvatar"></div>
       <textarea id="postText" placeholder="Share a win, ask a question, or motivate the community…" maxlength="1000" rows="3"></textarea>
     </div>
+    <!-- image preview -->
+    <div class="img-preview-wrap" id="imgPreviewWrap">
+      <img id="imgPreview" src="" alt="preview">
+      <button class="img-remove-btn" onclick="removeImage()" title="Remove image"><i class="fas fa-times"></i></button>
+    </div>
     <div class="compose-footer">
-      <span class="char-count" id="charCount">0 / 1000</span>
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+        <span class="char-count" id="charCount">0 / 1000</span>
+        <button type="button" class="img-pick-btn" onclick="document.getElementById('postImageInput').click()">
+          <i class="fas fa-image"></i> Photo
+        </button>
+        <input type="file" id="postImageInput" accept="image/*" style="display:none" onchange="previewImage(this)">
+      </div>
       <button class="btn btn-primary btn-sm" id="submitPost" onclick="submitPost(this)">Post</button>
     </div>
   </div>
@@ -1361,6 +1467,12 @@
     <i class="fas fa-users"></i>
     <p>No posts yet. Be the first to share something!</p>
   </div>
+</div>
+
+<!-- lightbox for post images -->
+<div id="postLightbox" onclick="this.classList.remove('open')">
+  <img src="" alt="full image">
+  <button onclick="event.stopPropagation();document.getElementById('postLightbox').classList.remove('open')"><i class="fas fa-times"></i></button>
 </div>
 {% endblock %}
 
@@ -1418,20 +1530,46 @@
     });
   }
 
+  // ── image picker ──────────────────────────────────────────────────────────
+  let _pendingFile = null;
+  function previewImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { alert('Image must be under 5 MB'); input.value = ''; return; }
+    _pendingFile = file;
+    const wrap = document.getElementById('imgPreviewWrap');
+    const img  = document.getElementById('imgPreview');
+    img.src = URL.createObjectURL(file);
+    wrap.style.display = 'block';
+  }
+  function removeImage() {
+    _pendingFile = null;
+    document.getElementById('postImageInput').value = '';
+    document.getElementById('imgPreview').src = '';
+    document.getElementById('imgPreviewWrap').style.display = 'none';
+  }
+
   // ── submit post ───────────────────────────────────────────────────────────
   async function submitPost(btn) {
     const text = postText.value.trim();
-    if (!text) { postText.focus(); return; }
+    if (!text && !_pendingFile) { postText.focus(); return; }
     await act(btn, async () => {
-      const r = await fetch('/api/community/posts', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({text}),
-      });
+      let body, headers = {};
+      if (_pendingFile) {
+        body = new FormData();
+        body.append('text', text);
+        body.append('image', _pendingFile);
+        // no Content-Type header — browser sets multipart boundary
+      } else {
+        body = JSON.stringify({text});
+        headers['Content-Type'] = 'application/json';
+      }
+      const r = await fetch('/api/community/posts', { method:'POST', headers, body });
       if (!r.ok) { const d = await r.json(); alert(d.error || 'Error'); return; }
       postText.value = '';
       charCount.textContent = '0 / 1000';
       charCount.classList.remove('warn');
+      removeImage();
       _skip = 0;
       _hasMore = true;
       document.getElementById('feed').innerHTML = '';
@@ -1439,12 +1577,25 @@
     });
   }
 
+  // ── lightbox ──────────────────────────────────────────────────────────────
+  function openLightbox(src) {
+    const lb = document.getElementById('postLightbox');
+    lb.querySelector('img').src = src;
+    lb.classList.add('open');
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.getElementById('postLightbox')?.classList.remove('open');
+  });
+
   // ── render post ───────────────────────────────────────────────────────────
   function renderPost(p) {
     const isMine = IS_LOGGED_IN && p.client_id === MY_ID;
     const likeClass = p.liked ? 'liked' : '';
     const likeIcon  = p.liked ? 'fas fa-heart' : 'far fa-heart';
     const comments  = (p.comments || []).map(renderComment).join('');
+    const imgHtml   = p.image_url
+      ? `<img class="post-img" src="${esc(p.image_url)}" alt="post image" loading="lazy" onclick="openLightbox('${esc(p.image_url)}')">`
+      : '';
     return `
     <div class="post-card" id="post-${p._id}">
       <div class="post-header">
@@ -1455,7 +1606,8 @@
         </div>
         ${isMine ? `<button class="post-delete-btn" title="Delete post" onclick="deletePost('${p._id}',this)"><i class="fas fa-trash-alt"></i></button>` : ''}
       </div>
-      <div class="post-body">${esc(p.text)}</div>
+      ${imgHtml}
+      ${p.text ? `<div class="post-body">${esc(p.text)}</div>` : ''}
       <div class="post-actions">
         <button class="action-btn ${likeClass}" id="like-${p._id}" onclick="toggleLike('${p._id}',this)">
           <i class="${likeIcon}"></i> <span class="like-count">${p.like_count}</span>
