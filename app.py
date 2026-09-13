@@ -3043,6 +3043,11 @@ try:
 except Exception:
     images_col = None
 
+try:
+    community_col = db['community_posts'] if db is not None else None
+except Exception:
+    community_col = None
+
 def _compress_image(data, mime):
     ext = 'png' if mime == 'image/png' else 'jpeg'
     img = Image.open(io.BytesIO(data))
@@ -3569,6 +3574,121 @@ def client_save_meal_checklist():
         upsert=True
     )
     return jsonify({'status': 'saved'})
+
+# ── COMMUNITY ────────────────────────────────────────────────────────────────
+@app.route('/community')
+def community():
+    cfg = get_config()
+    member_count = users_col.count_documents({'role': 'client', 'active': True}) if users_col is not None else 0
+    # grab up to 12 members with avatars for the avatar wall
+    members = list(users_col.find(
+        {'role': 'client', 'active': True},
+        {'name': 1, 'avatar_url': 1}
+    ).limit(12)) if users_col is not None else []
+    for m in members:
+        m['_id'] = str(m['_id'])
+    return render_template('community.html', cfg=cfg, member_count=member_count, members=members)
+
+@app.route('/api/community/posts', methods=['GET'])
+def community_get_posts():
+    if community_col is None:
+        return jsonify([]), 500
+    skip = max(0, int(request.args.get('skip', 0)))
+    posts = list(community_col.find({}).sort('created', -1).skip(skip).limit(10))
+    cid = session.get('client_id', '')
+    for p in posts:
+        p['_id'] = str(p['_id'])
+        p['created'] = to_ist(p.get('created'))
+        p['liked'] = cid in (p.get('likes') or [])
+        p['like_count'] = len(p.get('likes') or [])
+        p.pop('likes', None)
+        for c in p.get('comments') or []:
+            c['_id'] = str(c['_id'])
+    return jsonify(posts)
+
+@app.route('/api/community/posts', methods=['POST'])
+@client_login_required
+@limiter.limit('20 per hour')
+def community_create_post():
+    if community_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    d = request.json or {}
+    text = s(d.get('text', ''), 1000)
+    if not text:
+        return jsonify({'error': 'Post cannot be empty'}), 400
+    cid = session['client_id']
+    user = users_col.find_one({'_id': safe_oid(cid)}, {'name': 1, 'avatar_url': 1}) if users_col else None
+    result = community_col.insert_one({
+        'client_id':   cid,
+        'author_name': (user or {}).get('name', session.get('client_name', 'Member')),
+        'avatar_url':  (user or {}).get('avatar_url', ''),
+        'text':        text,
+        'likes':       [],
+        'comments':    [],
+        'created':     datetime.now(timezone.utc),
+    })
+    return jsonify({'status': 'posted', '_id': str(result.inserted_id)})
+
+@app.route('/api/community/posts/<pid>/like', methods=['POST'])
+@client_login_required
+def community_like_post(pid):
+    if community_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    oid = safe_oid(pid)
+    if not oid:
+        return jsonify({'error': 'Invalid id'}), 400
+    cid = session['client_id']
+    post = community_col.find_one({'_id': oid}, {'likes': 1})
+    if not post:
+        return jsonify({'error': 'Not found'}), 404
+    likes = post.get('likes') or []
+    if cid in likes:
+        community_col.update_one({'_id': oid}, {'$pull': {'likes': cid}})
+        liked = False
+        count = len(likes) - 1
+    else:
+        community_col.update_one({'_id': oid}, {'$addToSet': {'likes': cid}})
+        liked = True
+        count = len(likes) + 1
+    return jsonify({'liked': liked, 'like_count': count})
+
+@app.route('/api/community/posts/<pid>/comments', methods=['POST'])
+@client_login_required
+@limiter.limit('30 per hour')
+def community_add_comment(pid):
+    if community_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    oid = safe_oid(pid)
+    if not oid:
+        return jsonify({'error': 'Invalid id'}), 400
+    text = s((request.json or {}).get('text', ''), 500)
+    if not text:
+        return jsonify({'error': 'Comment cannot be empty'}), 400
+    cid = session['client_id']
+    user = users_col.find_one({'_id': safe_oid(cid)}, {'name': 1, 'avatar_url': 1}) if users_col else None
+    comment = {
+        '_id':         ObjectId(),
+        'client_id':   cid,
+        'author_name': (user or {}).get('name', session.get('client_name', 'Member')),
+        'avatar_url':  (user or {}).get('avatar_url', ''),
+        'text':        text,
+        'created':     datetime.now(timezone.utc),
+    }
+    community_col.update_one({'_id': oid}, {'$push': {'comments': comment}})
+    comment['_id'] = str(comment['_id'])
+    comment['created'] = to_ist(comment['created'])
+    return jsonify({'status': 'commented', 'comment': comment})
+
+@app.route('/api/community/posts/<pid>', methods=['DELETE'])
+@client_login_required
+def community_delete_post(pid):
+    if community_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    oid = safe_oid(pid)
+    if not oid:
+        return jsonify({'error': 'Invalid id'}), 400
+    community_col.delete_one({'_id': oid, 'client_id': session['client_id']})
+    return jsonify({'status': 'deleted'})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

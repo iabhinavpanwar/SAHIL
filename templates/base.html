@@ -2763,6 +2763,13 @@
           </li>
           <li>
             <a
+              href="{{ url_for('community') }}"
+              {% if request.endpoint == 'community' %}class="active"{% endif %}
+              >Community</a
+            >
+          </li>
+          <li>
+            <a
               href="{{ url_for('client_dashboard') if session.get('client_id') else url_for('client_login') }}"
               {% if request.endpoint in ['client_dashboard','client_login','register'] %}class="active"{% endif %}
               >Portal</a
