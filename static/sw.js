@@ -1,4 +1,4 @@
-const CACHE = 'spf-v1';
+const CACHE = 'spf-v3';
 const OFFLINE_URLS = ['/client/dashboard', '/static/IMAGE/logo.png', '/static/IMAGE/favicon.png'];
 
 self.addEventListener('install', e => {
@@ -16,7 +16,10 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
+  // Only handle same-origin requests; let browser handle fonts/CDN directly
   if (url.origin !== self.location.origin) return;
+  // Don't cache API calls
+  if (url.pathname.startsWith('/api/')) return;
   e.respondWith(
     (async () => {
       const preload = await e.preloadResponse;
