@@ -1,5 +1,5 @@
-const CACHE = 'spf-v3';
-const OFFLINE_URLS = ['/client/dashboard', '/static/IMAGE/logo.png', '/static/IMAGE/favicon.png'];
+const CACHE = 'spf-v5';
+const OFFLINE_URLS = ['/static/IMAGE/logo.png', '/static/IMAGE/favicon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(OFFLINE_URLS)).catch(() => {}));
@@ -14,23 +14,26 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Only handle GET, same-origin, non-API, non-HTML navigation requests
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
-  // Only handle same-origin requests; let browser handle fonts/CDN directly
   if (url.origin !== self.location.origin) return;
-  // Don't cache API calls
   if (url.pathname.startsWith('/api/')) return;
+  // Don't intercept HTML navigations — let browser handle them directly
+  if (e.request.mode === 'navigate') return;
+  // Only cache static assets
+  if (!url.pathname.startsWith('/static/')) return;
   e.respondWith(
-    (async () => {
-      const preload = await e.preloadResponse;
-      const res = preload || await fetch(e.request).catch(() => null);
-      if (res && res.status === 200) {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(res => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
         return res;
-      }
-      return caches.match(e.request).then(cached => cached || res || Response.error());
-    })()
+      }).catch(() => caches.match(e.request));
+    })
   );
 });
 
