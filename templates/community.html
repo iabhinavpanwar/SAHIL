@@ -1478,8 +1478,8 @@
 
 {% block scripts %}
 <script>
-  const IS_LOGGED_IN = {{ 'true' if session.get('client_id') else 'false' }};
-  const MY_ID        = {{ '"' + session.get('client_id','') + '"' }};
+  const IS_LOGGED_IN = {{ (session.get('client_id') is not none and session.get('client_id') != '') | tojson }};
+  const MY_ID        = {{ session.get('client_id', '') | tojson }};
   let   _skip        = 0;
   let   _loading     = false;
   let   _hasMore     = true;
