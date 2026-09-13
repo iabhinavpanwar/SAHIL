@@ -3407,7 +3407,7 @@ def admin_create_report_card():
     client_id = s(d.get('client_id', ''), 50)
     if not client_id:
         return jsonify({'error': 'client_id required'}), 400
-    client = users_col.find_one({'_id': safe_oid(client_id)}) if users_col else None
+    client = users_col.find_one({'_id': safe_oid(client_id)}) if users_col is not None else None
     result = report_cards_col.insert_one({
         'client_id':    client_id,
         'client_name':  client['name'] if client else '',
@@ -3660,7 +3660,7 @@ def community_create_post():
         cid = session.get('client_id')
         if not cid:
             return jsonify({'error': 'Not authenticated'}), 401
-        user = users_col.find_one({'_id': safe_oid(cid)}, {'name': 1, 'avatar_url': 1}) if users_col else None
+        user = users_col.find_one({'_id': safe_oid(cid)}, {'name': 1, 'avatar_url': 1}) if users_col is not None else None
         result = community_col.insert_one({
             'client_id':   cid,
             'author_name': (user or {}).get('name', session.get('client_name', 'Member')),
@@ -3712,7 +3712,7 @@ def community_add_comment(pid):
     if not text:
         return jsonify({'error': 'Comment cannot be empty'}), 400
     cid = session['client_id']
-    user = users_col.find_one({'_id': safe_oid(cid)}, {'name': 1, 'avatar_url': 1}) if users_col else None
+    user = users_col.find_one({'_id': safe_oid(cid)}, {'name': 1, 'avatar_url': 1}) if users_col is not None else None
     comment = {
         '_id':         ObjectId(),
         'client_id':   cid,
