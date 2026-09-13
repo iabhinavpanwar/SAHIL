@@ -53,7 +53,7 @@ def set_security_headers(response):
         "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
         "img-src 'self' data: blob: https:; "
         "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://calendly.com https://maps.google.com https://maps.app.goo.gl https://www.google.com/maps/; "
-        "connect-src 'self' https://cdn.jsdelivr.net;"
+        "connect-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com;"
     )
     return response
 
@@ -3037,11 +3037,15 @@ def admin_save_muscle_assignments(client_id):
 ALLOWED_MIME = {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
 
-try:
-    images_col = db['images']
-    images_col.create_index('image_id', unique=True)
-    community_col = db['community_posts']
-except Exception:
+if db is not None:
+    try:
+        images_col = db['images']
+        images_col.create_index('image_id', unique=True)
+        community_col = db['community_posts']
+    except Exception:
+        images_col = None
+        community_col = None
+else:
     images_col = None
     community_col = None
 
