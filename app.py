@@ -828,6 +828,23 @@ def get_blogs():
     return jsonify(items)
 
 # ── ADMIN API — CONFIG ────────────────────────────────────────────────────────
+@app.route('/api/admin/theme_color', methods=['GET'])
+def get_theme_color():
+    cfg = get_config()
+    return jsonify({'color': cfg.get('theme_color', '#e8ff00')})
+
+@app.route('/api/admin/theme_color', methods=['POST'])
+@login_required
+def set_theme_color():
+    if config_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    color = s((request.json or {}).get('color', ''), 20)
+    import re as _re
+    if not _re.match(r'^#[0-9a-fA-F]{6}$', color):
+        return jsonify({'error': 'Invalid hex color'}), 400
+    config_col.update_one({'_id': 'main'}, {'$set': {'theme_color': color}}, upsert=True)
+    return jsonify({'status': 'ok', 'color': color})
+
 @app.route('/api/admin/config', methods=['GET'])
 @login_required
 def admin_get_config():

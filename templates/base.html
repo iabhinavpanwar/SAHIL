@@ -2713,6 +2713,149 @@
     {% block head %}{% endblock %}
   </head>
   <body>
+
+    <!-- ── PRELOADER ──────────────────────────────────────────────────────── -->
+    <div id="spf-preloader">
+      <div id="spf-counter">0%</div>
+      <div id="spf-logo-wrap">
+        <img
+          id="spf-logo-img"
+          src="{{ url_for('static', filename='IMAGE/logo.png') }}"
+          alt=""
+        />
+        <div id="spf-name-wrap">
+          <span class="spf-letter" style="--d:0">S</span><span
+            class="spf-letter" style="--d:1">A</span><span
+            class="spf-letter" style="--d:2">H</span><span
+            class="spf-letter" style="--d:3">I</span><span
+            class="spf-letter" style="--d:4">L</span>
+        </div>
+        <div id="spf-underline"></div>
+      </div>
+      <div id="spf-tagline">Personal Training &amp; Nutrition Coaching</div>
+    </div>
+
+    <style>
+      #spf-preloader {
+        position: fixed;
+        inset: 0;
+        background: #0a0a0a;
+        z-index: 999999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.6s ease;
+      }
+      #spf-counter {
+        position: absolute;
+        top: clamp(1.25rem, 3vw, 2rem);
+        right: clamp(1.25rem, 3vw, 2rem);
+        font-family: 'Bebas Neue', var(--font-display, sans-serif);
+        font-size: clamp(1.6rem, 4vw, 2.4rem);
+        color: #e8ff00;
+        letter-spacing: 0.05em;
+        line-height: 1;
+        opacity: 0;
+        animation: spfFadeIn 0.3s 0.2s forwards;
+      }
+      #spf-logo-wrap {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(0.75rem, 2vw, 1.25rem);
+      }
+      #spf-logo-img {
+        width: clamp(64px, 14vw, 100px);
+        height: clamp(64px, 14vw, 100px);
+        object-fit: contain;
+        opacity: 0;
+        transform: scale(0.6);
+        animation: spfLogoPop 0.6s cubic-bezier(0.175,0.885,0.32,1.275) 0.3s forwards;
+      }
+      #spf-name-wrap {
+        display: flex;
+        gap: clamp(6px, 1.5vw, 12px);
+        font-family: 'Bebas Neue', var(--font-display, sans-serif);
+        font-size: clamp(3rem, 10vw, 6rem);
+        color: #fff;
+        line-height: 1;
+        letter-spacing: 0.08em;
+      }
+      .spf-letter {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(28px) scale(0.8);
+        animation: spfLetterPop 0.45s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+        animation-delay: calc(0.6s + var(--d) * 0.12s);
+      }
+      #spf-underline {
+        height: clamp(4px, 0.8vw, 7px);
+        width: 100%;
+        background: #e8ff00;
+        transform: scaleX(0);
+        transform-origin: left;
+        border-radius: 4px;
+        animation: spfUnderline 0.5s ease forwards;
+        animation-delay: 1.35s;
+      }
+      #spf-tagline {
+        margin-top: clamp(0.75rem, 2vw, 1.25rem);
+        font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+        color: #666;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0;
+        animation: spfFadeIn 0.5s ease forwards;
+        animation-delay: 1.5s;
+      }
+      @keyframes spfLogoPop {
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes spfLetterPop {
+        80%  { transform: translateY(-8px) scale(1.08); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      @keyframes spfUnderline {
+        to { transform: scaleX(1); }
+      }
+      @keyframes spfFadeIn {
+        to { opacity: 1; }
+      }
+    </style>
+
+    <script>
+      (function () {
+        var el = document.getElementById('spf-preloader');
+        var counter = document.getElementById('spf-counter');
+        var count = 0;
+        var target = 100;
+        var duration = 2200; // ms total
+        var start = performance.now();
+
+        function tick(now) {
+          var elapsed = now - start;
+          var progress = Math.min(elapsed / duration, 1);
+          // ease-out curve
+          var eased = 1 - Math.pow(1 - progress, 3);
+          count = Math.round(eased * target);
+          counter.textContent = count + '%';
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            counter.textContent = '100%';
+            setTimeout(function () {
+              el.style.opacity = '0';
+              setTimeout(function () {
+                el.style.display = 'none';
+              }, 620);
+            }, 400);
+          }
+        }
+        requestAnimationFrame(tick);
+      })();
+    </script>
     <nav class="navbar" id="navbar">
       <div class="nav-container">
         <a href="{{ url_for('index') }}" class="nav-logo">
