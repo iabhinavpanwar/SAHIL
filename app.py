@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from bson import ObjectId, errors as bson_errors
 from datetime import datetime, timezone, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.exceptions import HTTPException
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from PIL import Image
@@ -13,6 +14,17 @@ from email.message import EmailMessage
 import bleach, atexit, os, logging, secrets, re, io, hashlib, smtplib, json
 
 app = Flask(__name__)
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    if isinstance(e, HTTPException):
+        if request.path.startswith('/api/'):
+            return jsonify({'error': e.description, 'code': e.code}), e.code
+        return e
+    logger.exception('Unhandled exception on %s %s', request.method, request.path)
+    if request.path.startswith('/api/'):
+        return jsonify({'error': 'Internal server error'}), 500
+    return 'Internal Server Error', 500
 
 # -- SESSION REMINDER SCHEDULER ------------------------------------------------------------------
 try:
@@ -3630,33 +3642,39 @@ def community_get_posts():
 def community_create_post():
     if community_col is None:
         return jsonify({'error': 'DB unavailable'}), 500
-    # support both multipart (with image) and plain JSON
-    if request.content_type and 'multipart' in request.content_type:
-        text = s((request.form.get('text') or ''), 1000)
-        image_url = None
-        file = request.files.get('image')
-        if file and file.filename:
-            image_url, err = _handle_upload(file)
-            if err:
-                return jsonify({'error': err}), 400
-    else:
-        text = s((request.json or {}).get('text', ''), 1000)
-        image_url = None
-    if not text and not image_url:
-        return jsonify({'error': 'Post cannot be empty'}), 400
-    cid = session['client_id']
-    user = users_col.find_one({'_id': safe_oid(cid)}, {'name': 1, 'avatar_url': 1}) if users_col else None
-    result = community_col.insert_one({
-        'client_id':   cid,
-        'author_name': (user or {}).get('name', session.get('client_name', 'Member')),
-        'avatar_url':  (user or {}).get('avatar_url', ''),
-        'text':        text,
-        'image_url':   image_url,
-        'likes':       [],
-        'comments':    [],
-        'created':     datetime.now(timezone.utc),
-    })
-    return jsonify({'status': 'posted', '_id': str(result.inserted_id)})
+    try:
+        if request.content_type and 'multipart' in request.content_type:
+            text = s((request.form.get('text') or ''), 1000)
+            image_url = None
+            file = request.files.get('image')
+            if file and file.filename:
+                image_url, err = _handle_upload(file)
+                if err:
+                    return jsonify({'error': err}), 400
+        else:
+            body = request.get_json(silent=True) or {}
+            text = s(body.get('text', ''), 1000)
+            image_url = None
+        if not text and not image_url:
+            return jsonify({'error': 'Post cannot be empty'}), 400
+        cid = session.get('client_id')
+        if not cid:
+            return jsonify({'error': 'Not authenticated'}), 401
+        user = users_col.find_one({'_id': safe_oid(cid)}, {'name': 1, 'avatar_url': 1}) if users_col else None
+        result = community_col.insert_one({
+            'client_id':   cid,
+            'author_name': (user or {}).get('name', session.get('client_name', 'Member')),
+            'avatar_url':  (user or {}).get('avatar_url', ''),
+            'text':        text,
+            'image_url':   image_url,
+            'likes':       [],
+            'comments':    [],
+            'created':     datetime.now(timezone.utc),
+        })
+        return jsonify({'status': 'posted', '_id': str(result.inserted_id)})
+    except Exception as e:
+        logger.exception('community_create_post error: %s', e)
+        return jsonify({'error': 'Server error'}), 500
 
 @app.route('/api/community/posts/<pid>/like', methods=['POST'])
 @client_login_required
