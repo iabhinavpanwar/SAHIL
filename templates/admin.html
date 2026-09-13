@@ -2252,6 +2252,31 @@
         }
       }
 
+      /* ── CALENDAR (sessions tab) ──────────────────────────────────────────── */
+      .cal-wrap { background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:2rem;box-shadow:0 4px 24px rgba(0,0,0,0.18) }
+      .cal-header { display:flex;align-items:center;gap:0.75rem;padding:1rem 1.25rem;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap }
+      .cal-title { flex:1 1 auto;font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;color:var(--text) }
+      .cal-nav { width:34px;height:34px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:0.78rem;cursor:pointer;transition:all var(--transition);flex-shrink:0 }
+      .cal-nav:hover { background:var(--primary);border-color:var(--primary);color:#000 }
+      .cal-today-btn { padding:0.35rem 0.9rem;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text2);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all var(--transition) }
+      .cal-today-btn:hover { border-color:var(--primary);color:var(--primary) }
+      .cal-dow { display:grid;grid-template-columns:repeat(7,1fr);background:var(--bg2);border-bottom:1px solid var(--border) }
+      .cal-dow span { text-align:center;padding:0.55rem 0;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3) }
+      .cal-grid { display:grid;grid-template-columns:repeat(7,1fr);background:var(--bg3);gap:1px }
+      .cal-cell { min-height:70px;background:var(--card);padding:0.4rem 0.45rem 0.3rem;cursor:pointer;transition:background var(--transition);display:flex;flex-direction:column;gap:0.22rem;position:relative;min-width:0 }
+      .cal-cell:hover { background:var(--bg2) }
+      .cal-cell.cal-empty { cursor:default;background:var(--bg3);opacity:0.4 }
+      .cal-cell.cal-past { opacity:0.5 }
+      .cal-cell.cal-past:hover { background:var(--card) }
+      .cal-day-num { font-size:0.82rem;font-weight:600;color:var(--text3);line-height:1;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;transition:all var(--transition) }
+      .cal-cell.cal-today .cal-day-num { background:var(--primary);color:#000;font-weight:800 }
+      .cal-dot { font-size:0.6rem;font-weight:700;padding:0.15rem 0.4rem;border-radius:5px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;line-height:1.4 }
+      .cal-dot-more { font-size:0.6rem;color:var(--text3);font-weight:700;padding-left:0.1rem }
+      .cal-popup { position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem }
+      .cal-popup-inner { background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;width:100%;max-width:400px;position:relative;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5) }
+      .cal-popup-close { position:absolute;top:0.9rem;right:0.9rem;width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--transition) }
+      .cal-popup-close:hover { background:#e53935;border-color:#e53935;color:#fff }
+
       /* ── Print ────────────────────────────────────────────────────────────── */
       @media print {
         .admin-sidebar,
@@ -3022,6 +3047,23 @@
 
           <div class="tab-panel" id="tab-sessions">
             <div class="panel-header"><h3>Session Bookings</h3></div>
+            <div class="cal-wrap">
+              <div class="cal-header">
+                <button class="cal-nav" onclick="adminCalMove(-1)"><i class="fas fa-chevron-left"></i></button>
+                <span class="cal-title" id="adminCalTitle"></span>
+                <button class="cal-nav" onclick="adminCalMove(1)"><i class="fas fa-chevron-right"></i></button>
+                <button class="cal-today-btn" onclick="adminCalToday()">Today</button>
+              </div>
+              <div class="cal-dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+              <div class="cal-grid" id="adminCalGrid"></div>
+            </div>
+            <div class="cal-popup" id="adminCalPopup" style="display:none">
+              <div class="cal-popup-inner">
+                <button class="cal-popup-close" onclick="closeAdminCalPopup()">&times;</button>
+                <div id="adminCalPopupContent"></div>
+              </div>
+            </div>
+            <h4 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin:1.5rem 0 0.75rem">All Sessions</h4>
             <div class="items-list" id="adminSessionsList"></div>
           </div>
 
@@ -6285,8 +6327,99 @@
       }
 
       // ── SESSIONS ────────────────────────────────────────────────────────────────
+      let _adminSessions = [];
+      let _adminCalYear = new Date().getFullYear();
+      let _adminCalMonth = new Date().getMonth();
+
+      function adminCalMove(dir) {
+        _adminCalMonth += dir;
+        if (_adminCalMonth > 11) { _adminCalMonth = 0; _adminCalYear++; }
+        if (_adminCalMonth < 0)  { _adminCalMonth = 11; _adminCalYear--; }
+        renderAdminCal();
+      }
+      function adminCalToday() {
+        const n = new Date();
+        _adminCalYear = n.getFullYear();
+        _adminCalMonth = n.getMonth();
+        renderAdminCal();
+      }
+      function closeAdminCalPopup() {
+        document.getElementById('adminCalPopup').style.display = 'none';
+      }
+
+      function renderAdminCal() {
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        document.getElementById('adminCalTitle').textContent = months[_adminCalMonth] + ' ' + _adminCalYear;
+        const grid = document.getElementById('adminCalGrid');
+        const today = new Date();
+        const firstDay = new Date(_adminCalYear, _adminCalMonth, 1).getDay();
+        const daysInMonth = new Date(_adminCalYear, _adminCalMonth + 1, 0).getDate();
+        const sessMap = {};
+        _adminSessions.forEach(s => {
+          const raw = s.datetime || '';
+          const d = new Date(raw);
+          if (!isNaN(d)) {
+            const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+            if (!sessMap[key]) sessMap[key] = [];
+            sessMap[key].push(s);
+          }
+        });
+        let html = '';
+        for (let i = 0; i < firstDay; i++) html += '<div class="cal-cell cal-empty"></div>';
+        for (let d = 1; d <= daysInMonth; d++) {
+          const key = _adminCalYear + '-' + String(_adminCalMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          const daySess = sessMap[key] || [];
+          const isToday = d === today.getDate() && _adminCalMonth === today.getMonth() && _adminCalYear === today.getFullYear();
+          const isPast = new Date(_adminCalYear, _adminCalMonth, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          html += `<div class="cal-cell${isToday?' cal-today':''}${isPast?' cal-past':''}" onclick="adminCalDayClick('${key}')">`;
+          html += `<span class="cal-day-num">${d}</span>`;
+          const colors = { confirmed:'#44cc88', pending:'#ffb74d', cancelled:'var(--danger)', completed:'#4fc3f7' };
+          daySess.slice(0,2).forEach(s => {
+            const c = colors[s.status] || '#aaa';
+            html += `<div class="cal-dot" style="background:${c}" title="${esc(s.client_name||'')}">${esc((s.session_type||'').split(' ')[0])}</div>`;
+          });
+          if (daySess.length > 2) html += `<div class="cal-dot-more">+${daySess.length-2}</div>`;
+          html += '</div>';
+        }
+        grid.innerHTML = html;
+      }
+
+      function adminCalDayClick(key) {
+        const daySess = _adminSessions.filter(s => {
+          const d = new Date(s.datetime);
+          if (isNaN(d)) return false;
+          const k = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+          return k === key;
+        });
+        if (!daySess.length) return;
+        const colors = { confirmed:'#44cc88', pending:'#ffb74d', cancelled:'var(--danger)', completed:'#4fc3f7' };
+        const [y,m,d] = key.split('-');
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        document.getElementById('adminCalPopupContent').innerHTML = `
+          <h4 style="margin-bottom:1rem;font-size:1rem">${parseInt(d)} ${months[parseInt(m)-1]} ${y}</h4>
+          ${daySess.map(s => `
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.6rem">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap">
+                <strong style="font-size:0.9rem">${esc(s.client_name||'Client')}</strong>
+                <span style="background:${colors[s.status]||'#aaa'}22;color:${colors[s.status]||'#aaa'};padding:0.15rem 0.5rem;border-radius:20px;font-size:0.75rem;font-weight:700">${s.status}</span>
+              </div>
+              <div style="font-size:0.82rem;color:var(--text2);margin-top:0.3rem">${esc(s.datetime)}</div>
+              <div style="font-size:0.82rem;color:var(--text2)">${esc(s.session_type||'')}${s.notes?' · '+esc(s.notes):''}</div>
+              ${s.status==='pending'?`
+                <div style="display:flex;gap:0.4rem;margin-top:0.5rem">
+                  <button class="btn btn-sm btn-outline" onclick="updateSession('${s._id}','confirmed');closeAdminCalPopup()">Confirm</button>
+                  <button class="btn btn-sm btn-danger" onclick="updateSession('${s._id}','cancelled');closeAdminCalPopup()">Cancel</button>
+                </div>`:''}
+              ${s.status==='confirmed'?`<button class="btn btn-sm btn-outline" style="margin-top:0.5rem" onclick="updateSession('${s._id}','completed');closeAdminCalPopup()">Mark Done</button>`:''}
+            </div>`).join('')}
+        `;
+        document.getElementById('adminCalPopup').style.display = 'flex';
+      }
+
       async function loadAdminSessions() {
         const { data } = await api("/api/admin/sessions");
+        _adminSessions = data;
+        renderAdminCal();
         const list = document.getElementById("adminSessionsList");
         if (!data.length) {
           list.innerHTML =
