@@ -67,8 +67,9 @@
     />
     <style>
       @font-face {
-        font-family: 'Bebas Neue';
-        src: url("{{ url_for('static', filename='fonts/BebasNeue.woff2') }}") format('woff2');
+        font-family: "Bebas Neue";
+        src: url("{{ url_for('static', filename='fonts/BebasNeue.woff2') }}")
+          format("woff2");
         font-weight: 400;
         font-style: normal;
         font-display: swap;
@@ -2713,7 +2714,6 @@
     {% block head %}{% endblock %}
   </head>
   <body>
-
     <!-- ── PRELOADER ──────────────────────────────────────────────────────── -->
     <div id="spf-preloader">
       <div id="spf-counter">0%</div>
@@ -2724,15 +2724,24 @@
           alt=""
         />
         <div id="spf-name-wrap">
-          <span class="spf-letter" style="--d:0">S</span><span
-            class="spf-letter" style="--d:1">A</span><span
-            class="spf-letter" style="--d:2">H</span><span
-            class="spf-letter" style="--d:3">I</span><span
-            class="spf-letter" style="--d:4">L</span>
+          <span class="spf-letter" style="--d: 0">S</span
+          ><span class="spf-letter" style="--d: 1">A</span
+          ><span class="spf-letter" style="--d: 2">H</span
+          ><span class="spf-letter" style="--d: 3">I</span
+          ><span class="spf-letter" style="--d: 4">L</span>
         </div>
         <div id="spf-underline"></div>
       </div>
       <div id="spf-tagline">Personal Training &amp; Nutrition Coaching</div>
+      <div id="spf-credit">
+        developed by
+        <a
+          href="https://abhinavpanwar.onrender.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Abhinav Panwar</a
+        >
+      </div>
     </div>
 
     <style>
@@ -2751,7 +2760,7 @@
         position: absolute;
         top: clamp(1.25rem, 3vw, 2rem);
         right: clamp(1.25rem, 3vw, 2rem);
-        font-family: 'Bebas Neue', var(--font-display, sans-serif);
+        font-family: "Bebas Neue", var(--font-display, sans-serif);
         font-size: clamp(1.6rem, 4vw, 2.4rem);
         color: #e8ff00;
         letter-spacing: 0.05em;
@@ -2772,12 +2781,13 @@
         object-fit: contain;
         opacity: 0;
         transform: scale(0.6);
-        animation: spfLogoPop 0.6s cubic-bezier(0.175,0.885,0.32,1.275) 0.3s forwards;
+        animation: spfLogoPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s
+          forwards;
       }
       #spf-name-wrap {
         display: flex;
         gap: clamp(6px, 1.5vw, 12px);
-        font-family: 'Bebas Neue', var(--font-display, sans-serif);
+        font-family: "Bebas Neue", var(--font-display, sans-serif);
         font-size: clamp(3rem, 10vw, 6rem);
         color: #fff;
         line-height: 1;
@@ -2787,7 +2797,8 @@
         display: inline-block;
         opacity: 0;
         transform: translateY(28px) scale(0.8);
-        animation: spfLetterPop 0.45s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+        animation: spfLetterPop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+          forwards;
         animation-delay: calc(0.6s + var(--d) * 0.12s);
       }
       #spf-underline {
@@ -2810,25 +2821,76 @@
         animation: spfFadeIn 0.5s ease forwards;
         animation-delay: 1.5s;
       }
+      #spf-credit {
+        position: absolute;
+        bottom: clamp(1rem, 3vw, 2rem);
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: "Bebas Neue", var(--font-display, sans-serif);
+        font-size: clamp(0.65rem, 1.6vw, 0.85rem);
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: #5a5a5a;
+        opacity: 0;
+        animation: spfFadeIn 0.7s ease forwards;
+        animation-delay: 1.9s;
+        text-align: center;
+        white-space: nowrap;
+      }
+      #spf-credit a {
+        color: #b0b0b0;
+        text-decoration: none;
+        transition:
+          color 0.2s,
+          text-shadow 0.2s;
+        border-bottom: 1px solid rgba(232, 255, 0, 0.25);
+        padding-bottom: 2px;
+      }
+      #spf-credit a:hover {
+        color: #e8ff00;
+        text-shadow: 0 0 10px rgba(232, 255, 0, 0.35);
+        border-bottom-color: #e8ff00;
+      }
       @keyframes spfLogoPop {
-        to { opacity: 1; transform: scale(1); }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
       }
       @keyframes spfLetterPop {
-        80%  { transform: translateY(-8px) scale(1.08); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
+        80% {
+          transform: translateY(-8px) scale(1.08);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
       }
       @keyframes spfUnderline {
-        to { transform: scaleX(1); }
+        to {
+          transform: scaleX(1);
+        }
       }
       @keyframes spfFadeIn {
-        to { opacity: 1; }
+        to {
+          opacity: 1;
+        }
+      }
+      @media (max-width: 420px) {
+        #spf-credit {
+          white-space: normal;
+          font-size: 0.6rem;
+          width: 90%;
+          line-height: 1.6;
+          letter-spacing: 0.18em;
+        }
       }
     </style>
 
     <script>
       (function () {
-        var el = document.getElementById('spf-preloader');
-        var counter = document.getElementById('spf-counter');
+        var el = document.getElementById("spf-preloader");
+        var counter = document.getElementById("spf-counter");
         var count = 0;
         var target = 100;
         var duration = 2200; // ms total
@@ -2840,15 +2902,15 @@
           // ease-out curve
           var eased = 1 - Math.pow(1 - progress, 3);
           count = Math.round(eased * target);
-          counter.textContent = count + '%';
+          counter.textContent = count + "%";
           if (progress < 1) {
             requestAnimationFrame(tick);
           } else {
-            counter.textContent = '100%';
+            counter.textContent = "100%";
             setTimeout(function () {
-              el.style.opacity = '0';
+              el.style.opacity = "0";
               setTimeout(function () {
-                el.style.display = 'none';
+                el.style.display = "none";
               }, 620);
             }, 400);
           }
@@ -2874,56 +2936,114 @@
           <li>
             <a
               href="{{ url_for('index') }}"
-              {% if request.endpoint == 'index' %}class="active"{% endif %}
+              {%
+              if
+              request.endpoint=""
+              ="index"
+              %}class="active"
+              {%
+              endif
+              %}
               >Home</a
             >
           </li>
           <li>
             <a
               href="{{ url_for('about') }}"
-              {% if request.endpoint == 'about' %}class="active"{% endif %}
+              {%
+              if
+              request.endpoint=""
+              ="about"
+              %}class="active"
+              {%
+              endif
+              %}
               >About</a
             >
           </li>
           <li>
             <a
               href="{{ url_for('services') }}"
-              {% if request.endpoint == 'services' %}class="active"{% endif %}
+              {%
+              if
+              request.endpoint=""
+              ="services"
+              %}class="active"
+              {%
+              endif
+              %}
               >Services</a
             >
           </li>
           <li>
             <a
               href="{{ url_for('transformations') }}"
-              {% if request.endpoint == 'transformations' %}class="active"{% endif %}
+              {%
+              if
+              request.endpoint=""
+              ="transformations"
+              %}class="active"
+              {%
+              endif
+              %}
               >Results</a
             >
           </li>
           <li>
             <a
               href="{{ url_for('gallery') }}"
-              {% if request.endpoint == 'gallery' %}class="active"{% endif %}
+              {%
+              if
+              request.endpoint=""
+              ="gallery"
+              %}class="active"
+              {%
+              endif
+              %}
               >Gallery</a
             >
           </li>
           <li>
             <a
               href="{{ url_for('blog') }}"
-              {% if request.endpoint in ['blog','blog_post'] %}class="active"{% endif %}
+              {%
+              if
+              request.endpoint
+              in
+              ['blog','blog_post']
+              %}class="active"
+              {%
+              endif
+              %}
               >Blog</a
             >
           </li>
           <li>
             <a
               href="{{ url_for('community') }}"
-              {% if request.endpoint == 'community' %}class="active"{% endif %}
+              {%
+              if
+              request.endpoint=""
+              ="community"
+              %}class="active"
+              {%
+              endif
+              %}
               >Community</a
             >
           </li>
           <li>
             <a
               href="{{ url_for('client_dashboard') if session.get('client_id') else url_for('client_login') }}"
-              {% if request.endpoint in ['client_dashboard','client_login','register'] %}class="active"{% endif %}
+              {%
+              if
+              request.endpoint
+              in
+              ['client_dashboard','client_login','register']
+              %}class="active"
+              {%
+              endif
+              %}
               >Portal</a
             >
           </li>
