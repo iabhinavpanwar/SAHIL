@@ -2921,136 +2921,47 @@
     <nav class="navbar" id="navbar">
       <div class="nav-container">
         <a href="{{ url_for('index') }}" class="nav-logo">
-          <img
-            src="{{ url_for('static', filename='IMAGE/logo.png') }}"
-            alt="Logo"
-          />
-          <span class="logo-text"
-            >{{ cfg.get('hero_name','SAHIL PANWAR') }}</span
-          >
+          <img src="{{ url_for('static', filename='IMAGE/logo.png') }}" alt="Logo" />
+          <span class="logo-text">{{ cfg.get('hero_name','SAHIL PANWAR') }}</span>
         </a>
         <button class="nav-toggle" id="navToggle" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
         <ul class="nav-links" id="navLinks">
           <li>
-            <a
-              href="{{ url_for('index') }}"
-              {%
-              if
-              request.endpoint=""
-              ="index"
-              %}class="active"
-              {%
-              endif
-              %}
-              >Home</a
-            >
+            <a href="{{ url_for('index') }}"
+              {% if request.endpoint == 'index' %}class="active"{% endif %}>Home</a>
           </li>
           <li>
-            <a
-              href="{{ url_for('about') }}"
-              {%
-              if
-              request.endpoint=""
-              ="about"
-              %}class="active"
-              {%
-              endif
-              %}
-              >About</a
-            >
+            <a href="{{ url_for('about') }}"
+              {% if request.endpoint == 'about' %}class="active"{% endif %}>About</a>
           </li>
           <li>
-            <a
-              href="{{ url_for('services') }}"
-              {%
-              if
-              request.endpoint=""
-              ="services"
-              %}class="active"
-              {%
-              endif
-              %}
-              >Services</a
-            >
+            <a href="{{ url_for('services') }}"
+              {% if request.endpoint == 'services' %}class="active"{% endif %}>Services</a>
           </li>
           <li>
-            <a
-              href="{{ url_for('transformations') }}"
-              {%
-              if
-              request.endpoint=""
-              ="transformations"
-              %}class="active"
-              {%
-              endif
-              %}
-              >Results</a
-            >
+            <a href="{{ url_for('transformations') }}"
+              {% if request.endpoint == 'transformations' %}class="active"{% endif %}>Results</a>
           </li>
           <li>
-            <a
-              href="{{ url_for('gallery') }}"
-              {%
-              if
-              request.endpoint=""
-              ="gallery"
-              %}class="active"
-              {%
-              endif
-              %}
-              >Gallery</a
-            >
+            <a href="{{ url_for('gallery') }}"
+              {% if request.endpoint == 'gallery' %}class="active"{% endif %}>Gallery</a>
           </li>
           <li>
-            <a
-              href="{{ url_for('blog') }}"
-              {%
-              if
-              request.endpoint
-              in
-              ['blog','blog_post']
-              %}class="active"
-              {%
-              endif
-              %}
-              >Blog</a
-            >
+            <a href="{{ url_for('blog') }}"
+              {% if request.endpoint in ['blog','blog_post'] %}class="active"{% endif %}>Blog</a>
           </li>
           <li>
-            <a
-              href="{{ url_for('community') }}"
-              {%
-              if
-              request.endpoint=""
-              ="community"
-              %}class="active"
-              {%
-              endif
-              %}
-              >Community</a
-            >
+            <a href="{{ url_for('community') }}"
+              {% if request.endpoint == 'community' %}class="active"{% endif %}>Community</a>
           </li>
           <li>
-            <a
-              href="{{ url_for('client_dashboard') if session.get('client_id') else url_for('client_login') }}"
-              {%
-              if
-              request.endpoint
-              in
-              ['client_dashboard','client_login','register']
-              %}class="active"
-              {%
-              endif
-              %}
-              >Portal</a
-            >
+            <a href="{{ url_for('client_dashboard') if session.get('client_id') else url_for('client_login') }}"
+              {% if request.endpoint in ['client_dashboard','client_login','register'] %}class="active"{% endif %}>Portal</a>
           </li>
           <li>
-            <a href="{{ url_for('contact') }}" class="nav-cta"
-              >{{ cfg.get('hero_cta','Book Now') }}</a
-            >
+            <a href="{{ url_for('contact') }}" class="nav-cta">{{ cfg.get('hero_cta','Book Now') }}</a>
           </li>
         </ul>
       </div>
