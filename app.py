@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, redirect, url_for, render_template, Response
+﻿from flask import Flask, request, jsonify, session, redirect, url_for, render_template, Response
 from functools import wraps
 from dotenv import load_dotenv
 load_dotenv()
@@ -3619,14 +3619,20 @@ def client_save_meal_checklist():
 def community():
     cfg = get_config()
     member_count = users_col.count_documents({'role': 'client', 'active': True}) if users_col is not None else 0
-    # grab up to 12 members with avatars for the avatar wall
+    post_count   = community_col.count_documents({}) if community_col is not None else 0
     members = list(users_col.find(
         {'role': 'client', 'active': True},
         {'name': 1, 'avatar_url': 1}
     ).limit(12)) if users_col is not None else []
     for m in members:
         m['_id'] = str(m['_id'])
-    return render_template('community.html', cfg=cfg, member_count=member_count, members=members)
+    return render_template(
+        'community.html',
+        cfg=cfg,
+        member_count=member_count,
+        members=members,
+        post_count=post_count,      # ← new
+    )
 
 @app.route('/api/community/posts', methods=['GET'])
 def community_get_posts():
