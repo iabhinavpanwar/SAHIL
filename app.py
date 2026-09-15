@@ -112,6 +112,16 @@ def safe_oid(oid):
     except (bson_errors.InvalidId, TypeError):
         return None
 
+def hex_to_rgb_str(hex_color):
+    """Convert '#rrggbb' to 'r, g, b' for use in CSS rgba(var(--primary-rgb), …)."""
+    h = (hex_color or '#e8ff00').lstrip('#')
+    if len(h) != 6:
+        return '232, 255, 0'
+    try:
+        return f'{int(h[0:2], 16)}, {int(h[2:4], 16)}, {int(h[4:6], 16)}'
+    except ValueError:
+        return '232, 255, 0'
+
 def s(text, max_len=2000):
     return bleach.clean(str(text), tags=[], strip=True)[:max_len]
 
@@ -454,7 +464,14 @@ def log_visit():
 
 # ── PUBLIC PAGES ──────────────────────────────────────────────────────────────
 def get_config():
-    return (config_col.find_one({'_id': 'main'}, {'_id': 0}) or {}) if config_col is not None else {}
+    if config_col is None:
+        return {}
+    cfg = config_col.find_one({'_id': 'main'}, {'_id': 0}) or {}
+    # Ensure theme_color is always present and derive its RGB triplet
+    color = cfg.get('theme_color') or '#e8ff00'
+    cfg['theme_color'] = color
+    cfg['theme_color_rgb'] = hex_to_rgb_str(color)
+    return cfg
 
 @app.context_processor
 def inject_globals():
