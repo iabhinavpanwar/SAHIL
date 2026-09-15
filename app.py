@@ -3643,6 +3643,7 @@ def community_get_posts():
     except (ValueError, TypeError):
         skip = 0
     try:
+        total = community_col.count_documents({})
         posts = list(community_col.find({}).sort('created', -1).skip(skip).limit(10))
         cid = session.get('client_id', '')
         for p in posts:
@@ -3654,7 +3655,7 @@ def community_get_posts():
             for c in p.get('comments') or []:
                 c['_id'] = str(c['_id'])
                 c['created'] = to_ist(c.get('created'))
-        return jsonify(posts)
+        return jsonify({'posts': posts, 'total': total})   # ← changed shape
     except Exception as e:
         logger.error('community_get_posts error: %s', e)
         return jsonify({'error': 'Server error'}), 500

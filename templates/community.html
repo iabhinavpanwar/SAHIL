@@ -1106,31 +1106,33 @@
   }
 
   // ── submit post ───────────────────────────────────────────────────────────
-  async function submitPost(btn) {
-    const text = postText.value.trim();
-    if (!text && !_pendingFile) { postText.focus(); return; }
-    await act(btn, async () => {
-      let body, headers = {};
-      if (_pendingFile) {
-        body = new FormData();
-        body.append('text', text);
-        body.append('image', _pendingFile);
-      } else {
-        body = JSON.stringify({text});
-        headers['Content-Type'] = 'application/json';
-      }
-      const r = await fetch('/api/community/posts', { method:'POST', headers, body });
-      if (!r.ok) { const d = await r.json(); alert(d.error || 'Error'); return; }
-      postText.value = '';
-      charCount.textContent = '0 / 1000';
-      charCount.classList.remove('warn');
-      removeImage();
-      _skip = 0;
-      _hasMore = true;
-      document.getElementById('feed').innerHTML = '';
-      await loadPosts();
-    });
-  }
+async function submitPost(btn) {
+  const text = postText.value.trim();
+  if (!text && !_pendingFile) { postText.focus(); return; }
+  await act(btn, async () => {
+    let body, headers = {};
+    if (_pendingFile) {
+      body = new FormData();
+      body.append('text', text);
+      body.append('image', _pendingFile);
+    } else {
+      body = JSON.stringify({text});
+      headers['Content-Type'] = 'application/json';
+    }
+    const r = await fetch('/api/community/posts', { method:'POST', headers, body });
+    if (!r.ok) { const d = await r.json(); alert(d.error || 'Error'); return; }
+    const el = document.getElementById('postCount');
+    el.textContent = (parseInt(el.textContent) || 0) + 1;   // ← only on success
+    postText.value = '';
+    charCount.textContent = '0 / 1000';
+    charCount.classList.remove('warn');
+    removeImage();
+    _skip = 0;
+    _hasMore = true;
+    document.getElementById('feed').innerHTML = '';
+    await loadPosts();
+  });
+}
 
   // ── lightbox ──────────────────────────────────────────────────────────────
   function openLightbox(src) {
@@ -1197,41 +1199,40 @@
   }
 
   // ── load posts ────────────────────────────────────────────────────────────
-  async function loadPosts() {
-    if (_loading || !_hasMore) return;
-    _loading = true;
-    const wrap = document.getElementById('loadMoreWrap');
-    if (wrap) wrap.innerHTML = '<button class="btn btn-outline btn-sm" disabled><span class="spin"></span> Loading…</button>';
-    try {
-      const r = await fetch(`/api/community/posts?skip=${_skip}`);
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const posts = await r.json();
-      const feed = document.getElementById('feed');
-      if (_skip === 0) {
-        document.getElementById('postCount').textContent = '—';
-      }
-      if (posts.length === 0 && _skip === 0) {
-        document.getElementById('feedEmpty').style.display = '';
-        if (wrap) wrap.style.display = 'none';
-      } else {
-        document.getElementById('feedEmpty').style.display = 'none';
-        posts.forEach(p => { feed.insertAdjacentHTML('beforeend', renderPost(p)); });
-        _skip += posts.length;
-        _hasMore = posts.length === 10;
-        if (wrap) {
-          wrap.style.display = _hasMore ? '' : 'none';
-          wrap.innerHTML = _hasMore ? '<button class="btn btn-outline btn-sm" onclick="loadPosts()">Load more</button>' : '';
-        }
-      }
-    } catch(e) {
-      console.error(e);
-      const feed = document.getElementById('feed');
-      feed.innerHTML = '<div class="feed-empty"><i class="fas fa-exclamation-triangle"></i><p>Could not load the feed. Please refresh the page.</p></div>';
+async function loadPosts() {
+  if (_loading || !_hasMore) return;
+  _loading = true;
+  const wrap = document.getElementById('loadMoreWrap');
+  if (wrap) wrap.innerHTML = '<button class="btn btn-outline btn-sm" disabled><span class="spin"></span> Loading…</button>';
+  try {
+    const r = await fetch(`/api/community/posts?skip=${_skip}`);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const posts = data.posts;
+    document.getElementById('postCount').textContent = data.total;   // ← update here
+    const feed = document.getElementById('feed');
+    if (posts.length === 0 && _skip === 0) {
+      document.getElementById('feedEmpty').style.display = '';
       if (wrap) wrap.style.display = 'none';
-    } finally {
-      _loading = false;
+    } else {
+      document.getElementById('feedEmpty').style.display = 'none';
+      posts.forEach(p => feed.insertAdjacentHTML('beforeend', renderPost(p)));
+      _skip += posts.length;
+      _hasMore = posts.length === 10;
+      if (wrap) {
+        wrap.style.display = _hasMore ? '' : 'none';
+        wrap.innerHTML = _hasMore ? '<button class="btn btn-outline btn-sm" onclick="loadPosts()">Load more</button>' : '';
+      }
     }
+  } catch(e) {
+    console.error(e);
+    const feed = document.getElementById('feed');
+    feed.innerHTML = '<div class="feed-empty"><i class="fas fa-exclamation-triangle"></i><p>Could not load the feed. Please refresh the page.</p></div>';
+    if (wrap) wrap.style.display = 'none';
+  } finally {
+    _loading = false;
   }
+}
 
   // ── toggle like ───────────────────────────────────────────────────────────
   async function toggleLike(pid, btn) {
@@ -1284,6 +1285,9 @@
       const r = await fetch(`/api/community/posts/${pid}`, {method:'DELETE'});
       if (r.ok) {
         document.getElementById(`post-${pid}`)?.remove();
+        const el = document.getElementById('postCount');
+        const n = parseInt(el.textContent) || 0;
+        if (n > 0) el.textContent = n - 1;
         if (!document.querySelector('.post-card')) {
           document.getElementById('feedEmpty').style.display = '';
         }
