@@ -12,6 +12,7 @@ from flask_limiter.util import get_remote_address
 from PIL import Image
 from email.message import EmailMessage
 import bleach, atexit, os, logging, secrets, re, io, hashlib, smtplib, json
+import requests
 
 app = Flask(__name__)
 
@@ -173,45 +174,36 @@ def _send_whatsapp(message):
         return False
 
 def _send_email(to_addr, subject, body):
-    import ssl
-    host = (os.environ.get('MAIL_SERVER') or '').strip()
-    if not host or not to_addr:
-        logger.warning('Email skipped: MAIL_SERVER or to_addr missing (to=%s)', to_addr)
+    api_key = os.environ.get('RESEND_API_KEY', '').strip()
+    if not api_key or not to_addr:
+        logger.warning('Email skipped: RESEND_API_KEY or to_addr missing (to=%s)', to_addr)
         return False
+    
+    # Use your verified domain, or this test domain for initial setup
+    from_addr = os.environ.get('MAIL_FROM', 'onboarding@resend.dev')
+    
     try:
-        port = int(os.environ.get('MAIL_PORT', '587'))
-    except ValueError:
-        port = 587
-    user = os.environ.get('MAIL_USERNAME', '')
-    password = os.environ.get('MAIL_PASSWORD', '')
-    from_addr = os.environ.get('MAIL_FROM', user or 'noreply@localhost')
-    use_tls = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
-    use_ssl = os.environ.get('MAIL_USE_SSL', 'false').lower() == 'true'
-    msg = EmailMessage()
-    msg['Subject'] = subject
-    msg['From'] = from_addr
-    msg['To'] = to_addr
-    msg.set_content(body)
-    try:
-        if use_ssl:
-            ctx = ssl.create_default_context()
-            with smtplib.SMTP_SSL(host, port, timeout=15, context=ctx) as smtp:
-                if user:
-                    smtp.login(user, password)
-                smtp.send_message(msg)
-        else:
-            with smtplib.SMTP(host, port, timeout=15) as smtp:
-                smtp.ehlo()
-                if use_tls:
-                    smtp.starttls()
-                    smtp.ehlo()
-                if user:
-                    smtp.login(user, password)
-                smtp.send_message(msg)
-        logger.info('Email sent to %s: %s', to_addr, subject)
-        return True
+        r = requests.post(
+            'https://api.resend.com/emails',
+            headers={
+                'Authorization': f'Bearer {api_key}',
+                'Content-Type': 'application/json',
+            },
+            json={
+                'from': from_addr,
+                'to': [to_addr],
+                'subject': subject,
+                'text': body,
+            },
+            timeout=12,
+        )
+        if r.status_code in (200, 201, 202):
+            logger.info('Email sent to %s: %s', to_addr, subject)
+            return True
+        logger.error('Resend failed (%s): %s', r.status_code, r.text[:300])
+        return False
     except Exception as e:
-        logger.error('Email send failed to %s: %s', to_addr, e)
+        logger.error('Resend exception to %s: %s', to_addr, e)
         return False
 
 def _issue_reset_token(user):
