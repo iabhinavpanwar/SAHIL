@@ -1,6 +1,6 @@
 {
-  "name": "Sahil Panwar Fitness",
-  "short_name": "SPFitness",
+  "name": "Sahil Panwar",
+  "short_name": "Sahil Panwar",
   "description": "Your personal fitness training portal",
   "start_url": "/client/dashboard",
   "display": "standalone",

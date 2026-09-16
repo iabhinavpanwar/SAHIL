@@ -459,7 +459,15 @@ def seed():
 seed()
 
 # ── VISITOR LOGGING ───────────────────────────────────────────────────────────
-SKIP = {'/static', '/api', '/favicon'}
+SKIP = {
+    '/static',
+    '/api',
+    '/favicon',
+    '/manifest.json',
+    '/sw.js',
+    '/robots.txt',
+    '/sitemap.xml',
+}
 
 @app.before_request
 def log_visit():
@@ -467,13 +475,16 @@ def log_visit():
         return
     if any(request.path.startswith(p) for p in SKIP):
         return
-    visits_col.insert_one({
-        'ip':   request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()[:45],
-        'path': request.path[:200],
-        'ua':   request.headers.get('User-Agent', '')[:200],
-        'ref':  request.headers.get('Referer', '')[:300],
-        'ts':   datetime.now(timezone.utc),
-    })
+    try:
+        visits_col.insert_one({
+            'ip':   request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()[:45],
+            'path': request.path[:200],
+            'ua':   request.headers.get('User-Agent', '')[:200],
+            'ref':  request.headers.get('Referer', '')[:300],
+            'ts':   datetime.now(timezone.utc),
+        })
+    except Exception as e:
+        logger.debug('Visit log skipped: %s', e)
 
 # ── PUBLIC PAGES ──────────────────────────────────────────────────────────────
 def get_config():
