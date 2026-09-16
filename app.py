@@ -173,8 +173,10 @@ def _send_whatsapp(message):
         return False
 
 def _send_email(to_addr, subject, body):
+    import ssl
     host = (os.environ.get('MAIL_SERVER') or '').strip()
     if not host or not to_addr:
+        logger.warning('Email skipped: MAIL_SERVER or to_addr missing (to=%s)', to_addr)
         return False
     try:
         port = int(os.environ.get('MAIL_PORT', '587'))
@@ -184,21 +186,32 @@ def _send_email(to_addr, subject, body):
     password = os.environ.get('MAIL_PASSWORD', '')
     from_addr = os.environ.get('MAIL_FROM', user or 'noreply@localhost')
     use_tls = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
+    use_ssl = os.environ.get('MAIL_USE_SSL', 'false').lower() == 'true'
     msg = EmailMessage()
     msg['Subject'] = subject
     msg['From'] = from_addr
     msg['To'] = to_addr
     msg.set_content(body)
     try:
-        with smtplib.SMTP(host, port, timeout=12) as smtp:
-            if use_tls:
-                smtp.starttls()
-            if user:
-                smtp.login(user, password)
-            smtp.send_message(msg)
+        if use_ssl:
+            ctx = ssl.create_default_context()
+            with smtplib.SMTP_SSL(host, port, timeout=15, context=ctx) as smtp:
+                if user:
+                    smtp.login(user, password)
+                smtp.send_message(msg)
+        else:
+            with smtplib.SMTP(host, port, timeout=15) as smtp:
+                smtp.ehlo()
+                if use_tls:
+                    smtp.starttls()
+                    smtp.ehlo()
+                if user:
+                    smtp.login(user, password)
+                smtp.send_message(msg)
+        logger.info('Email sent to %s: %s', to_addr, subject)
         return True
     except Exception as e:
-        logger.warning('Email send failed: %s', e)
+        logger.error('Email send failed to %s: %s', to_addr, e)
         return False
 
 def _issue_reset_token(user):
