@@ -700,6 +700,33 @@ def client_login():
     reset_ok = request.args.get('reset')
     return render_template('client_login.html', error=error, registered=registered, reset_ok=reset_ok)
 
+@app.route('/api/_debug_email')
+def debug_email():
+    """Temporary: test SMTP login end-to-end."""
+    import smtplib, os
+    host = os.environ.get('MAIL_SERVER', '')
+    port = int(os.environ.get('MAIL_PORT', '587'))
+    user = os.environ.get('MAIL_USERNAME', '')
+    pw   = os.environ.get('MAIL_PASSWORD', '')
+    result = {
+        'MAIL_SERVER': host,
+        'MAIL_PORT': port,
+        'MAIL_USE_TLS': os.environ.get('MAIL_USE_TLS', 'true'),
+        'MAIL_USERNAME_set': bool(user),
+        'MAIL_PASSWORD_set': bool(pw),
+        'MAIL_PASSWORD_len': len(pw),
+    }
+    try:
+        with smtplib.SMTP(host, port, timeout=12) as s:
+            s.ehlo()
+            s.starttls()
+            s.ehlo()
+            s.login(user, pw)
+        result['login'] = 'SUCCESS'
+    except Exception as e:
+        result['login'] = f'FAILED: {type(e).__name__}: {e}'
+    return result
+
 @app.route('/client/forgot-password', methods=['GET', 'POST'])
 @limiter.limit('5 per hour')
 def forgot_password():
