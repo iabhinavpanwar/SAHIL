@@ -2641,7 +2641,23 @@
   <div class="portal-mob-header">
     <button class="portal-mob-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
     <h3 id="mobTabTitle">Overview</h3>
+    <button class="portal-nav-btn" onclick="openNotifPanel()" style="margin-left:auto;position:relative;width:38px;height:38px;padding:0;flex-shrink:0" title="Notifications">
+      <i class="fas fa-bell"></i>
+      <span id="notifBadge" style="display:none;position:absolute;top:4px;right:4px;background:var(--danger);color:#fff;font-size:0.6rem;font-weight:700;padding:0.1rem 0.3rem;border-radius:8px;line-height:1"></span>
+    </button>
   </div>
+  <!-- NOTIFICATION PANEL -->
+  <div id="notifPanel" style="display:none;position:fixed;top:var(--nav-h);right:0;width:min(360px,100vw);height:calc(100vh - var(--nav-h));background:var(--bg2);border-left:1px solid var(--border);z-index:200;overflow-y:auto;padding:1rem;box-shadow:-4px 0 20px rgba(0,0,0,0.3)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <strong style="font-size:1rem">Notifications</strong>
+      <div style="display:flex;gap:0.5rem">
+        <button class="btn btn-sm btn-outline" onclick="markAllNotifsRead()">Mark all read</button>
+        <button class="btn btn-sm btn-outline" onclick="closeNotifPanel()"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div id="notifList"><p style="color:var(--text3);font-size:0.85rem">Loading...</p></div>
+  </div>
+  <div id="notifOverlay" onclick="closeNotifPanel()" style="display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.3)"></div>
 
   <!-- SIDEBAR -->
   <aside class="portal-sidebar" id="portalSidebar">
@@ -4552,5 +4568,53 @@ loadOverview(); calInit();
 refreshUnreadBadge();
 loadMoodAndTip();
 subscribePush();
+loadNotifBadge();
+
+// -- NOTIFICATION BELL --
+async function loadNotifBadge() {
+  const { data } = await api('/api/client/notifications?limit=1&unread_only=true');
+  const badge = document.getElementById('notifBadge');
+  if (!badge) return;
+  const count = data && data.unread_count != null ? data.unread_count : 0;
+  badge.textContent = count > 9 ? '9+' : count;
+  badge.style.display = count > 0 ? '' : 'none';
+}
+async function openNotifPanel() {
+  document.getElementById('notifPanel').style.display = '';
+  document.getElementById('notifOverlay').style.display = '';
+  const list = document.getElementById('notifList');
+  list.innerHTML = '<p style="color:var(--text3);font-size:0.85rem">Loading...</p>';
+  const { data } = await api('/api/client/notifications?limit=30');
+  if (!data || !data.items || !data.items.length) {
+    list.innerHTML = '<p style="color:var(--text3);font-size:0.85rem">No notifications yet.</p>';
+    return;
+  }
+  list.innerHTML = data.items.map(n => `
+    <div style="padding:0.75rem 0;border-bottom:1px solid var(--border);opacity:${n.read?'0.6':'1'}">
+      <div style="display:flex;gap:0.5rem;align-items:flex-start">
+        <span style="font-size:1.1rem">${n.icon||'🔔'}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:${n.read?'400':'600'};font-size:0.88rem">${esc(n.title||'')}</div>
+          <div style="font-size:0.82rem;color:var(--text2);margin-top:0.15rem">${esc(n.body||'')}</div>
+          <div style="font-size:0.75rem;color:var(--text3);margin-top:0.25rem">${esc(n.created||'')}</div>
+        </div>
+        ${!n.read ? `<button class="btn btn-sm btn-outline" style="flex-shrink:0;font-size:0.7rem;padding:0.15rem 0.4rem" onclick="markNotifRead('${n._id}',this)">&#10003;</button>` : ''}
+      </div>
+    </div>`).join('');
+  loadNotifBadge();
+}
+function closeNotifPanel() {
+  document.getElementById('notifPanel').style.display = 'none';
+  document.getElementById('notifOverlay').style.display = 'none';
+}
+async function markNotifRead(id, btnEl) {
+  btnEl.disabled = true;
+  await api('/api/client/notifications/' + id + '/read', 'POST');
+  await openNotifPanel();
+}
+async function markAllNotifsRead() {
+  await api('/api/client/notifications/read_all', 'POST');
+  await openNotifPanel();
+}
 </script>
 {% endblock %}

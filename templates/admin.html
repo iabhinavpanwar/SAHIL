@@ -2556,6 +2556,10 @@
           <button class="sidebar-btn" data-tab="payments">
             <i class="fas fa-receipt"></i> Payments
           </button>
+          <button class="sidebar-btn" data-tab="community">
+            <i class="fas fa-users"></i> Community
+            <span class="badge-count" id="communityCount"></span>
+          </button>
         </nav>
         <a href="{{ url_for('logout') }}" class="sidebar-logout"
           ><i class="fas fa-sign-out-alt"></i> Logout</a
@@ -3449,6 +3453,17 @@
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-community">
+            <div class="panel-header">
+              <h3>Community Posts</h3>
+              <span id="communityTotalLabel" style="font-size:0.85rem;color:var(--text3)"></span>
+            </div>
+            <div class="items-list" id="communityPostsList"></div>
+            <div style="text-align:center;margin-top:1rem" id="communityLoadMoreWrap" style="display:none">
+              <button class="btn btn-outline btn-sm" onclick="loadCommunityPosts()">Load more</button>
             </div>
           </div>
 
@@ -5030,6 +5045,7 @@
           payments: loadAdminInvoices,
           musclemap: loadMuscleMapTab,
           announcements: loadAnnouncements,
+          community: loadCommunityPosts,
         };
         loaders[name]?.();
       }
@@ -7604,6 +7620,48 @@
         await act(btnEl, async () => {
           await api(`/api/admin/announcements/${id}`, "DELETE");
           await loadAnnouncements();
+        });
+      }
+
+      // -- COMMUNITY MODERATION --
+      let _communityPage = 0;
+      async function loadCommunityPosts(reset = true) {
+        if (reset) _communityPage = 0;
+        const { data } = await api(/api/admin/community/posts?page= + _communityPage);
+        const list = document.getElementById('communityPostsList');
+        const label = document.getElementById('communityTotalLabel');
+        const moreWrap = document.getElementById('communityLoadMoreWrap');
+        if (!data || !data.posts) return;
+        if (reset) list.innerHTML = '';
+        if (label) label.textContent = data.total + ' post' + (data.total !== 1 ? 's' : '') + ' total';
+        if (!data.posts.length && reset) {
+          list.innerHTML = '<p class="empty-state">No community posts yet.</p>';
+          if (moreWrap) moreWrap.style.display = 'none';
+          return;
+        }
+        data.posts.forEach(function(p) {
+          const row = document.createElement('div');
+          row.className = 'item-row';
+          row.style.opacity = p.hidden ? '0.5' : '1';
+          const hiddenTag = p.hidden ? ' &mdash; hidden' : '';
+          const txt = (p.text || '').substring(0, 120) + ((p.text || '').length > 120 ? '...' : '');
+          row.innerHTML = '<div class="item-info" style="flex:1"><strong>' + esc(p.author_name || 'Unknown') + hiddenTag + '</strong><span style="white-space:normal">' + esc(txt) + '</span><span style="font-size:0.75rem;color:var(--text3)">' + esc(p.created || '') + ' &middot; ' + (p.likes||[]).length + ' likes &middot; ' + (p.comments||[]).length + ' comments</span></div><div class="item-actions"><button class="btn btn-sm btn-outline" onclick="adminToggleHidePost(\'' + p._id + '\',' + (!!p.hidden) + ',this)">' + (p.hidden ? 'Unhide' : 'Hide') + '</button><button class="btn btn-sm btn-danger" onclick="adminDeleteCommunityPost(\'' + p._id + '\',this)">Delete</button></div>';
+          list.appendChild(row);
+        });
+        _communityPage++;
+        if (moreWrap) moreWrap.style.display = data.has_more ? '' : 'none';
+      }
+      async function adminDeleteCommunityPost(pid, btnEl) {
+        if (!confirm('Permanently delete this post?')) return;
+        await act(btnEl, async () => {
+          await api('/api/admin/community/posts/' + pid, 'DELETE');
+          await loadCommunityPosts();
+        });
+      }
+      async function adminToggleHidePost(pid, hidden, btnEl) {
+        await act(btnEl, async () => {
+          await api('/api/admin/community/posts/' + pid + '/hide', 'POST', { hidden: !hidden });
+          await loadCommunityPosts();
         });
       }
     </script>

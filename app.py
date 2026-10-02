@@ -3270,6 +3270,20 @@ def _push_notify(client_id, title, body, url='/client/dashboard', tag='spf'):
     """Send Web Push notification to a client (or 'admin') via pywebpush if available."""
     if push_subs_col is None:
         return
+    # Persist notification to history for client (skip admin)
+    if client_id and client_id != 'admin' and db is not None:
+        try:
+            db['notifications'].insert_one({
+                'client_id': client_id,
+                'title': title,
+                'body': body,
+                'url': url,
+                'tag': tag,
+                'read': False,
+                'created': datetime.now(timezone.utc),
+            })
+        except Exception as e:
+            logger.debug('Notification history save failed: %s', e)
     try:
         from pywebpush import webpush, WebPushException
         vapid_private = os.environ.get('VAPID_PRIVATE_KEY', '')
@@ -3681,7 +3695,7 @@ def community_get_posts():
         skip = 0
     try:
         total = community_col.count_documents({})
-        posts = list(community_col.find({}).sort('created', -1).skip(skip).limit(10))
+        posts = list(community_col.find({'hidden': {'$ne': True}}).sort('created', -1).skip(skip).limit(10))
         cid = session.get('client_id', '')
         for p in posts:
             p['_id'] = str(p['_id'])
@@ -3797,6 +3811,112 @@ def community_delete_post(pid):
         return jsonify({'error': 'Invalid id'}), 400
     community_col.delete_one({'_id': oid, 'client_id': session['client_id']})
     return jsonify({'status': 'deleted'})
+
+# ── ADMIN API — COMMUNITY MODERATION ─────────────────────────────────────────
+@app.route('/api/admin/community/posts')
+@login_required
+def admin_get_community_posts():
+    if community_col is None:
+        return jsonify([]), 500
+    try:
+        skip = max(0, int(request.args.get('skip', 0)))
+    except (ValueError, TypeError):
+        skip = 0
+    try:
+        page = max(0, int(request.args.get('page', 0)))
+        skip = page * 20
+    except (ValueError, TypeError):
+        skip = 0
+    posts = list(community_col.find({}).sort('created', -1).skip(skip).limit(20))
+    total = community_col.count_documents({})
+    for p in posts:
+        p['_id'] = str(p['_id'])
+        p['created'] = to_ist(p.get('created'))
+        p['likes'] = p.get('likes') or []
+        p['comments'] = p.get('comments') or []
+    has_more = (skip + 20) < total
+    return jsonify({'posts': posts, 'total': total, 'has_more': has_more})
+
+@app.route('/api/admin/community/posts/<pid>', methods=['DELETE'])
+@login_required
+def admin_delete_community_post(pid):
+    if community_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    oid = safe_oid(pid)
+    if not oid:
+        return jsonify({'error': 'Invalid id'}), 400
+    community_col.delete_one({'_id': oid})
+    return jsonify({'status': 'deleted'})
+
+@app.route('/api/admin/community/posts/<pid>/hide', methods=['POST'])
+@login_required
+def admin_hide_community_post(pid):
+    if community_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    oid = safe_oid(pid)
+    if not oid:
+        return jsonify({'error': 'Invalid id'}), 400
+    d = request.json or {}
+    hidden = bool(d.get('hidden', True))
+    community_col.update_one({'_id': oid}, {'$set': {'hidden': hidden}})
+    return jsonify({'status': 'ok', 'hidden': hidden})
+
+# ── CLIENT API — NOTIFICATION HISTORY ────────────────────────────────────────
+@app.route('/api/client/notifications')
+@client_login_required
+def client_get_notifications():
+    if db is None:
+        return jsonify({'items': [], 'unread_count': 0})
+    cid = session['client_id']
+    try:
+        limit = max(1, min(100, int(request.args.get('limit', 30))))
+    except (ValueError, TypeError):
+        limit = 30
+    unread_only = request.args.get('unread_only') == 'true'
+    query = {'client_id': cid}
+    if unread_only:
+        query['read'] = False
+    items = list(db['notifications'].find(query).sort('created', -1).limit(limit))
+    for i in items:
+        i['_id'] = str(i['_id'])
+        i['created'] = to_ist(i.get('created'))
+    unread_count = db['notifications'].count_documents({'client_id': cid, 'read': False})
+    return jsonify({'items': items, 'unread_count': unread_count})
+
+@app.route('/api/client/notifications/<nid>/read', methods=['POST'])
+@client_login_required
+def client_mark_notification_read(nid):
+    if db is None:
+        return jsonify({'ok': True})
+    oid = safe_oid(nid)
+    if not oid:
+        return jsonify({'error': 'Invalid id'}), 400
+    db['notifications'].update_one(
+        {'_id': oid, 'client_id': session['client_id']},
+        {'$set': {'read': True}}
+    )
+    return jsonify({'status': 'ok'})
+
+@app.route('/api/client/notifications/read_all', methods=['POST'])
+@client_login_required
+def client_mark_all_notifications_read():
+    if db is None:
+        return jsonify({'ok': True})
+    db['notifications'].update_many(
+        {'client_id': session['client_id'], 'read': False},
+        {'$set': {'read': True}}
+    )
+    return jsonify({'status': 'ok'})
+
+@app.route('/api/client/notifications/unread_count')
+@client_login_required
+def client_notification_unread_count():
+    if db is None:
+        return jsonify({'count': 0})
+    count = db['notifications'].count_documents(
+        {'client_id': session['client_id'], 'read': False}
+    )
+    return jsonify({'count': count})
 
 # ── LEGAL & UTILITY PAGES ────────────────────────────────────────────────
 @app.route('/privacy')
