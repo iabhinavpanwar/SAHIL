@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}Blog — {{ cfg.get('hero_name','Sahil
+﻿{% extends "base.html" %} {% block title %}Blog — {{ cfg.get('hero_name','Sahil
 Panwar') }}{% endblock %} {% block head %}
 <style>
   /* ══════════════════════════════════════════════════════════════════════════
@@ -26,7 +26,7 @@ Panwar') }}{% endblock %} {% block head %}
     height: clamp(260px, 45vw, 600px);
     background: radial-gradient(
       circle,
-      rgba(232, 255, 0, 0.06) 0%,
+      rgba(var(--primary-rgb), 0.06) 0%,
       transparent 70%
     );
     pointer-events: none;
@@ -41,7 +41,7 @@ Panwar') }}{% endblock %} {% block head %}
     height: clamp(200px, 36vw, 450px);
     background: radial-gradient(
       circle,
-      rgba(232, 255, 0, 0.04) 0%,
+      rgba(var(--primary-rgb), 0.04) 0%,
       transparent 70%
     );
     pointer-events: none;
@@ -235,7 +235,7 @@ Panwar') }}{% endblock %} {% block head %}
   }
 
   .featured-post:hover {
-    border-color: rgba(232, 255, 0, 0.3);
+    border-color: rgba(var(--primary-rgb), 0.3);
     transform: translateY(-4px);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   }
@@ -272,7 +272,7 @@ Panwar') }}{% endblock %} {% block head %}
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    box-shadow: 0 6px 20px rgba(232, 255, 0, 0.35);
+    box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.35);
     z-index: 2;
     white-space: nowrap;
   }
@@ -350,7 +350,7 @@ Panwar') }}{% endblock %} {% block head %}
   }
 
   .blog-card:hover {
-    border-color: rgba(232, 255, 0, 0.35);
+    border-color: rgba(var(--primary-rgb), 0.35);
     transform: translateY(-6px);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   }
@@ -382,7 +382,7 @@ Panwar') }}{% endblock %} {% block head %}
     align-items: center;
     justify-content: center;
     background:
-      linear-gradient(135deg, rgba(232, 255, 0, 0.06) 0%, transparent 60%),
+      linear-gradient(135deg, rgba(var(--primary-rgb), 0.06) 0%, transparent 60%),
       var(--bg3);
     font-size: clamp(1.75rem, 5vw, 2.5rem);
     color: var(--border);
@@ -402,7 +402,7 @@ Panwar') }}{% endblock %} {% block head %}
     border-radius: 6px;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(232, 255, 0, 0.25);
+    border: 1px solid rgba(var(--primary-rgb), 0.25);
     z-index: 2;
     max-width: calc(100% - 1.7rem);
     overflow: hidden;
@@ -488,12 +488,12 @@ Panwar') }}{% endblock %} {% block head %}
   }
 
   .blog-tags .tag-sm {
-    background: rgba(232, 255, 0, 0.07);
+    background: rgba(var(--primary-rgb), 0.07);
     color: var(--primary);
     font-size: clamp(0.62rem, 1.4vw, 0.68rem);
     padding: 0.2rem 0.55rem;
     border-radius: 4px;
-    border: 1px solid rgba(232, 255, 0, 0.12);
+    border: 1px solid rgba(var(--primary-rgb), 0.12);
     font-weight: 600;
     letter-spacing: 0.02em;
     transition: all var(--transition);
@@ -504,7 +504,7 @@ Panwar') }}{% endblock %} {% block head %}
   }
 
   .blog-tags .tag-sm:hover {
-    background: rgba(232, 255, 0, 0.15);
+    background: rgba(var(--primary-rgb), 0.15);
     transform: translateY(-1px);
   }
 
@@ -1063,7 +1063,7 @@ Panwar') }}{% endblock %} {% block head %}
 
     .blog-tags .tag-sm:hover {
       transform: none;
-      background: rgba(232, 255, 0, 0.07);
+      background: rgba(var(--primary-rgb), 0.07);
     }
 
     .featured-body h2 a:hover {
@@ -1229,8 +1229,8 @@ Panwar') }}{% endblock %} {% block head %}
             class="category-chip"
             style="
               position: static;
-              background: rgba(232, 255, 0, 0.08);
-              border: 1px solid rgba(232, 255, 0, 0.2);
+              background: rgba(var(--primary-rgb), 0.08);
+              border: 1px solid rgba(var(--primary-rgb), 0.2);
               color: var(--primary);
             "
           >

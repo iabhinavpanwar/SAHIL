@@ -359,8 +359,8 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     z-index: 0;
     pointer-events: none;
     background-image:
-      linear-gradient(rgba(232, 255, 0, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(232, 255, 0, 0.04) 1px, transparent 1px);
+      linear-gradient(rgba(var(--primary-rgb), 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--primary-rgb), 0.04) 1px, transparent 1px);
     background-size: 56px 56px;
     mask-image: radial-gradient(
       ellipse 70% 60% at 50% 45%,
@@ -386,8 +386,8 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(232, 255, 0, 0.1);
-    border: 1px solid rgba(232, 255, 0, 0.25);
+    background: rgba(var(--primary-rgb), 0.1);
+    border: 1px solid rgba(var(--primary-rgb), 0.25);
     border-radius: 50px;
     padding: clamp(0.3rem, 1.4vw, 0.35rem) clamp(0.75rem, 2.4vw, 1rem);
     font-size: clamp(0.7rem, 1.7vw, 0.8rem);
@@ -504,7 +504,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   .btn-hero {
     font-size: clamp(0.88rem, 2vw, 1rem);
     padding: clamp(0.75rem, 2vw, 0.9rem) clamp(1.4rem, 3.6vw, 2rem);
-    box-shadow: 0 0 30px rgba(232, 255, 0, 0.3);
+    box-shadow: 0 0 30px rgba(var(--primary-rgb), 0.3);
     animation: heroBtnPulse 3s ease-in-out infinite;
     min-height: 46px;
   }
@@ -512,10 +512,10 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   @keyframes heroBtnPulse {
     0%,
     100% {
-      box-shadow: 0 0 30px rgba(232, 255, 0, 0.3);
+      box-shadow: 0 0 30px rgba(var(--primary-rgb), 0.3);
     }
     50% {
-      box-shadow: 0 0 55px rgba(232, 255, 0, 0.6);
+      box-shadow: 0 0 55px rgba(var(--primary-rgb), 0.6);
     }
   }
 
@@ -538,7 +538,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   .btn-ghost:hover {
     border-color: var(--primary);
     color: var(--primary);
-    background: rgba(232, 255, 0, 0.05);
+    background: rgba(var(--primary-rgb), 0.05);
     transform: translateY(-2px);
   }
 
@@ -731,8 +731,8 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     width: clamp(44px, 10vw, 52px);
     height: clamp(44px, 10vw, 52px);
     border-radius: 14px;
-    background: rgba(232, 255, 0, 0.08);
-    border: 1px solid rgba(232, 255, 0, 0.15);
+    background: rgba(var(--primary-rgb), 0.08);
+    border: 1px solid rgba(var(--primary-rgb), 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -762,7 +762,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     border-radius: var(--radius);
     background: radial-gradient(
       circle at 50% 0%,
-      rgba(232, 255, 0, 0.07) 0%,
+      rgba(var(--primary-rgb), 0.07) 0%,
       transparent 70%
     );
     opacity: 0;
@@ -788,7 +788,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   .btn-card:hover {
     border-color: var(--primary);
     color: var(--primary);
-    background: rgba(232, 255, 0, 0.05);
+    background: rgba(var(--primary-rgb), 0.05);
     gap: 0.75rem;
   }
 
@@ -838,8 +838,8 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     height: clamp(40px, 9vw, 48px);
     border-radius: 12px;
     flex-shrink: 0;
-    background: rgba(232, 255, 0, 0.08);
-    border: 1px solid rgba(232, 255, 0, 0.15);
+    background: rgba(var(--primary-rgb), 0.08);
+    border: 1px solid rgba(var(--primary-rgb), 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -900,7 +900,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   }
 
   .teaser-card:hover {
-    border-color: rgba(232, 255, 0, 0.3);
+    border-color: rgba(var(--primary-rgb), 0.3);
     transform: translateY(-6px);
     box-shadow: var(--shadow-lg);
   }
@@ -944,7 +944,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   }
 
   .after-label {
-    background: rgba(232, 255, 0, 0.9);
+    background: rgba(var(--primary-rgb), 0.9);
     color: #000;
   }
 
@@ -1023,7 +1023,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
 
   .tcard-quote {
     font-size: clamp(1.5rem, 3.6vw, 2rem);
-    color: rgba(232, 255, 0, 0.2);
+    color: rgba(var(--primary-rgb), 0.2);
     margin-bottom: 0.75rem;
     line-height: 1;
   }
@@ -1050,7 +1050,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--primary);
-    box-shadow: 0 0 20px rgba(232, 255, 0, 0.15);
+    box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.15);
     flex-shrink: 0;
   }
 
@@ -1067,7 +1067,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     justify-content: center;
     border: 2px solid var(--primary);
     flex-shrink: 0;
-    box-shadow: 0 0 20px rgba(232, 255, 0, 0.2);
+    box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.2);
   }
 
   .testimonial-author strong {
@@ -1107,7 +1107,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   .carousel-btn:hover {
     border-color: var(--primary);
     color: var(--primary);
-    background: rgba(232, 255, 0, 0.06);
+    background: rgba(var(--primary-rgb), 0.06);
   }
 
   .carousel-dots {
@@ -2029,8 +2029,8 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     }
 
     .service-card:hover .service-icon-wrap {
-      background: rgba(232, 255, 0, 0.08);
-      border-color: rgba(232, 255, 0, 0.15);
+      background: rgba(var(--primary-rgb), 0.08);
+      border-color: rgba(var(--primary-rgb), 0.15);
       transform: none;
     }
 
@@ -2053,8 +2053,8 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     }
 
     .why-item:hover .why-icon {
-      background: rgba(232, 255, 0, 0.08);
-      border-color: rgba(232, 255, 0, 0.15);
+      background: rgba(var(--primary-rgb), 0.08);
+      border-color: rgba(var(--primary-rgb), 0.15);
     }
 
     .why-item:hover .why-icon i {
@@ -2240,7 +2240,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
         if (p.y > H) p.y = 0;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(232,255,0," + p.a + ")";
+        ctx.fillStyle = "rgba(var(--primary-rgb)," + p.a + ")";
         ctx.fill();
       }
       if (running) raf = requestAnimationFrame(draw);

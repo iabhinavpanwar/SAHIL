@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Community — {{ cfg.get('hero_name','Sahil Panwar') }}{% endblock %}
 
 {% block head %}
@@ -36,7 +36,7 @@
     inset: 0;
     background: radial-gradient(
       ellipse at 60% 0%,
-      rgba(232, 255, 0, 0.07) 0%,
+      rgba(var(--primary-rgb), 0.07) 0%,
       transparent 65%
     );
     pointer-events: none;
@@ -184,7 +184,7 @@
   }
 
   .compose-card:focus-within {
-    border-color: rgba(232, 255, 0, 0.35);
+    border-color: rgba(var(--primary-rgb), 0.35);
   }
 
   .compose-top {
@@ -309,7 +309,7 @@
   }
 
   .post-card:hover {
-    border-color: rgba(232, 255, 0, 0.2);
+    border-color: rgba(var(--primary-rgb), 0.2);
   }
 
   /* ── POST HEADER ───────────────────────────────────────────────────────── */
@@ -429,13 +429,13 @@
   .action-btn:hover {
     border-color: var(--primary);
     color: var(--primary);
-    background: rgba(232, 255, 0, 0.05);
+    background: rgba(var(--primary-rgb), 0.05);
   }
 
   .action-btn.liked {
     border-color: var(--primary);
     color: var(--primary);
-    background: rgba(232, 255, 0, 0.08);
+    background: rgba(var(--primary-rgb), 0.08);
   }
 
   .action-btn:disabled {
@@ -631,7 +631,7 @@
     min-height: 30px;
     -webkit-tap-highlight-color: transparent;
   }
-  .img-pick-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(232,255,0,.05); }
+  .img-pick-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(var(--primary-rgb),.05); }
   .img-pick-btn i { font-size: .75rem; }
 
   .img-preview-wrap {
@@ -894,7 +894,7 @@
     .av-chip:hover { border-color: var(--border); color: var(--text2); }
     .post-card:hover { border-color: var(--border); }
     .action-btn:hover:not(.liked) { border-color: var(--border); color: var(--text2); background: none; }
-    .action-btn.liked:hover { border-color: var(--primary); color: var(--primary); background: rgba(232, 255, 0, 0.08); }
+    .action-btn.liked:hover { border-color: var(--primary); color: var(--primary); background: rgba(var(--primary-rgb), 0.08); }
     .post-delete-btn:hover { color: var(--text3); background: none; }
     .comment-submit:hover:not(:disabled) { transform: none; background: var(--primary); }
   }

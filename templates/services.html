@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}Services — {{
+﻿{% extends "base.html" %} {% block title %}Services — {{
 cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
 <style>
   /* ══════════════════════════════════════════════════════════════════════════
@@ -26,7 +26,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     height: clamp(260px, 45vw, 600px);
     background: radial-gradient(
       circle,
-      rgba(232, 255, 0, 0.06) 0%,
+      rgba(var(--primary-rgb), 0.06) 0%,
       transparent 70%
     );
     pointer-events: none;
@@ -41,7 +41,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     height: clamp(200px, 36vw, 450px);
     background: radial-gradient(
       circle,
-      rgba(232, 255, 0, 0.04) 0%,
+      rgba(var(--primary-rgb), 0.04) 0%,
       transparent 70%
     );
     pointer-events: none;
@@ -198,7 +198,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     inset: 0;
     background: radial-gradient(
       circle at 50% 0%,
-      rgba(232, 255, 0, 0.04) 0%,
+      rgba(var(--primary-rgb), 0.04) 0%,
       transparent 60%
     );
     opacity: 0;
@@ -207,7 +207,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
   }
 
   .pricing-card:hover {
-    border-color: rgba(232, 255, 0, 0.35);
+    border-color: rgba(var(--primary-rgb), 0.35);
     transform: translateY(-6px);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   }
@@ -220,9 +220,9 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     border-color: var(--primary);
     box-shadow:
       0 0 0 1px var(--primary),
-      0 20px 60px rgba(232, 255, 0, 0.12);
+      0 20px 60px rgba(var(--primary-rgb), 0.12);
     background:
-      linear-gradient(180deg, rgba(232, 255, 0, 0.05) 0%, transparent 40%),
+      linear-gradient(180deg, rgba(var(--primary-rgb), 0.05) 0%, transparent 40%),
       var(--card);
   }
 
@@ -230,7 +230,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     transform: translateY(-8px) scale(1.01);
     box-shadow:
       0 0 0 1px var(--primary),
-      0 28px 70px rgba(232, 255, 0, 0.2);
+      0 28px 70px rgba(var(--primary-rgb), 0.2);
   }
 
   /* ── FEATURED BADGE ────────────────────────────────────────────────────── */
@@ -248,7 +248,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     white-space: nowrap;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    box-shadow: 0 8px 24px rgba(232, 255, 0, 0.35);
+    box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.35);
     z-index: 2;
     max-width: calc(100% - 1rem);
     overflow: hidden;
@@ -260,7 +260,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     position: absolute;
     inset: -3px;
     border-radius: inherit;
-    border: 1px solid rgba(232, 255, 0, 0.4);
+    border: 1px solid rgba(var(--primary-rgb), 0.4);
     animation: svc-badge-ring 2.5s ease-out infinite;
     pointer-events: none;
   }
@@ -287,8 +287,8 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     width: clamp(44px, 10vw, 52px);
     height: clamp(44px, 10vw, 52px);
     border-radius: 14px;
-    background: rgba(232, 255, 0, 0.08);
-    border: 1px solid rgba(232, 255, 0, 0.18);
+    background: rgba(var(--primary-rgb), 0.08);
+    border: 1px solid rgba(var(--primary-rgb), 0.18);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -477,13 +477,13 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
   }
 
   .faq-item:hover {
-    border-color: rgba(232, 255, 0, 0.2);
+    border-color: rgba(var(--primary-rgb), 0.2);
   }
 
   .faq-item.open {
-    border-color: rgba(232, 255, 0, 0.4);
+    border-color: rgba(var(--primary-rgb), 0.4);
     background:
-      linear-gradient(180deg, rgba(232, 255, 0, 0.03) 0%, transparent 50%),
+      linear-gradient(180deg, rgba(var(--primary-rgb), 0.03) 0%, transparent 50%),
       var(--card);
   }
 
@@ -703,7 +703,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
       transform: none;
       box-shadow:
         0 0 0 1px var(--primary),
-        0 12px 40px rgba(232, 255, 0, 0.1);
+        0 12px 40px rgba(var(--primary-rgb), 0.1);
     }
 
     .pricing-card.featured:hover {
@@ -951,7 +951,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     .pricing-card.featured {
       box-shadow:
         0 0 0 1px var(--primary),
-        0 8px 24px rgba(232, 255, 0, 0.08);
+        0 8px 24px rgba(var(--primary-rgb), 0.08);
     }
 
     .pricing-badge {
@@ -1286,12 +1286,12 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
       transform: none;
       box-shadow:
         0 0 0 1px var(--primary),
-        0 12px 40px rgba(232, 255, 0, 0.12);
+        0 12px 40px rgba(var(--primary-rgb), 0.12);
     }
 
     .pricing-card:hover .pricing-icon {
-      background: rgba(232, 255, 0, 0.08);
-      border-color: rgba(232, 255, 0, 0.18);
+      background: rgba(var(--primary-rgb), 0.08);
+      border-color: rgba(var(--primary-rgb), 0.18);
       transform: none;
     }
 
