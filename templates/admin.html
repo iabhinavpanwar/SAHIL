@@ -46,8 +46,9 @@
 
       :root {
         --primary: #e8ff00;
+        --primary-rgb: 232, 255, 0;
         --primary-dark: #c8df00;
-        --primary-glow: rgba(232, 255, 0, 0.15);
+        --primary-glow: rgba(var(--primary-rgb), 0.15);
         --bg: #0a0a0a;
         --bg2: #111111;
         --bg3: #1a1a1a;
@@ -192,12 +193,12 @@
       .btn-primary {
         background: var(--primary);
         color: #000;
-        box-shadow: 0 4px 20px rgba(232, 255, 0, 0.2);
+        box-shadow: 0 4px 20px rgba(var(--primary-rgb), 0.2);
       }
       .btn-primary:hover {
         background: var(--primary-dark);
         transform: translateY(-2px);
-        box-shadow: 0 8px 30px rgba(232, 255, 0, 0.35);
+        box-shadow: 0 8px 30px rgba(var(--primary-rgb), 0.35);
       }
 
       .btn-outline {
@@ -331,7 +332,7 @@
       }
 
       .sidebar-btn.active {
-        background: rgba(232, 255, 0, 0.08);
+        background: rgba(var(--primary-rgb), 0.08);
         color: var(--primary);
         font-weight: 600;
       }
@@ -346,6 +347,7 @@
         background: var(--primary);
         border-radius: 0 3px 3px 0;
       }
+
 
       .sidebar-btn i {
         width: 18px;
@@ -524,7 +526,7 @@
         inset: 0;
         background: linear-gradient(
           135deg,
-          rgba(232, 255, 0, 0.03) 0%,
+          rgba(var(--primary-rgb), 0.03) 0%,
           transparent 60%
         );
         opacity: 0;
@@ -536,7 +538,7 @@
       }
 
       .dash-stat:hover {
-        border-color: rgba(232, 255, 0, 0.3);
+        border-color: rgba(var(--primary-rgb), 0.3);
         transform: translateY(-3px);
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
       }
@@ -602,7 +604,7 @@
       }
 
       .form-section:hover {
-        border-color: rgba(232, 255, 0, 0.15);
+        border-color: rgba(var(--primary-rgb), 0.15);
       }
 
       .form-section h4 {
@@ -670,7 +672,7 @@
       .form-group select:focus {
         outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(232, 255, 0, 0.1);
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
       }
 
       .form-group select option {
@@ -712,7 +714,7 @@
       }
 
       .item-row:hover {
-        border-color: rgba(232, 255, 0, 0.2);
+        border-color: rgba(var(--primary-rgb), 0.2);
         transform: translateX(4px);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       }
@@ -1003,7 +1005,7 @@
       }
 
       .pipeline-col:hover {
-        border-color: rgba(232, 255, 0, 0.15);
+        border-color: rgba(var(--primary-rgb), 0.15);
       }
 
       .pipeline-col-h {
@@ -1048,14 +1050,14 @@
       }
 
       .lead-card:hover {
-        border-color: rgba(232, 255, 0, 0.2);
+        border-color: rgba(var(--primary-rgb), 0.2);
         transform: translateY(-2px);
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
       }
 
       .lead-card.unread {
         border-color: var(--primary);
-        box-shadow: 0 0 0 1px rgba(232, 255, 0, 0.15);
+        box-shadow: 0 0 0 1px rgba(var(--primary-rgb), 0.15);
       }
 
       .lead-card strong {
@@ -1114,7 +1116,7 @@
       }
 
       .mm-svg-wrap:hover {
-        border-color: rgba(232, 255, 0, 0.15);
+        border-color: rgba(var(--primary-rgb), 0.15);
       }
 
       .mm-svg-wrap p {
@@ -1140,17 +1142,17 @@
       }
 
       [data-muscle]:hover {
-        color: rgba(232, 255, 0, 0.5) !important;
-        filter: drop-shadow(0 0 8px rgba(232, 255, 0, 0.5));
+        color: rgba(var(--primary-rgb), 0.5) !important;
+        filter: drop-shadow(0 0 8px rgba(var(--primary-rgb), 0.5));
       }
 
       [data-muscle].mm-assigned {
-        color: rgba(232, 255, 0, 0.3) !important;
+        color: rgba(var(--primary-rgb), 0.3) !important;
       }
 
       [data-muscle].mm-selected {
-        color: rgba(232, 255, 0, 0.7) !important;
-        filter: drop-shadow(0 0 10px rgba(232, 255, 0, 0.8));
+        color: rgba(var(--primary-rgb), 0.7) !important;
+        filter: drop-shadow(0 0 10px rgba(var(--primary-rgb), 0.8));
       }
 
       .mm-svg-wrap svg g:not([data-muscle]) {
@@ -1180,7 +1182,7 @@
       /* ── TODAY'S VIEW ─────────────────────────────────────────────────────── */
       .today-view {
         background: var(--card);
-        border: 1px solid rgba(232, 255, 0, 0.2);
+        border: 1px solid rgba(var(--primary-rgb), 0.2);
         border-radius: var(--radius);
         padding: clamp(0.9rem, 2.4vw, 1.5rem) clamp(0.95rem, 2.6vw, 1.75rem);
         margin-bottom: clamp(1.1rem, 2.8vw, 1.75rem);
@@ -1249,7 +1251,7 @@
       }
 
       .today-item:hover {
-        border-color: rgba(232, 255, 0, 0.2);
+        border-color: rgba(var(--primary-rgb), 0.2);
         transform: translateX(3px);
       }
 
@@ -1370,7 +1372,7 @@
 
       /* ── SELECTION ────────────────────────────────────────────────────────── */
       ::selection {
-        background: rgba(232, 255, 0, 0.25);
+        background: rgba(var(--primary-rgb), 0.25);
         color: var(--text);
       }
 
@@ -2213,7 +2215,7 @@
         }
 
         .sidebar-btn.active:hover {
-          background: rgba(232, 255, 0, 0.08);
+          background: rgba(var(--primary-rgb), 0.08);
           color: var(--primary);
         }
 
@@ -4682,7 +4684,7 @@
       .theme-color-picker:hover,
       .theme-color-picker:focus-visible {
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(232, 255, 0, 0.12);
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.12);
         outline: none;
       }
 
@@ -4703,7 +4705,7 @@
       .theme-color-hex:focus {
         outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(232, 255, 0, 0.1);
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
       }
 
       .theme-color-preview-row {
@@ -4844,6 +4846,10 @@
             const data = await res.json().catch(() => ({}));
             if (res.ok) {
               document.documentElement.style.setProperty("--primary", hex);
+              const [r, g, b] = hex.slice(1).match(/.{2}/g).map(h => parseInt(h, 16));
+              document.documentElement.style.setProperty("--primary-rgb", `${r}, ${g}, ${b}`);
+              const dark = `#${[r,g,b].map(v => Math.max(0,v-32).toString(16).padStart(2,'0')).join('')}`;
+              document.documentElement.style.setProperty("--primary-dark", dark);
               if (statusEl) {
                 statusEl.textContent = "✓ Saved";
                 statusEl.className = "theme-color-status saved";
