@@ -3,6 +3,7 @@
 
 {% block head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <style>
 /* ══════════════════════════════════════════════════════════════════════════
    CLIENT PORTAL — FULLY RESPONSIVE STYLESHEET
@@ -2607,6 +2608,56 @@
 @media (max-width: 900px) { #ptab-musclemap #mmBody { grid-template-columns: 1fr 1fr; } #ptab-musclemap #mmPanel { grid-column: 1 / -1; } }
 @media (max-width: 560px) { #ptab-musclemap #mmBody { grid-template-columns: 1fr; } }
 
+/* ── WORKOUT SESSION OVERLAY ─────────────────────────────────────────── */
+.ws-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: fade-up 0.25s ease;
+}
+.ws-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-wrap: wrap;
+}
+.ws-header h3 { flex: 1; font-size: 1rem; margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-progress-bar { height: 4px; background: var(--bg3); }
+.ws-progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+.ws-body { flex: 1; padding: 1.5rem 1.25rem; max-width: 600px; margin: 0 auto; width: 100%; }
+.ws-ex-name { font-size: 1.4rem; font-weight: 800; color: var(--text); margin-bottom: 0.25rem; }
+.ws-ex-meta { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--text2); margin-bottom: 1.5rem; }
+.ws-ex-meta span { background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 0.25rem 0.75rem; }
+.ws-set-indicator { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.ws-set-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: var(--text3); transition: all 0.2s; }
+.ws-set-dot.done { background: var(--primary); border-color: var(--primary); color: #000; }
+.ws-set-dot.current { border-color: var(--primary); color: var(--primary); box-shadow: 0 0 0 3px rgba(232,255,0,0.2); }
+.ws-timer-ring { position: relative; width: 160px; height: 160px; margin: 0 auto 1.5rem; }
+.ws-timer-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ws-timer-ring .ws-ring-bg { fill: none; stroke: var(--bg3); stroke-width: 8; }
+.ws-timer-ring .ws-ring-fill { fill: none; stroke: var(--primary); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.ws-timer-ring .ws-ring-fill.rest { stroke: #4fc3f7; }
+.ws-timer-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ws-timer-text .ws-t-num { font-size: 2.2rem; font-weight: 900; color: var(--primary); font-variant-numeric: tabular-nums; line-height: 1; }
+.ws-timer-text .ws-t-label { font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem; }
+.ws-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.ws-next-info { text-align: center; font-size: 0.82rem; color: var(--text3); padding: 0.75rem; background: var(--bg2); border-radius: var(--portal-radius-sm); border: 1px solid var(--border); }
+@media (max-width: 480px) {
+  .ws-timer-ring { width: 130px; height: 130px; }
+  .ws-timer-text .ws-t-num { font-size: 1.8rem; }
+  .ws-ex-name { font-size: 1.15rem; }
+}
+
 /* ── Print ────────────────────────────────────────────────────────────── */
 @media print {
   .portal-sidebar,
@@ -3277,6 +3328,19 @@
     </div>
 
   </main>
+</div>
+
+<!-- WORKOUT SESSION OVERLAY -->
+<div id="wsOverlay" class="ws-overlay" style="display:none" role="dialog" aria-modal="true" aria-label="Workout Session">
+  <div class="ws-header">
+    <button onclick="wsClose()" style="color:var(--text2);font-size:1.1rem;padding:0.3rem" title="Exit session"><i class="fas fa-times"></i></button>
+    <h3 id="wsTitle">Workout Session</h3>
+    <span id="wsExCounter" style="font-size:0.8rem;color:var(--text3);white-space:nowrap"></span>
+  </div>
+  <div class="ws-progress-bar"><div class="ws-progress-fill" id="wsProgressFill" style="width:0%"></div></div>
+  <div class="ws-body">
+    <div id="wsPhase"></div>
+  </div>
 </div>
 {% endblock %}
 
@@ -3967,6 +4031,7 @@ function clearChatImg() {
 // ── WORKOUTS ─────────────────────────────────────────────────────────────────
 async function loadWorkout() {
   const { data } = await api('/api/client/program');
+  _wsCurrentProgram = data || null;
   const el = document.getElementById('workoutContent');
   if (!data || !data.name) { el.innerHTML = '<p class="empty-state">No workout program assigned yet. Your trainer will assign one soon.</p>'; return; }
   el.innerHTML = `
@@ -3983,7 +4048,10 @@ async function loadWorkout() {
       <div class="form-section" style="margin-bottom:1rem">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
           <h4 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--primary);margin:0">${esc(day.day_label)}</h4>
-          <button class="btn btn-sm btn-outline" onclick="logWorkoutDay('${data._id}','${esc(day.day_label)}',this)" style="font-size:0.78rem"><i class="fas fa-check"></i> Mark Complete</button>
+          <div style="display:flex;gap:0.5rem">
+            <button class="btn btn-sm btn-primary" onclick="startWorkoutSession(${dayIdx})" style="font-size:0.78rem"><i class="fas fa-play"></i> Start</button>
+            <button class="btn btn-sm btn-outline" onclick="logWorkoutDay('${data._id}','${esc(day.day_label)}',this)" style="font-size:0.78rem"><i class="fas fa-check"></i> Done</button>
+          </div>
         </div>
         ${(day.exercises||[]).map(ex => `
           <div style="display:flex;gap:1rem;align-items:flex-start;padding:0.75rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
@@ -4691,5 +4759,219 @@ loadOverview(); calInit();
 refreshUnreadBadge();
 loadMoodAndTip();
 subscribePush();
+
+// -- WORKOUT SESSION ----------------------------------------------------------
+let _ws = null;
+let _wsTimer = null;
+let _wsCurrentProgram = null;
+const WS_KEY = 'ws_session';
+
+function _wsSave() {
+  if (!_ws) return;
+  localStorage.setItem(WS_KEY, JSON.stringify({
+    programId: _ws.programId, dayIdx: _ws.dayIdx,
+    exIdx: _ws.exIdx, setIdx: _ws.setIdx, phase: _ws.phase,
+  }));
+}
+
+function _wsRestore(programData) {
+  try {
+    const s = JSON.parse(localStorage.getItem(WS_KEY) || 'null');
+    return (s && s.programId === programData._id) ? s : null;
+  } catch { return null; }
+}
+
+function _wsClear() { localStorage.removeItem(WS_KEY); }
+
+function _wsParseRest(r) {
+  if (!r) return 60;
+  const n = parseInt(r); if (!isNaN(n) && n > 0) return n;
+  const m = String(r).match(/(\d+)\s*min/i); if (m) return parseInt(m[1]) * 60;
+  const s = String(r).match(/(\d+)\s*s/i); if (s) return parseInt(s[1]);
+  const c = String(r).match(/(\d+):(\d+)/); if (c) return parseInt(c[1])*60+parseInt(c[2]);
+  return 60;
+}
+
+function startWorkoutSession(dayIdx) {
+  const data = _wsCurrentProgram;
+  if (!data) return;
+  const saved = _wsRestore(data);
+  if (saved && saved.dayIdx === dayIdx) {
+    if (confirm('Resume your previous session?')) {
+      _ws = { programId: data._id, program: data, dayIdx, exIdx: saved.exIdx, setIdx: saved.setIdx, phase: saved.phase };
+      _wsShowOverlay(); _wsRender(); return;
+    }
+    _wsClear();
+  }
+  _ws = { programId: data._id, program: data, dayIdx, exIdx: 0, setIdx: 0, phase: 'work' };
+  _wsSave(); _wsShowOverlay(); _wsRender();
+}
+
+function _wsShowOverlay() {
+  document.getElementById('wsOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function wsClose() {
+  if (_ws && !confirm('Exit session? Progress is saved.')) return;
+  clearInterval(_wsTimer); _wsTimer = null;
+  document.getElementById('wsOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function _wsCurrentEx() {
+  const day = _ws.program.days[_ws.dayIdx];
+  return day ? (day.exercises || [])[_ws.exIdx] : null;
+}
+
+function _wsTotalEx() {
+  const day = _ws.program.days[_ws.dayIdx];
+  return day ? (day.exercises || []).length : 0;
+}
+
+function _wsNextLabel() {
+  const ex = _wsCurrentEx(); if (!ex) return '';
+  const sets = parseInt(ex.sets) || 1;
+  if (_ws.setIdx + 1 < sets) return 'Set ' + (_ws.setIdx + 2) + ' of ' + sets + ' \u2014 ' + esc(ex.exercise_name);
+  const nextEx = (_ws.program.days[_ws.dayIdx].exercises || [])[_ws.exIdx + 1];
+  return nextEx ? esc(nextEx.exercise_name) : 'Finish workout \ud83c\udf89';
+}
+
+function _wsRender() {
+  const day = _ws.program.days[_ws.dayIdx];
+  const ex = _wsCurrentEx();
+  const totalEx = _wsTotalEx();
+  const sets = parseInt((ex && ex.sets)) || 1;
+  const pct = totalEx ? ((_ws.exIdx + (_ws.setIdx / Math.max(1, sets))) / totalEx * 100) : 0;
+  document.getElementById('wsTitle').textContent = day ? day.day_label : 'Workout';
+  document.getElementById('wsExCounter').textContent = 'Exercise ' + (_ws.exIdx + 1) + ' / ' + totalEx;
+  document.getElementById('wsProgressFill').style.width = Math.min(100, pct) + '%';
+  if (!ex) { _wsFinish(); return; }
+  if (_ws.phase === 'rest') {
+    _wsRenderRest(_wsParseRest(ex.rest), ex, sets);
+  } else {
+    _wsRenderWork(ex, sets);
+  }
+  _wsSave();
+}
+
+function _wsRenderWork(ex, sets) {
+  clearInterval(_wsTimer); _wsTimer = null;
+  const dots = Array.from({length: sets}, (_, i) => {
+    const cls = i < _ws.setIdx ? 'done' : i === _ws.setIdx ? 'current' : '';
+    return '<div class="ws-set-dot ' + cls + '">' + (i+1) + '</div>';
+  }).join('');
+  const meta = [];
+  if (ex.sets) meta.push('<span>\ud83d\udd01 ' + esc(ex.sets) + ' sets</span>');
+  if (ex.reps) meta.push('<span>\ud83d\udd04 ' + esc(ex.reps) + ' reps</span>');
+  if (ex.weight) meta.push('<span>\u2696\ufe0f ' + esc(ex.weight) + '</span>');
+  if (ex.rest) meta.push('<span>\u23f1\ufe0f Rest: ' + esc(ex.rest) + '</span>');
+  const nextLabel = _wsNextLabel();
+  document.getElementById('wsPhase').innerHTML =
+    '<div class="ws-ex-name">' + esc(ex.exercise_name) + '</div>' +
+    '<div class="ws-ex-meta">' + meta.join('') + '</div>' +
+    '<div class="ws-set-indicator">' + dots + '</div>' +
+    '<div style="text-align:center;margin-bottom:1.5rem">' +
+      '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:0.5rem">Set ' + (_ws.setIdx+1) + ' of ' + sets + '</div>' +
+      '<div style="font-size:3rem;font-weight:900;color:var(--primary)">\ud83d\udcaa</div>' +
+      '<div style="font-size:1rem;color:var(--text2);margin-top:0.5rem">' + (ex.reps ? 'Do ' + esc(ex.reps) + ' reps' : 'Perform the exercise') + '</div>' +
+    '</div>' +
+    (ex.notes ? '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--portal-radius-sm);padding:0.75rem 1rem;font-size:0.85rem;color:var(--text2);margin-bottom:1.5rem">\ud83d\udcdd ' + esc(ex.notes) + '</div>' : '') +
+    (ex.video_embed ? '<div class="ex-demo" style="margin-bottom:1.5rem"><iframe src="' + esc(ex.video_embed) + '" title="' + esc(ex.exercise_name) + ' demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>' : '') +
+    '<div class="ws-actions">' +
+      '<button class="btn btn-primary" onclick="_wsDoneSet()" style="min-width:140px"><i class="fas fa-check"></i> Set Done</button>' +
+      '<button class="btn btn-outline" onclick="_wsSkipEx()">Skip Exercise</button>' +
+    '</div>' +
+    (nextLabel ? '<div class="ws-next-info">\u23ed\ufe0f Next: ' + nextLabel + '</div>' : '');
+}
+
+function _wsRenderRest(totalSecs, ex, sets) {
+  clearInterval(_wsTimer); _wsTimer = null;
+  let remaining = totalSecs;
+  const C = 2 * Math.PI * 54;
+  const nextLabel = _wsNextLabel();
+  const buildHtml = () =>
+    '<div style="text-align:center;margin-bottom:0.5rem;font-size:0.85rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em">Rest after set ' + _ws.setIdx + ' of ' + sets + '</div>' +
+    '<div class="ws-timer-ring">' +
+      '<svg viewBox="0 0 120 120">' +
+        '<circle class="ws-ring-bg" cx="60" cy="60" r="54"/>' +
+        '<circle class="ws-ring-fill rest" id="wsRingFill" cx="60" cy="60" r="54" stroke-dasharray="' + C + '" stroke-dashoffset="' + (C*(1-remaining/totalSecs)) + '"/>' +
+      '</svg>' +
+      '<div class="ws-timer-text">' +
+        '<div class="ws-t-num" id="wsRestNum" style="color:#4fc3f7">' + Math.floor(remaining/60) + ':' + String(remaining%60).padStart(2,'0') + '</div>' +
+        '<div class="ws-t-label">rest</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ws-actions"><button class="btn btn-primary" onclick="_wsSkipRest()" style="min-width:140px">Skip Rest \u23e9</button></div>' +
+    (nextLabel ? '<div class="ws-next-info">\u23ed\ufe0f Next: ' + nextLabel + '</div>' : '');
+  document.getElementById('wsPhase').innerHTML = buildHtml();
+  _wsTimer = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(_wsTimer); _wsTimer = null;
+      if ('vibrate' in navigator) navigator.vibrate([150,80,150]);
+      _wsAfterRest();
+    } else {
+      const numEl = document.getElementById('wsRestNum');
+      const ringEl = document.getElementById('wsRingFill');
+      if (numEl) numEl.textContent = Math.floor(remaining/60) + ':' + String(remaining%60).padStart(2,'0');
+      if (ringEl) ringEl.setAttribute('stroke-dashoffset', C*(1-remaining/totalSecs));
+    }
+  }, 1000);
+}
+
+function _wsDoneSet() {
+  const ex = _wsCurrentEx();
+  const sets = parseInt((ex && ex.sets)) || 1;
+  const restSecs = _wsParseRest(ex && ex.rest);
+  _ws.setIdx++;
+  if (_ws.setIdx >= sets) {
+    _ws.exIdx++; _ws.setIdx = 0; _ws.phase = 'work'; _wsSave();
+    if (!_wsCurrentEx()) { _wsFinish(); return; }
+    if (restSecs > 0) { _ws.phase = 'rest'; _wsSave(); _wsRenderRest(restSecs, ex, sets); }
+    else _wsRender();
+  } else {
+    if (restSecs > 0) { _ws.phase = 'rest'; _wsSave(); _wsRenderRest(restSecs, ex, sets); }
+    else { _ws.phase = 'work'; _wsRender(); }
+  }
+}
+
+function _wsSkipRest() { clearInterval(_wsTimer); _wsTimer = null; _wsAfterRest(); }
+function _wsAfterRest() { _ws.phase = 'work'; _wsRender(); }
+
+function _wsSkipEx() {
+  clearInterval(_wsTimer); _wsTimer = null;
+  _ws.exIdx++; _ws.setIdx = 0; _ws.phase = 'work'; _wsSave();
+  if (!_wsCurrentEx()) { _wsFinish(); return; }
+  _wsRender();
+}
+
+function _wsFinish() {
+  clearInterval(_wsTimer); _wsTimer = null; _wsClear();
+  document.getElementById('wsProgressFill').style.width = '100%';
+  const day = _ws.program.days[_ws.dayIdx];
+  document.getElementById('wsPhase').innerHTML =
+    '<div style="text-align:center;padding:2rem 1rem">' +
+      '<div style="font-size:3.5rem;margin-bottom:1rem">\ud83c\udf89</div>' +
+      '<h2 style="font-size:1.5rem;margin-bottom:0.5rem">Workout Complete!</h2>' +
+      '<p style="color:var(--text2);margin-bottom:2rem">' + (day ? esc(day.day_label) : '') + ' done. Great work!</p>' +
+      '<div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">' +
+        '<button class="btn btn-primary" onclick="_wsMarkAndClose()"><i class="fas fa-check"></i> Mark Complete & Exit</button>' +
+        '<button class="btn btn-outline" onclick="wsClose()">Exit</button>' +
+      '</div>' +
+    '</div>';
+}
+
+async function _wsMarkAndClose() {
+  const day = _ws.program.days[_ws.dayIdx];
+  if (day) {
+    const today = new Date().toISOString().slice(0,10);
+    await api('/api/client/workout_log', 'POST', { program_id: _ws.programId, day_label: day.day_label, date: today });
+  }
+  document.getElementById('wsOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+  loadWorkout();
+}
+
 </script>
 {% endblock %}
