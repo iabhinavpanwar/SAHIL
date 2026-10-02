@@ -1,4 +1,4 @@
-﻿from flask import Flask, request, jsonify, session, redirect, url_for, render_template, Response
+from flask import Flask, request, jsonify, session, redirect, url_for, render_template, Response
 from functools import wraps
 from dotenv import load_dotenv
 load_dotenv()
@@ -10,8 +10,7 @@ from werkzeug.exceptions import HTTPException
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from PIL import Image
-from email.message import EmailMessage
-import bleach, atexit, os, logging, secrets, re, io, hashlib, smtplib, json
+import bleach, atexit, os, logging, secrets, re, io, hashlib, json
 
 app = Flask(__name__)
 
@@ -172,47 +171,6 @@ def _send_whatsapp(message):
         logger.warning('WhatsApp notify failed: %s', e)
         return False
 
-def _send_email(to_addr, subject, body):
-    import ssl
-    host = (os.environ.get('MAIL_SERVER') or '').strip()
-    if not host or not to_addr:
-        logger.warning('Email skipped: MAIL_SERVER or to_addr missing (to=%s)', to_addr)
-        return False
-    try:
-        port = int(os.environ.get('MAIL_PORT', '587'))
-    except ValueError:
-        port = 587
-    user = os.environ.get('MAIL_USERNAME', '')
-    password = os.environ.get('MAIL_PASSWORD', '')
-    from_addr = os.environ.get('MAIL_FROM', user or 'noreply@localhost')
-    use_tls = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
-    use_ssl = os.environ.get('MAIL_USE_SSL', 'false').lower() == 'true'
-    msg = EmailMessage()
-    msg['Subject'] = subject
-    msg['From'] = from_addr
-    msg['To'] = to_addr
-    msg.set_content(body)
-    try:
-        if use_ssl:
-            ctx = ssl.create_default_context()
-            with smtplib.SMTP_SSL(host, port, timeout=15, context=ctx) as smtp:
-                if user:
-                    smtp.login(user, password)
-                smtp.send_message(msg)
-        else:
-            with smtplib.SMTP(host, port, timeout=15) as smtp:
-                smtp.ehlo()
-                if use_tls:
-                    smtp.starttls()
-                    smtp.ehlo()
-                if user:
-                    smtp.login(user, password)
-                smtp.send_message(msg)
-        logger.info('Email sent to %s: %s', to_addr, subject)
-        return True
-    except Exception as e:
-        logger.error('Email send failed to %s: %s', to_addr, e)
-        return False
 
 def _issue_reset_token(user):
     token = secrets.token_urlsafe(32)
@@ -383,8 +341,8 @@ except Exception as e:
 atexit.register(lambda: mongo_client.close() if mongo_client else None)
 
 def _send_session_reminders():
-    """Send email reminders for sessions starting in ~24 hours."""
-    if sessions_col is None or users_col is None:
+    """Send push reminders for sessions starting in ~24 hours."""
+    if sessions_col is None:
         return
     window_start = datetime.now(timezone.utc) + timedelta(hours=23)
     window_end   = datetime.now(timezone.utc) + timedelta(hours=25)
@@ -394,24 +352,15 @@ def _send_session_reminders():
         'reminder_sent': {'$ne': True},
     })
     for sess in upcoming:
-        user = users_col.find_one({'_id': safe_oid(sess.get('client_id', ''))}, {'email': 1, 'name': 1})
-        if not user or not user.get('email'):
+        client_id = sess.get('client_id')
+        if not client_id:
             continue
         dt_ist = to_ist(sess.get('datetime'))
-        sent = _send_email(
-            user['email'],
-            'Reminder: Your training session tomorrow',
-            f"Hi {user.get('name', 'there')},\n\n"
-            f"This is a reminder that your {sess.get('session_type','session')} is scheduled for:\n"
-            f"{dt_ist}\n\n"
-            f"{('Notes: ' + sess['notes']) if sess.get('notes') else ''}\n\n"
-            "See you soon!\n� Sahil Panwar"
-        )
-        if sent:
-            sessions_col.update_one({'_id': sess['_id']}, {'$set': {'reminder_sent': True}})
-            logger.info('Reminder sent to %s for session %s', user['email'], sess['_id'])
-        else:
-            logger.warning('Reminder skipped for session %s (email not configured or send failed)', sess['_id'])
+        _push_notify(str(client_id), '\u23f0 Session Tomorrow',
+                     f'{sess.get("session_type", "Session")} at {dt_ist}',
+                     '/client/dashboard', 'reminder')
+        sessions_col.update_one({'_id': sess['_id']}, {'$set': {'reminder_sent': True}})
+        logger.info('Push reminder sent for session %s', sess['_id'])
 
 # Only start scheduler in the main process (not in gunicorn worker forks)
 if _scheduler_available and _scheduler is not None and os.environ.get('SERVER_SOFTWARE', '').startswith('gunicorn') is False:
@@ -696,13 +645,6 @@ def register():
                 'joined':   datetime.now(timezone.utc),
             })
             _send_whatsapp(f"New client registered: {name} ({email})")
-            _send_email(
-                email,
-                'Welcome to Sahil Panwar!',
-                f'Hi {name},\n\nWelcome aboard! Your client account has been created.\n\n'
-                f'Login here: {url_for("client_login", _external=True)}\n\n'
-                'Your trainer will be in touch soon.\n\u2014 Sahil Panwar'
-            )
             return redirect(url_for('client_login', registered='1'))
     return render_template('register.html', error=error)
 
@@ -726,37 +668,11 @@ def client_login():
     reset_ok = request.args.get('reset')
     return render_template('client_login.html', error=error, registered=registered, reset_ok=reset_ok)
 
-@app.route('/api/_debug_email')
-def debug_email():
-    """Temporary: test SMTP login end-to-end."""
-    import smtplib, os
-    host = os.environ.get('MAIL_SERVER', '')
-    port = int(os.environ.get('MAIL_PORT', '587'))
-    user = os.environ.get('MAIL_USERNAME', '')
-    pw   = os.environ.get('MAIL_PASSWORD', '')
-    result = {
-        'MAIL_SERVER': host,
-        'MAIL_PORT': port,
-        'MAIL_USE_TLS': os.environ.get('MAIL_USE_TLS', 'true'),
-        'MAIL_USERNAME_set': bool(user),
-        'MAIL_PASSWORD_set': bool(pw),
-        'MAIL_PASSWORD_len': len(pw),
-    }
-    try:
-        with smtplib.SMTP(host, port, timeout=12) as s:
-            s.ehlo()
-            s.starttls()
-            s.ehlo()
-            s.login(user, pw)
-        result['login'] = 'SUCCESS'
-    except Exception as e:
-        result['login'] = f'FAILED: {type(e).__name__}: {e}'
-    return result
-
 @app.route('/client/forgot-password', methods=['GET', 'POST'])
 @limiter.limit('5 per hour')
 def forgot_password():
     sent = False
+    reset_link = None
     if request.method == 'POST':
         email = s(request.form.get('email', '').strip().lower(), 200)
         sent = True
@@ -764,15 +680,8 @@ def forgot_password():
             user = users_col.find_one({'email': email, 'role': 'client', 'active': True})
             if user:
                 token = _issue_reset_token(user)
-                link = _reset_url(token)
-                _send_email(
-                    user['email'],
-                    'Reset your training portal password',
-                    f'Hi {user.get("name", "there")},\n\n'
-                    f'Use this link to reset your password (valid for 1 hour):\n{link}\n\n'
-                    'If you did not request this, you can ignore this email.\n'
-                )
-    return render_template('forgot_password.html', sent=sent)
+                reset_link = _reset_url(token)
+    return render_template('forgot_password.html', sent=sent, reset_link=reset_link)
 
 @app.route('/client/reset-password/<token>', methods=['GET', 'POST'])
 @limiter.limit('10 per hour')
@@ -869,7 +778,6 @@ def newsletter_signup():
         + (f'{pdf_url}\n\n' if pdf_url else '')
         + f'Stay consistent and keep pushing!\n\u2014 {trainer}'
     )
-    _send_email(email, f'Your {title} — {trainer}', body)
     return jsonify({'status': 'subscribed'})
 
 @app.route('/api/testimonials')
@@ -1529,16 +1437,8 @@ def admin_checkin_feedback(cid):
     feedback = s((request.json or {}).get('feedback', ''), 1000)
     checkins_col.update_one({'_id': oid}, {'$set': {'feedback': feedback, 'reviewed': True}})
     checkin_doc = checkins_col.find_one({'_id': oid}) if checkins_col is not None else None
-    if checkin_doc and feedback and users_col is not None:
-        fb_client = users_col.find_one({'_id': safe_oid(checkin_doc.get('client_id', ''))}, {'email': 1, 'name': 1})
-        if fb_client and fb_client.get('email'):
-            _send_email(
-                fb_client['email'],
-                'Your trainer left feedback on your check-in',
-                f'Hi {fb_client.get("name", "there")},\n\n'
-                f'Your trainer reviewed your check-in and left feedback:\n\n"{feedback}"\n\n'
-                f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
-            )
+    if checkin_doc and feedback:
+        _push_notify(checkin_doc.get('client_id', ''), '\U0001f4ac Trainer Feedback', feedback[:80], '/client/dashboard', 'feedback')
     return jsonify({'status': 'ok'})
 
 @app.route('/api/admin/checkins/<cid>', methods=['DELETE'])
@@ -1680,14 +1580,8 @@ def admin_reply_message(client_id):
         'read_by_trainer': True,
         'read_by_client':  False,
     })
-    if client and client.get('email') and text:
-        _send_email(
-            client['email'],
-            'New message from your trainer \u2014 Sahil Panwar',
-            f'Hi {client.get("name", "there")},\n\n'
-            f'Your trainer sent you a message:\n\n"{text[:300]}"\n\n'
-            f'Login to reply: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
-        )
+    if text:
+        _push_notify(client_id, '\U0001f4ac New Message', text[:80], '/client/dashboard', 'message')
     return jsonify({'status': 'sent', '_id': str(result.inserted_id)})
 
 @app.route('/api/client/messages/<mid>', methods=['DELETE'])
@@ -1929,15 +1823,7 @@ def admin_assign_program(pid):
         {'_id': safe_oid(client_id)},
         {'$set': {'assigned_program_id': str(oid), 'assigned_program_name': program['name']}}
     )
-    prog_client = users_col.find_one({'_id': safe_oid(client_id)}, {'email': 1, 'name': 1})
-    if prog_client and prog_client.get('email'):
-        _send_email(
-            prog_client['email'],
-            'New workout program assigned \u2014 Sahil Panwar',
-            f'Hi {prog_client.get("name", "there")},\n\n'
-            f'Your trainer assigned you a new workout program: "{program["name"]}"\n\n'
-            f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
-        )
+    _push_notify(client_id, '\U0001f4aa New Workout Program', f'Your trainer assigned: {program["name"]}', '/client/dashboard', 'program')
     return jsonify({'status': 'assigned'})
 
 # ── CLIENT API — WORKOUT PROGRAM ──────────────────────────────────────────────
@@ -2085,15 +1971,7 @@ def admin_assign_meal_plan(pid):
         {'_id': safe_oid(client_id)},
         {'$set': {'assigned_meal_plan_id': str(oid), 'assigned_meal_plan_name': plan['name']}}
     )
-    meal_client = users_col.find_one({'_id': safe_oid(client_id)}, {'email': 1, 'name': 1})
-    if meal_client and meal_client.get('email'):
-        _send_email(
-            meal_client['email'],
-            'New meal plan assigned \u2014 Sahil Panwar',
-            f'Hi {meal_client.get("name", "there")},\n\n'
-            f'Your trainer assigned you a new meal plan: "{plan["name"]}"\n\n'
-            f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
-        )
+    _push_notify(client_id, '\U0001f957 New Meal Plan', f'Your trainer assigned: {plan["name"]}', '/client/dashboard', 'meal')
     return jsonify({'status': 'assigned'})
 
 # ── CLIENT API — NUTRITION ────────────────────────────────────────────────────
@@ -2313,13 +2191,7 @@ def admin_client_reset_link(cid):
         return jsonify({'error': 'Client not found'}), 404
     token = _issue_reset_token(user)
     link = _reset_url(token)
-    emailed = _send_email(
-        user.get('email', ''),
-        'Reset your training portal password',
-        f'Hi {user.get("name", "there")},\n\n'
-        f'Your trainer generated a password reset link (valid for 1 hour):\n{link}\n'
-    )
-    return jsonify({'url': link, 'emailed': emailed})
+    return jsonify({'url': link})
 
 @app.route('/api/admin/clients/<cid>/password', methods=['POST'])
 @login_required
@@ -2464,17 +2336,9 @@ def admin_update_session_status(sid):
         return jsonify({'error': 'Invalid status'}), 400
     sessions_col.update_one({'_id': oid}, {'$set': {'status': status_val}})
     sess_doc = sessions_col.find_one({'_id': oid})
-    if sess_doc and users_col is not None:
-        sess_client = users_col.find_one({'_id': safe_oid(sess_doc.get('client_id', ''))}, {'email': 1, 'name': 1})
-        if sess_client and sess_client.get('email'):
-            dt_ist = to_ist(sess_doc.get('datetime'))
-            _send_email(
-                sess_client['email'],
-                f'Your session has been {status_val} \u2014 Sahil Panwar',
-                f'Hi {sess_client.get("name", "there")},\n\n'
-                f'Your {sess_doc.get("session_type", "session")} scheduled for {dt_ist} has been {status_val}.\n\n'
-                f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
-            )
+    if sess_doc and sess_doc.get('client_id'):
+        dt_ist = to_ist(sess_doc.get('datetime'))
+        _push_notify(str(sess_doc['client_id']), f'\U0001f4c5 Session {status_val.capitalize()}', f'{sess_doc.get("session_type", "Session")} on {dt_ist}', '/client/dashboard', 'session')
     return jsonify({'status': 'updated'})
 
 @app.route('/api/admin/sessions/<sid>', methods=['DELETE'])
@@ -2523,17 +2387,8 @@ def admin_create_invoice():
     }
     result = payments_col.insert_one(doc)
     doc['_id'] = str(result.inserted_id)
-    if users_col is not None:
-        inv_client = users_col.find_one({'_id': safe_oid(client_id)}, {'email': 1, 'name': 1})
-        if inv_client and inv_client.get('email'):
-            _send_email(
-                inv_client['email'],
-                'New invoice from Sahil Panwar',
-                f'Hi {inv_client.get("name", "there")},\n\n'
-                f'A new invoice has been raised:\n\n'
-                'Description: ' + (description or '�') + '\nAmount: Rs.' + f'{float(amount):.2f}' + '\nDue: ' + (due_date or '�') + '\n\n'
-                f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
-            )
+    _push_notify(client_id, '\U0001f4cb New Invoice', f'New invoice raised', '/client/dashboard', 'invoice')
+
     return jsonify(doc), 201
 
 @app.route('/api/admin/invoices/<iid>/mark_paid', methods=['POST'])
@@ -2552,17 +2407,9 @@ def admin_mark_paid(iid):
         'transaction_ref': s(b.get('ref', ''), 200),
     }})
     paid_inv = payments_col.find_one({'_id': oid})
-    if paid_inv and users_col is not None:
-        paid_client = users_col.find_one({'_id': safe_oid(paid_inv.get('client_id', ''))}, {'email': 1, 'name': 1})
-        if paid_client and paid_client.get('email'):
-            _send_email(
-                paid_client['email'],
-                'Payment confirmed \u2014 Sahil Panwar',
-                f'Hi {paid_client.get("name", "there")},\n\n'
-                f'Your payment of Rs.{paid_inv.get("amount", 0):.2f} has been received. Thank you!\n\n'
-                'Method: ' + b.get('method', 'UPI') + '\nRef: ' + (b.get('ref') or '�') + '\n\n'
-                f'Login to view receipt: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
-            )
+    if paid_inv:
+        _push_notify(paid_inv.get('client_id', ''), '\u2705 Payment Confirmed', 'Payment received. Thank you!', '/client/dashboard', 'payment')
+
     return jsonify({'status': 'updated'})
 
 @app.route('/api/admin/invoices/<iid>', methods=['DELETE'])
@@ -3016,14 +2863,8 @@ def admin_add_announcement():
         'created': datetime.now(timezone.utc),
     })
     if bool(d.get('active', True)) and users_col is not None:
-        for ann_u in users_col.find({'role': 'client', 'active': True}, {'email': 1, 'name': 1}):
-            if ann_u.get('email'):
-                _send_email(
-                    ann_u['email'],
-                    f'Announcement: {title}',
-                    f'Hi {ann_u.get("name", "there")},\n\n{title}\n\n{body}\n\n'
-                    f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
-                )
+        for ann_u in users_col.find({'role': 'client', 'active': True}, {'_id': 1}):
+            _push_notify(str(ann_u['_id']), f'\U0001f4e2 {title}', body[:80], '/client/dashboard', 'announcement')
     return jsonify({'status': 'added', '_id': str(result.inserted_id)})
 
 @app.route('/api/admin/announcements/<aid>', methods=['PUT'])
@@ -3492,19 +3333,6 @@ def admin_update_goal(gid):
     if goal and 'approved' in d:
         msg = '? Goal approved!' if d['approved'] else '? Goal needs revision'
         _push_notify(goal['client_id'], msg, goal.get('title', '')[:80], '/client/dashboard', 'goal')
-        if users_col is not None:
-            goal_client = users_col.find_one({'_id': safe_oid(goal['client_id'])}, {'email': 1, 'name': 1})
-            if goal_client and goal_client.get('email'):
-                status_word = 'approved' if d['approved'] else 'needs revision'
-                note = update.get('trainer_note', '')
-                _send_email(
-                    goal_client['email'],
-                    f'Your goal has been {status_word} \u2014 Sahil Panwar',
-                    f'Hi {goal_client.get("name", "there")},\n\n'
-                    f'Your goal "{goal.get("title", "")}" has been {status_word}.\n\n'
-                    + (f'Trainer note: {note}\n\n' if note else '') +
-                    f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
-                )
     return jsonify({'status': 'updated'})
 
 # -- REPORT CARDS --------------------------------------------------------------
@@ -3529,20 +3357,7 @@ def admin_create_report_card():
         'comment':      s(d.get('comment', ''), 1000),
         'created':      datetime.now(timezone.utc),
     })
-    _push_notify(client_id, '?? Weekly Report Card', 'Your trainer sent your weekly report!', '/client/dashboard', 'report')
-    if client and client.get('email'):
-        _send_email(
-            client['email'],
-            'Your weekly report card is ready \u2014 Sahil Panwar',
-            f'Hi {client.get("name", "there")},\n\n'
-            f'Your trainer sent your weekly report card:\n\n'
-            f'Overall Score:  {d.get("score", 7)}/10\n'
-            f'Consistency:    {d.get("consistency", 7)}/10\n'
-            f'Nutrition:      {d.get("nutrition", 7)}/10\n'
-            f'Progress:       {d.get("progress", 7)}/10\n\n'
-            + (f'Comment: {d.get("comment")}\n\n' if d.get('comment') else '') +
-            f'Login to view: {url_for("client_dashboard", _external=True)}\n\u2014 Sahil Panwar'
-        )
+    _push_notify(client_id, '\U0001f4ca Weekly Report Card', 'Your trainer sent your weekly report!', '/client/dashboard', 'report')
     return jsonify({'status': 'created', '_id': str(result.inserted_id)})
 
 @app.route('/api/admin/report_cards', methods=['GET'])
