@@ -1770,13 +1770,16 @@ def admin_add_program():
     if not name:
         return jsonify({'error': 'name required'}), 400
     # days: list of {day_label, exercises: [{exercise_id, sets, reps, weight, rest, notes}]}
+    ex_muscle_map = {str(e['_id']): (e.get('muscle') or '') for e in exercises_col.find({}, {'muscle': 1})} if exercises_col is not None else {}
     days = []
     for day in d.get('days', []):
         exs = []
         for ex in day.get('exercises', []):
+            eid = s(str(ex.get('exercise_id', '')), 50)
             exs.append({
-                'exercise_id':   s(str(ex.get('exercise_id', '')), 50),
+                'exercise_id':   eid,
                 'exercise_name': s(ex.get('exercise_name', ''), 200),
+                'muscle':        s(ex.get('muscle', '') or ex_muscle_map.get(eid, ''), 100),
                 'sets':  s(str(ex.get('sets', '')), 20),
                 'reps':  s(str(ex.get('reps', '')), 20),
                 'weight': s(str(ex.get('weight', '')), 20),
@@ -1804,13 +1807,16 @@ def admin_update_program(pid):
     name = s(d.get('name', ''), 200)
     if not name:
         return jsonify({'error': 'name required'}), 400
+    ex_muscle_map = {str(e['_id']): (e.get('muscle') or '') for e in exercises_col.find({}, {'muscle': 1})} if exercises_col is not None else {}
     days = []
     for day in d.get('days', []):
         exs = []
         for ex in day.get('exercises', []):
+            eid = s(str(ex.get('exercise_id', '')), 50)
             exs.append({
-                'exercise_id':   s(str(ex.get('exercise_id', '')), 50),
+                'exercise_id':   eid,
                 'exercise_name': s(ex.get('exercise_name', ''), 200),
+                'muscle':        s(ex.get('muscle', '') or ex_muscle_map.get(eid, ''), 100),
                 'sets':  s(str(ex.get('sets', '')), 20),
                 'reps':  s(str(ex.get('reps', '')), 20),
                 'weight': s(str(ex.get('weight', '')), 20),
@@ -1915,11 +1921,16 @@ def client_get_program():
     program['_id'] = str(program['_id'])
     program.pop('created', None)
     by_id, by_name = _exercise_video_index()
+    # build muscle lookup for exercises that don't have muscle stored yet
+    ex_muscle_map = {str(e['_id']): (e.get('muscle') or '') for e in exercises_col.find({}, {'muscle': 1})} if exercises_col is not None else {}
+    name_muscle_map = {(e.get('name') or '').strip().lower(): (e.get('muscle') or '') for e in exercises_col.find({}, {'name': 1, 'muscle': 1})} if exercises_col is not None else {}
     for day in program.get('days') or []:
         for ex in day.get('exercises') or []:
             embed = by_id.get(ex.get('exercise_id', '')) or by_name.get((ex.get('exercise_name') or '').strip().lower(), '')
             if embed:
                 ex['video_embed'] = embed
+            if not ex.get('muscle'):
+                ex['muscle'] = ex_muscle_map.get(ex.get('exercise_id', ''), '') or name_muscle_map.get((ex.get('exercise_name') or '').strip().lower(), '')
     return jsonify(program)
 
 # ── ADMIN API — NUTRITION ────────────────────────────────────────────────────

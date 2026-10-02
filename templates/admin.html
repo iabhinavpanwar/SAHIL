@@ -2550,10 +2550,7 @@
           <button class="sidebar-btn" data-tab="sessions">
             <i class="fas fa-calendar-alt"></i> Sessions
           </button>
-          <button class="sidebar-btn" data-tab="musclemap">
-            <i class="fas fa-person-running"></i> Muscle Map
-          </button>
-          <button class="sidebar-btn" data-tab="payments">
+                    <button class="sidebar-btn" data-tab="payments">
             <i class="fas fa-receipt"></i> Payments
           </button>
         </nav>
@@ -3271,185 +3268,6 @@
               </button>
             </div>
             <div class="items-list" id="adminInvoicesList"></div>
-          </div>
-
-          <div class="tab-panel" id="tab-musclemap">
-            <div class="panel-header">
-              <h3>Muscle Map &mdash; Assign Exercises</h3>
-            </div>
-            <div
-              style="
-                display: flex;
-                gap: 1rem;
-                margin-bottom: 1rem;
-                flex-wrap: wrap;
-                align-items: flex-end;
-              "
-            >
-              <div class="form-group" style="flex: 1; min-width: 200px">
-                <label>Select Client</label
-                ><select id="mmClientSelect" onchange="loadClientMuscleMap()">
-                  <option value="">&mdash; pick a client &mdash;</option>
-                </select>
-              </div>
-              <button
-                class="btn btn-primary btn-sm"
-                onclick="saveMuscleAssignments()"
-              >
-                <i class="fas fa-save"></i> Save
-              </button>
-            </div>
-            <p id="mmSaveMsg" class="form-msg"></p>
-            <div id="mmAdminBody" style="display: none">
-              <div
-                style="
-                  display: flex;
-                  gap: 0.75rem;
-                  margin-bottom: 1rem;
-                  flex-wrap: wrap;
-                  align-items: center;
-                "
-              >
-                <div
-                  style="
-                    display: flex;
-                    background: var(--bg3);
-                    border: 1px solid var(--border);
-                    border-radius: var(--radius-sm);
-                    overflow: hidden;
-                  "
-                >
-                  <button
-                    id="mmGenderMale"
-                    style="
-                      padding: 0.4rem 1rem;
-                      font-size: 0.85rem;
-                      font-weight: 700;
-                      background: var(--primary);
-                      color: #000;
-                    "
-                    onclick="setAdminGender('male')"
-                  >
-                    &#9794; Male
-                  </button>
-                  <button
-                    id="mmGenderFemale"
-                    style="
-                      padding: 0.4rem 1rem;
-                      font-size: 0.85rem;
-                      font-weight: 600;
-                      color: var(--text2);
-                    "
-                    onclick="setAdminGender('female')"
-                  >
-                    &#9792; Female
-                  </button>
-                </div>
-              </div>
-              <div
-                style="
-                  display: grid;
-                  grid-template-columns: 1fr 1fr 1.3fr;
-                  gap: 1.5rem;
-                "
-              >
-                <div class="mm-svg-wrap">
-                  <p>Front</p>
-                  <div id="mmAdminFrontMale">
-                    {% include 'partials/svg_male_front.html' %}
-                  </div>
-                  <div id="mmAdminFrontFemale" style="display: none">
-                    {% include 'partials/svg_female_front.html' %}
-                  </div>
-                </div>
-                <div class="mm-svg-wrap">
-                  <p>Back</p>
-                  <div id="mmAdminBackMale">
-                    {% include 'partials/svg_male_back.html' %}
-                  </div>
-                  <div id="mmAdminBackFemale" style="display: none">
-                    {% include 'partials/svg_female_back.html' %}
-                  </div>
-                </div>
-                <div
-                  style="
-                    background: var(--bg3);
-                    border: 1px solid var(--border);
-                    border-radius: var(--radius);
-                    padding: 1rem;
-                  "
-                >
-                  <p
-                    id="mmSelectedMuscle"
-                    style="
-                      font-size: 1rem;
-                      font-weight: 700;
-                      color: var(--primary);
-                      margin-bottom: 0.75rem;
-                    "
-                  >
-                    Select a muscle
-                  </p>
-                  <div id="mmExerciseEditor" style="display: none">
-                    <div class="form-group" style="margin-bottom: 0.75rem">
-                      <label
-                        style="
-                          font-size: 0.78rem;
-                          font-weight: 600;
-                          color: var(--text2);
-                        "
-                        >Training Day</label
-                      >
-                      <select
-                        id="mmDaySelect"
-                        oninput="mmSyncDay()"
-                        style="
-                          background: var(--bg2);
-                          border: 1px solid var(--border);
-                          border-radius: var(--radius-sm);
-                          color: var(--text);
-                          padding: 0.5rem 0.75rem;
-                          font-size: 0.88rem;
-                          width: 100%;
-                        "
-                      >
-                        <option value="">— No specific day —</option>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
-                      </select>
-                    </div>
-                    <div
-                      id="mmExRows"
-                      style="
-                        display: flex;
-                        flex-direction: column;
-                        gap: 0.5rem;
-                        max-height: 280px;
-                        overflow-y: auto;
-                        margin-bottom: 0.75rem;
-                      "
-                    ></div>
-                    <button
-                      class="btn btn-sm btn-outline"
-                      onclick="addMmExRow()"
-                    >
-                      + Add Exercise
-                    </button>
-                  </div>
-                  <p
-                    id="mmSelectHint"
-                    style="color: var(--text3); font-size: 0.85rem"
-                  >
-                    Click a muscle group to assign exercises.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div class="tab-panel" id="tab-nutrition">
@@ -5028,7 +4846,6 @@
           nutrition: loadMealPlans,
           sessions: loadAdminSessions,
           payments: loadAdminInvoices,
-          musclemap: loadMuscleMapTab,
           announcements: loadAnnouncements,
         };
         loaders[name]?.();
@@ -6720,11 +6537,12 @@
         .map(
           (ex, ei) => `
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-bottom:0.5rem;font-size:0.85rem">
-          <select onchange="pgDays[${di}].exercises[${ei}].exercise_name=this.options[this.selectedIndex].text;pgDays[${di}].exercises[${ei}].exercise_id=this.value"
+          <select onchange="pgDays[${di}].exercises[${ei}].exercise_name=this.options[this.selectedIndex].text;pgDays[${di}].exercises[${ei}].exercise_id=this.value;pgDays[${di}].exercises[${ei}].muscle=(allExercises.find(e=>e._id===this.value)||{}).muscle||'';renderPgDays()"
             style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:0.4rem 0.5rem;flex:1;min-width:140px">
             <option value="">Select exercise</option>
             ${allExercises.map((e) => `<option value="${e._id}" ${ex.exercise_id === e._id ? "selected" : ""}>${esc(e.name)}</option>`).join("")}
           </select>
+          <span style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:20px;background:rgba(232,255,0,0.1);color:var(--primary);border:1px solid rgba(232,255,0,0.2);white-space:nowrap">${esc((allExercises.find(e=>e._id===ex.exercise_id)||{}).muscle||ex.muscle||'')} </span>
           <input type="text" placeholder="Sets" value="${esc(ex.sets || "")}" onchange="pgDays[${di}].exercises[${ei}].sets=this.value"
             style="width:55px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:0.4rem 0.5rem"/>
           <input type="text" placeholder="Reps" value="${esc(ex.reps || "")}" onchange="pgDays[${di}].exercises[${ei}].reps=this.value"
