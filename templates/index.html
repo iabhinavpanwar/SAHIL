@@ -29,7 +29,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
         Consultation') }}
       </a>
       <a href="{{ url_for('transformations') }}" class="btn btn-ghost">
-        <i class="fas fa-play-circle"></i> See Results
+        <i class="fas fa-play-circle"></i> {{ cfg.get('hero_see_results_btn','See Results') }}
       </a>
     </div>
     <div class="hero-trust">
@@ -56,7 +56,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
         data-suffix="+"
         >0</span
       >
-      <span class="stat-label">Years Experience</span>
+      <span class="stat-label">{{ cfg.get('stat_years_label','Years Experience') }}</span>
     </div>
     <div class="stat">
       <span
@@ -65,7 +65,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
         data-suffix="+"
         >0</span
       >
-      <span class="stat-label">Clients Trained</span>
+      <span class="stat-label">{{ cfg.get('stat_clients_label','Clients Trained') }}</span>
     </div>
     <div class="stat">
       <span
@@ -74,7 +74,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
         data-suffix="+"
         >0</span
       >
-      <span class="stat-label">Transformations</span>
+      <span class="stat-label">{{ cfg.get('stat_transforms_label','Transformations') }}</span>
     </div>
   </div>
 
@@ -88,24 +88,14 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
 <div class="features-strip" aria-hidden="true">
   <div class="features-track">
     {% for _ in range(2) %}
-    <div class="feature-pill">
-      <i class="fas fa-dumbbell"></i> Strength Training
-    </div>
-    <div class="feature-pill"><i class="fas fa-fire"></i> Fat Loss</div>
-    <div class="feature-pill">
-      <i class="fas fa-heartbeat"></i> Cardio &amp; Endurance
-    </div>
-    <div class="feature-pill">
-      <i class="fas fa-apple-alt"></i> Nutrition Plans
-    </div>
-    <div class="feature-pill"><i class="fas fa-brain"></i> Mental Fitness</div>
-    <div class="feature-pill">
-      <i class="fas fa-trophy"></i> Competition Prep
-    </div>
-    <div class="feature-pill">
-      <i class="fas fa-mobile-alt"></i> Online Coaching
-    </div>
-    <div class="feature-pill"><i class="fas fa-users"></i> Group Sessions</div>
+    <div class="feature-pill"><i class="fas fa-dumbbell"></i> {{ cfg.get('feature_1','Strength Training') }}</div>
+    <div class="feature-pill"><i class="fas fa-fire"></i> {{ cfg.get('feature_2','Fat Loss') }}</div>
+    <div class="feature-pill"><i class="fas fa-heartbeat"></i> {{ cfg.get('feature_3','Cardio &amp; Endurance') }}</div>
+    <div class="feature-pill"><i class="fas fa-apple-alt"></i> {{ cfg.get('feature_4','Nutrition Plans') }}</div>
+    <div class="feature-pill"><i class="fas fa-brain"></i> {{ cfg.get('feature_5','Mental Fitness') }}</div>
+    <div class="feature-pill"><i class="fas fa-trophy"></i> {{ cfg.get('feature_6','Competition Prep') }}</div>
+    <div class="feature-pill"><i class="fas fa-mobile-alt"></i> {{ cfg.get('feature_7','Online Coaching') }}</div>
+    <div class="feature-pill"><i class="fas fa-users"></i> {{ cfg.get('feature_8','Group Sessions') }}</div>
     {% endfor %}
   </div>
 </div>
@@ -114,8 +104,8 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
 <section class="section services-preview" id="services">
   <div class="container">
     <div class="section-header reveal">
-      <p class="section-eyebrow">What I Offer</p>
-      <h2>Training Programs</h2>
+      <p class="section-eyebrow">{{ cfg.get('services_eyebrow','What I Offer') }}</p>
+      <h2>{{ cfg.get('services_heading','Training Programs') }}</h2>
       <p class="section-desc">
         {{ cfg.get('services_lead','Tailored programs designed to push your limits and deliver real, lasting results.') }}
       </p>
@@ -156,7 +146,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     </div>
     <div class="section-cta reveal">
       <a href="{{ url_for('services') }}" class="btn btn-outline"
-        >View All Programs <i class="fas fa-arrow-right"></i
+        >{{ cfg.get('view_all_programs_btn','View All Programs') }} <i class="fas fa-arrow-right"></i
       ></a>
     </div>
   </div>
@@ -202,11 +192,10 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
 <section class="section transform-teaser">
   <div class="container">
     <div class="section-header reveal">
-      <p class="section-eyebrow">Before &amp; After</p>
-      <h2>Real Transformations</h2>
+      <p class="section-eyebrow">{{ cfg.get('transformations_eyebrow','Before &amp; After') }}</p>
+      <h2>{{ cfg.get('transformations_heading','Real Transformations') }}</h2>
       <p class="section-desc">
-        These aren't filters — these are results from real people who committed
-        to the process.
+        {{ cfg.get('transformations_subtext',"These aren't filters — these are results from real people who committed to the process.") }}
       </p>
     </div>
     <div class="teaser-grid">
@@ -247,7 +236,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     {% if transformations is defined and transformations %}
     <div class="section-cta reveal">
       <a href="{{ url_for('transformations') }}" class="btn btn-outline"
-        >View All Transformations <i class="fas fa-arrow-right"></i
+        >{{ cfg.get('view_all_transforms_btn','View All Transformations') }} <i class="fas fa-arrow-right"></i
       ></a>
     </div>
     {% endif %}
@@ -258,8 +247,8 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
 <section class="section testimonials-section" id="testimonials">
   <div class="container">
     <div class="section-header reveal">
-      <p class="section-eyebrow">Client Stories</p>
-      <h2>Real Results, Real People</h2>
+      <p class="section-eyebrow">{{ cfg.get('testimonials_eyebrow','Client Stories') }}</p>
+      <h2>{{ cfg.get('testimonials_heading','Real Results, Real People') }}</h2>
     </div>
     <div class="testimonials-carousel" id="testimonialsCarousel">
       {% for t in testimonials %}
@@ -323,7 +312,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
         rel="noopener"
         class="btn btn-cta-wa btn-lg"
       >
-        <i class="fab fa-whatsapp"></i> WhatsApp Me
+        <i class="fab fa-whatsapp"></i> {{ cfg.get('whatsapp_btn_text','WhatsApp Me') }}
       </a>
       {% endif %}
     </div>

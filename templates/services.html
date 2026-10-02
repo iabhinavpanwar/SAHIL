@@ -1432,8 +1432,8 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
 <!-- ══ PAGE HERO ══════════════════════════════════════════════════════════ -->
 <section class="services-hero">
   <div class="container">
-    <p class="section-eyebrow">Training Programs</p>
-    <h1>Services &amp; <span class="accent">Pricing</span></h1>
+    <p class="section-eyebrow">{{ cfg.get('services_page_eyebrow','Training Programs') }}</p>
+    <h1>{{ cfg.get('services_page_heading','Services &amp; Pricing')|safe }}</h1>
     <p class="lead">
       {{ cfg.get('services_lead','Choose the program that fits your goals — from one-on-one coaching to fully managed transformation plans. Every package is tailored to you.') }}
     </p>
@@ -1473,7 +1473,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
           {% endif %} {% if svc.get('price') %}
           <div class="pricing-price">
             {{ svc.price }}
-            <span class="suffix">/ plan</span>
+            <span class="suffix">{{ cfg.get('price_suffix','/ plan') }}</span>
           </div>
           {% endif %}
         </div>
@@ -1517,10 +1517,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
         alt="Logo"
         class="empty-logo"
       />
-      <p>
-        Programs are being updated. Get in touch for current availability and
-        pricing.
-      </p>
+      <p>Programs are being updated. {{ cfg.get('services_empty_text','Get in touch for current availability and pricing.') }}</p>
       <a href="{{ url_for('contact') }}" class="btn btn-primary">
         Contact Me
       </a>
@@ -1534,8 +1531,8 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
 <section class="faq-section">
   <div class="container faq-container">
     <div class="section-header">
-      <p class="section-eyebrow">Questions</p>
-      <h2>Frequently Asked</h2>
+      <p class="section-eyebrow">{{ cfg.get('faq_eyebrow','Questions') }}</p>
+      <h2>{{ cfg.get('faq_heading','Frequently Asked') }}</h2>
     </div>
     <div class="faq-list" id="faqList">
       {% for f in faqs %}

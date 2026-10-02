@@ -2729,11 +2729,10 @@
           alt=""
         />
         <div id="spf-name-wrap">
-          <span class="spf-letter" style="--d: 0">S</span
-          ><span class="spf-letter" style="--d: 1">A</span
-          ><span class="spf-letter" style="--d: 2">H</span
-          ><span class="spf-letter" style="--d: 3">I</span
-          ><span class="spf-letter" style="--d: 4">L</span>
+          {% set _pname = cfg.get('preloader_name', cfg.get('hero_name','SAHIL')).split()[0] %}
+          {% for i in range(_pname|length) %}
+          <span class="spf-letter" style="--d: {{ i }}">{{ _pname[i] }}</span>{% if not loop.last %}{% endif %}
+          {% endfor %}
         </div>
         <div id="spf-underline"></div>
       </div>
@@ -3036,7 +3035,7 @@
         </div>
 
         <div class="footer-links">
-          <h4>Quick Links</h4>
+          <h4>{{ cfg.get('footer_links_heading','Quick Links') }}</h4>
           <ul>
             <li><a href="{{ url_for('index') }}">Home</a></li>
             <li><a href="{{ url_for('about') }}">About</a></li>
@@ -3049,7 +3048,7 @@
         </div>
 
         <div class="footer-contact">
-          <h4>Get In Touch</h4>
+          <h4>{{ cfg.get('footer_contact_heading','Get In Touch') }}</h4>
           {% if cfg.get('contact_email') %}
           <div class="footer-contact-item">
             <div class="fc-icon"><i class="fas fa-envelope"></i></div>
@@ -3082,7 +3081,7 @@
         </div>
 
         <div class="footer-newsletter">
-          <h4>Free Workout Plan</h4>
+          <h4>{{ cfg.get('newsletter_heading','Free Workout Plan') }}</h4>
           <p class="nl-desc">
             {{ cfg.get('lead_magnet_title','Get your free 7-day transformation
             plan.') }}
@@ -3094,11 +3093,11 @@
               placeholder="Enter your email"
               required
             />
-            <button type="submit">Get It Free</button>
+            <button type="submit">{{ cfg.get('newsletter_btn_text','Get It Free') }}</button>
           </form>
           <p id="nlMsg" class="form-msg"></p>
           <div class="nl-trust">
-            <i class="fas fa-lock"></i> No spam. Unsubscribe anytime.
+            <i class="fas fa-lock"></i> {{ cfg.get('newsletter_trust_text','No spam. Unsubscribe anytime.') }}
           </div>
         </div>
       </div>
@@ -3117,7 +3116,7 @@
           <a href="{{ url_for('privacy') }}">Privacy</a>
           <a href="{{ url_for('terms') }}">Terms</a>
         </div>
-        <p class="footer-made">Made with <span>&#9829;</span> for fitness</p>
+        <p class="footer-made">{{ cfg.get('footer_made_text','Made with ♥ for fitness') }}</p>
       </div>
     </footer>
 
@@ -3273,7 +3272,7 @@
 
     {% if cfg.get('contact_whatsapp') %}
     <a
-      href="https://wa.me/{{ cfg.contact_whatsapp|replace('+','')|replace(' ','') }}?text={{ 'Hi! I am interested in your training programs.' | urlencode }}"
+      href="https://wa.me/{{ cfg.contact_whatsapp|replace('+','')|replace(' ','') }}?text={{ cfg.get('whatsapp_default_message','Hi! I am interested in your training programs.') | urlencode }}"
       target="_blank"
       rel="noopener"
       style="

@@ -949,18 +949,18 @@
 {% block content %}
 <!-- HERO BANNER -->
 <section class="comm-hero">
-  <p class="section-eyebrow">Fitness Community</p>
-  <h1>Train Together. <span style="color:var(--primary)">Grow Together.</span></h1>
-  <p>Share your wins, ask questions, and motivate each other.</p>
+  <p class="section-eyebrow">{{ cfg.get('community_eyebrow','Fitness Community') }}</p>
+  <h1>{{ cfg.get('community_heading','Train Together. <span style="color:var(--primary)">Grow Together.</span>')|safe }}</h1>
+  <p>{{ cfg.get('community_subtext','Share your wins, ask questions, and motivate each other.') }}</p>
 
   <div class="comm-stats">
     <div class="comm-stat">
       <strong id="memberCount">{{ member_count }}</strong>
-      <span>Members</span>
+      <span>{{ cfg.get('community_members_label','Members') }}</span>
     </div>
     <div class="comm-stat">
       <strong id="postCount">{{ post_count }}</strong>
-      <span>Posts</span>
+      <span>{{ cfg.get('community_posts_label','Posts') }}</span>
     </div>
   </div>
 
@@ -992,7 +992,7 @@
   <div class="compose-card" id="composeCard">
     <div class="compose-top">
       <div class="compose-avatar" id="myAvatar"></div>
-      <textarea id="postText" placeholder="Share a win, ask a question, or motivate the community…" maxlength="1000" rows="3"></textarea>
+      <textarea id="postText" placeholder="{{ cfg.get('community_compose_placeholder','Share a win, ask a question, or motivate the community…') }}" maxlength="1000" rows="3"></textarea>
     </div>
     <!-- image preview -->
     <div class="img-preview-wrap" id="imgPreviewWrap">
@@ -1012,7 +1012,7 @@
   </div>
   {% else %}
   <div class="login-nudge">
-    <p>Join the conversation — <strong>log in</strong> to post and interact with the community.</p>
+    <p>{{ cfg.get('community_login_nudge','Join the conversation — log in to post and interact with the community.')|safe }}</p>
     <a href="{{ url_for('client_login') }}" class="btn btn-primary btn-sm">Log In</a>
     <a href="{{ url_for('register') }}" class="btn btn-outline btn-sm" style="margin-left:.5rem">Register</a>
   </div>
@@ -1027,7 +1027,7 @@
 
   <div class="feed-empty" id="feedEmpty" style="display:none">
     <i class="fas fa-users"></i>
-    <p>No posts yet. Be the first to share something!</p>
+    <p>{{ cfg.get('community_empty_feed','No posts yet. Be the first to share something!') }}</p>
   </div>
 </div>
 

@@ -1545,7 +1545,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
   <div class="container contact-grid">
     <!-- ══ INFO PANEL ══════════════════════════════════════════════════════ -->
     <div class="contact-info">
-      <h2>Get In Touch</h2>
+      <h2>{{ cfg.get('contact_info_heading','Get In Touch') }}</h2>
       <p class="info-sub">
         {{ cfg.get('contact_info_sub',"Reach out through any channel below — or fill in the form and I'll get back to you personally.") }}
       </p>
@@ -1618,8 +1618,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
           rel="noopener"
           class="btn btn-primary"
         >
-          <i class="fas fa-calendar-alt" aria-hidden="true"></i> Book on
-          Calendly
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i> {{ cfg.get('calendly_btn_text','Book on Calendly') }}
         </a>
         {% endif %} {% if cfg.get('contact_whatsapp') %}
         <a
@@ -1628,7 +1627,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
           rel="noopener"
           class="btn-wa"
         >
-          <i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp Me
+          <i class="fab fa-whatsapp" aria-hidden="true"></i> {{ cfg.get('whatsapp_btn_text','WhatsApp Me') }}
         </a>
         {% endif %}
       </div>
@@ -1648,7 +1647,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
 
     <!-- ══ FORM PANEL ══════════════════════════════════════════════════════ -->
     <div class="contact-form-wrap">
-      <h2>Send a Message</h2>
+      <h2>{{ cfg.get('contact_form_heading','Send a Message') }}</h2>
       <p class="form-sub">
         {{ cfg.get('contact_form_sub',"Fill in the details below and I'll get back to you personally within 24 hours.") }}
       </p>
@@ -1696,14 +1695,14 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
           <div class="form-group">
             <label for="cGoal">Your Goal</label>
             <select id="cGoal" name="goal">
-              <option value="">Select a goal</option>
-              <option>Weight Loss</option>
-              <option>Muscle Gain</option>
-              <option>Strength Training</option>
-              <option>General Fitness</option>
-              <option>Sports Performance</option>
-              <option>Rehabilitation</option>
-              <option>Nutrition Coaching</option>
+          <option value="">{{ cfg.get('contact_goal_placeholder','Select a goal') }}</option>
+              <option>{{ cfg.get('contact_goal_1','Weight Loss') }}</option>
+              <option>{{ cfg.get('contact_goal_2','Muscle Gain') }}</option>
+              <option>{{ cfg.get('contact_goal_3','Strength Training') }}</option>
+              <option>{{ cfg.get('contact_goal_4','General Fitness') }}</option>
+              <option>{{ cfg.get('contact_goal_5','Sports Performance') }}</option>
+              <option>{{ cfg.get('contact_goal_6','Rehabilitation') }}</option>
+              <option>{{ cfg.get('contact_goal_7','Nutrition Coaching') }}</option>
             </select>
           </div>
         </div>
@@ -1722,7 +1721,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
 
         <button type="submit" class="contact-submit" id="contactSubmit">
           <span class="btn-label">
-            <i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message
+            <i class="fas fa-paper-plane" aria-hidden="true"></i> {{ cfg.get('contact_submit_text','Send Message') }}
           </span>
           <span class="btn-spinner">
             <span class="ct-spinner"></span> Sending…
@@ -1745,8 +1744,8 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
 <section class="faq-section">
   <div class="container faq-container">
     <div class="section-header">
-      <p class="section-eyebrow">Questions</p>
-      <h2>Frequently Asked</h2>
+      <p class="section-eyebrow">{{ cfg.get('faq_eyebrow','Questions') }}</p>
+      <h2>{{ cfg.get('faq_heading','Frequently Asked') }}</h2>
     </div>
     <div class="faq-list" id="faqList">
       {% for f in faqs %}
