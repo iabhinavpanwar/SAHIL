@@ -1859,8 +1859,45 @@ def admin_assign_program(pid):
         {'_id': safe_oid(client_id)},
         {'$set': {'assigned_program_id': str(oid), 'assigned_program_name': program['name']}}
     )
+    # ── Auto-sync muscle map from program exercises ──────────────────────────
+    _sync_muscle_map_from_program(client_id, program)
+    # ────────────────────────────────────────────────────────────────────────
     _push_notify(client_id, '\U0001f4aa New Workout Program', f'Your trainer assigned: {program["name"]}', '/client/dashboard', 'program')
     return jsonify({'status': 'assigned'})
+
+def _sync_muscle_map_from_program(client_id, program):
+    """Derive muscle_assignments from a program's exercises using the exercises collection."""""
+    if users_col is None or exercises_col is None:
+        return
+    # Build name→muscle lookup from exercises library
+    name_to_muscle = {}
+    for ex in exercises_col.find({}, {'name': 1, 'muscle': 1}):
+        name = (ex.get('name') or '').strip().lower()
+        muscle = (ex.get('muscle') or '').strip()
+        if name and muscle:
+            name_to_muscle[name] = muscle
+    # Group exercises by muscle, preserving day label
+    muscle_map = {}  # muscle -> {day, exercises[]}
+    for day in (program.get('days') or []):
+        day_label = day.get('day_label', '')
+        for ex in (day.get('exercises') or []):
+            ex_name = (ex.get('exercise_name') or '').strip()
+            muscle = name_to_muscle.get(ex_name.lower(), '')
+            if not muscle:
+                continue
+            if muscle not in muscle_map:
+                muscle_map[muscle] = {'day': day_label, 'exercises': []}
+            muscle_map[muscle]['exercises'].append({
+                'name':  ex_name,
+                'sets':  ex.get('sets', ''),
+                'reps':  ex.get('reps', ''),
+                'notes': ex.get('notes', ''),
+                'video_url': '',
+            })
+    if not muscle_map:
+        return
+    assignments = [{'muscle': m, 'day': v['day'], 'exercises': v['exercises']} for m, v in muscle_map.items()]
+    users_col.update_one({'_id': safe_oid(client_id)}, {'$set': {'muscle_assignments': assignments}})
 
 # ── CLIENT API — WORKOUT PROGRAM ──────────────────────────────────────────────
 @app.route('/api/client/program')

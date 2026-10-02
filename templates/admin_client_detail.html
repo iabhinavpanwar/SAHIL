@@ -1724,6 +1724,10 @@
             <h3><i class="fas fa-tasks" aria-hidden="true"></i> Assignments</h3>
           </div>
           <div id="secAssignments"><p class="empty">Loading…</p></div>
+          <p style="font-size:0.72rem;color:var(--text-muted,#888);margin:6px 0 0;">
+            <i class="fas fa-link" style="font-size:0.65rem"></i>
+            Assigning a workout program automatically updates the Muscle Map.
+          </p>
         </div>
 
         <!-- TRAINER NOTES -->
@@ -1758,8 +1762,12 @@
               <i class="fas fa-person-running" aria-hidden="true"></i> Muscle
               Map
             </h3>
-            <a href="/admin?tab=musclemap&client={{ client._id }}">Edit</a>
+            <a href="/admin?tab=musclemap&client={{ client._id }}">Edit manually</a>
           </div>
+          <p style="font-size:0.72rem;color:var(--text-muted,#888);margin:0 0 8px;">
+            <i class="fas fa-sync-alt" style="font-size:0.65rem"></i>
+            Auto-synced from the assigned workout program. Manual edits override this.
+          </p>
           <div id="secMuscleMap"><p class="empty">Loading…</p></div>
         </div>
 
