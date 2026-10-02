@@ -1,947 +1,546 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Terms of Service — Sahil Panwar</title>
-  <!-- Font Awesome 6 (free) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    /* ----- design tokens (self-contained, consistent with base theme) ----- */
-    :root {
-      --primary: #e63946;
-      --primary-rgb: 230, 57, 70;
-      --text: #1a1a1a;
-      --text1: #1a1a1a;
-      --text2: #4a4a4a;
-      --text3: #6c6c6c;
-      --bg: #fafafa;
-      --bg2: #f4f4f7;
-      --card: #ffffff;
-      --border: #e5e5e5;
-      --nav-h: 4.5rem;
-      --radius: 16px;
-      --radius-sm: 10px;
-      --font-display: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      --transition: 0.25s ease;
-      --shadow-sm: 0 6px 16px rgba(0, 0, 0, 0.025);
-      --shadow-md: 0 10px 30px -8px rgba(0, 0, 0, 0.06);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --text: #f0f0f0;
-        --text1: #f0f0f0;
-        --text2: #c0c0c0;
-        --text3: #9a9a9a;
-        --bg: #0f0f0f;
-        --bg2: #171717;
-        --card: #1c1c1c;
-        --border: #2a2a2a;
-      }
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: calc(var(--nav-h) + 1.5rem);
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-display);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1180px;
-      margin: 0 auto;
-      padding-inline: clamp(1rem, 4vw, 1.5rem);
-    }
-
-    /* ----- nav placeholder (mimics base.html nav) ----- */
-    .nav-placeholder {
-      height: var(--nav-h);
-      width: 100%;
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 1.5rem;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      box-shadow: var(--shadow-sm);
-      backdrop-filter: blur(12px);
-    }
-
-    .nav-placeholder span {
-      font-weight: 800;
-      font-size: 1.2rem;
-      letter-spacing: -0.02em;
-      color: var(--primary);
-    }
-
-    /* ============================================================
-       HERO
-       ============================================================ */
-    .legal-hero {
-      position: relative;
-      padding: calc(var(--nav-h) + clamp(2.25rem, 6vw, 4rem)) 0 clamp(2rem, 5vw, 3.25rem);
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    .legal-hero::before {
-      content: "";
-      position: absolute;
-      top: -35%;
-      right: -12%;
-      width: clamp(260px, 46vw, 620px);
-      height: clamp(260px, 46vw, 620px);
-      background: radial-gradient(circle, rgba(var(--primary-rgb), 0.07) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    /* subtle grid pattern */
-    .legal-hero::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(var(--primary-rgb), 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(var(--primary-rgb), 0.025) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: radial-gradient(ellipse at 50% 0%, #000 20%, transparent 75%);
-      -webkit-mask-image: radial-gradient(ellipse at 50% 0%, #000 20%, transparent 75%);
-      pointer-events: none;
-      opacity: 0.7;
-    }
-
-    .legal-hero .container {
-      position: relative;
-      z-index: 2;
-    }
-
-    .legal-hero .section-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-      font-size: clamp(0.68rem, 1.6vw, 0.8rem);
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--primary);
-      padding: 0.35rem 0.85rem;
-      background: rgba(var(--primary-rgb), 0.08);
-      border: 1px solid rgba(var(--primary-rgb), 0.16);
-      border-radius: 60px;
-    }
-
-    .legal-hero .section-eyebrow::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      flex: 0 0 6px;
-      border-radius: 50%;
-      background: var(--primary);
-      box-shadow: 0 0 12px var(--primary);
-      animation: legal-dot 2s ease-in-out infinite;
-    }
-
-    @keyframes legal-dot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%      { opacity: 0.5; transform: scale(1.35); }
-    }
-
-    .legal-hero h1 {
-      font-family: var(--font-display);
-      font-weight: 900;
-      font-size: clamp(2rem, 7.5vw, 4.25rem);
-      letter-spacing: -0.02em;
-      line-height: 1.05;
-      margin-top: 1rem;
-      animation: legal-fade-up 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-    }
-
-    .legal-hero h1 .accent {
-      color: var(--primary);
-      position: relative;
-      display: inline-block;
-    }
-
-    .legal-hero h1 .accent::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -6px;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary), rgba(var(--primary-rgb), 0.3));
-      border-radius: 3px;
-      transform: scaleX(0);
-      transform-origin: left;
-      animation: legal-underline 0.9s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    }
-
-    @keyframes legal-underline { to { transform: scaleX(1); } }
-
-    @keyframes legal-fade-up {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .legal-hero .legal-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem 1.5rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .legal-hero .legal-meta span {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text3);
-      font-size: clamp(0.72rem, 1.6vw, 0.84rem);
-      font-weight: 500;
-      padding: 0.4rem 0.9rem;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 60px;
-      transition: border-color var(--transition), color var(--transition);
-    }
-
-    .legal-hero .legal-meta span:hover {
-      border-color: rgba(var(--primary-rgb), 0.3);
-      color: var(--text2);
-    }
-
-    .legal-hero .legal-meta i {
-      color: var(--primary);
-      font-size: 0.8rem;
-    }
-
-    /* ============================================================
-       LAYOUT
-       ============================================================ */
-    .legal-body {
-      padding: clamp(2.5rem, 7vw, 5rem) 0 clamp(3rem, 8vw, 6rem);
-    }
-
-    .legal-layout {
-      display: grid;
-      grid-template-columns: 240px minmax(0, 1fr);
-      gap: clamp(2rem, 5vw, 3.5rem);
-      align-items: start;
-    }
-
-    /* ============================================================
-       TOC SIDEBAR
-       ============================================================ */
-    .legal-toc {
-      position: sticky;
-      top: calc(var(--nav-h) + 1.5rem);
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.35rem 1.25rem;
-      box-shadow: var(--shadow-sm);
-      animation: legal-fade-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-      max-height: calc(100vh - var(--nav-h) - 3rem);
-      overflow-y: auto;
-      scrollbar-width: thin;
-    }
-
-    .legal-toc::-webkit-scrollbar { width: 6px; }
-    .legal-toc::-webkit-scrollbar-track { background: transparent; }
-    .legal-toc::-webkit-scrollbar-thumb {
-      background: rgba(var(--primary-rgb), 0.25);
-      border-radius: 3px;
-    }
-
-    .legal-toc h3 {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--primary);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-weight: 700;
-    }
-
-    .legal-toc h3::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: rgba(var(--primary-rgb), 0.18);
-    }
-
-    .legal-toc ul {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      list-style: none;
-    }
-
-    .legal-toc a {
-      color: var(--text3);
-      font-size: 0.82rem;
-      line-height: 1.45;
-      transition: color var(--transition), background var(--transition), padding var(--transition);
-      display: flex;
-      align-items: flex-start;
-      gap: 0.55rem;
-      padding: 0.45rem 0.6rem;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .legal-toc a::before {
-      content: "";
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--border);
-      flex-shrink: 0;
-      margin-top: 0.5rem;
-      transition: background var(--transition), transform var(--transition);
-    }
-
-    .legal-toc a:hover,
-    .legal-toc a:focus-visible {
-      color: var(--primary);
-      background: rgba(var(--primary-rgb), 0.05);
-      outline: none;
-    }
-
-    .legal-toc a:hover::before,
-    .legal-toc a:focus-visible::before {
-      background: var(--primary);
-      transform: scale(1.4);
-    }
-
-    /* ============================================================
-       CONTENT
-       ============================================================ */
-    .legal-content {
-      animation: legal-fade-up 0.7s 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-      min-width: 0;
-    }
-
-    .legal-section {
-      margin-bottom: clamp(2rem, 5vw, 3rem);
-      padding-bottom: clamp(2rem, 5vw, 3rem);
-      border-bottom: 1px solid var(--border);
-      scroll-margin-top: calc(var(--nav-h) + 1.5rem);
-    }
-
-    .legal-section:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-
-    .legal-section-header {
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-      margin-bottom: 1.35rem;
-    }
-
-    .legal-section-icon {
-      width: clamp(40px, 9vw, 48px);
-      height: clamp(40px, 9vw, 48px);
-      border-radius: 14px;
-      flex-shrink: 0;
-      background: rgba(var(--primary-rgb), 0.08);
-      border: 1px solid rgba(var(--primary-rgb), 0.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary);
-      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
-      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    .legal-section:hover .legal-section-icon {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
-      transform: scale(1.06) rotate(-3deg);
-      box-shadow: 0 8px 20px -6px rgba(var(--primary-rgb), 0.5);
-    }
-
-    .legal-section h2 {
-      font-size: clamp(1.1rem, 2.8vw, 1.4rem);
-      letter-spacing: -0.015em;
-      line-height: 1.3;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .legal-content p {
-      color: var(--text2);
-      line-height: 1.8;
-      font-size: clamp(0.9rem, 1.95vw, 0.98rem);
-      margin-bottom: 0.9rem;
-    }
-
-    .legal-content p:last-child { margin-bottom: 0; }
-
-    .legal-content ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-      margin: 0.85rem 0 1rem;
-    }
-
-    .legal-content ul li {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.7rem;
-      color: var(--text2);
-      font-size: clamp(0.88rem, 1.9vw, 0.96rem);
-      line-height: 1.65;
-      padding: 0.15rem 0;
-    }
-
-    .legal-content ul li::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--primary);
-      flex-shrink: 0;
-      margin-top: 0.6rem;
-      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.12);
-    }
-
-    .legal-content strong {
-      color: var(--text);
-      font-weight: 700;
-    }
-
-    .legal-content a {
-      color: var(--primary);
-      font-weight: 500;
-      transition: opacity var(--transition);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(var(--primary-rgb), 0.3);
-    }
-
-    .legal-content a:hover {
-      opacity: 0.75;
-      border-bottom-color: transparent;
-    }
-
-    /* highlight card */
-    .legal-highlight {
-      position: relative;
-      background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.06), rgba(var(--primary-rgb), 0.02));
-      border: 1px solid rgba(var(--primary-rgb), 0.15);
-      border-left: 4px solid var(--primary);
-      border-radius: 0 var(--radius) var(--radius) 0;
-      padding: 1.15rem 1.35rem;
-      margin: 0 0 2rem;
-      color: var(--text2);
-      font-size: clamp(0.88rem, 1.95vw, 0.98rem);
-      line-height: 1.7;
-    }
-
-    .legal-highlight::before {
-      content: "\f05a";
-      font-family: "Font Awesome 6 Free";
-      font-weight: 900;
-      position: absolute;
-      top: 1.15rem;
-      right: 1.25rem;
-      font-size: 1.4rem;
-      color: rgba(var(--primary-rgb), 0.18);
-    }
-
-    .legal-highlight strong { color: var(--primary); }
-
-    /* nested highlight inside sections */
-    .legal-section .legal-highlight {
-      margin: 1rem 0 0;
-    }
-
-    .legal-section .legal-highlight::before {
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.15rem;
-    }
-
-    /* contact card */
-    .legal-contact-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: clamp(1.15rem, 3vw, 1.6rem);
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      margin-top: 1rem;
-      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .legal-contact-card:hover {
-      border-color: rgba(var(--primary-rgb), 0.35);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .legal-contact-card .lcc-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      flex-shrink: 0;
-      background: rgba(var(--primary-rgb), 0.08);
-      border: 1px solid rgba(var(--primary-rgb), 0.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary);
-      font-size: 1.15rem;
-      transition: all var(--transition);
-    }
-
-    .legal-contact-card:hover .lcc-icon {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-
-    .legal-contact-card .lcc-body {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .legal-contact-card .lcc-body strong {
-      display: block;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text3);
-      margin-bottom: 0.35rem;
-      font-weight: 700;
-    }
-
-    .legal-contact-card .lcc-body a,
-    .legal-contact-card .lcc-body span {
-      color: var(--text);
-      font-size: 0.98rem;
-      font-weight: 600;
-      word-break: break-word;
-      text-decoration: none;
-    }
-
-    .legal-contact-card .lcc-body a:hover {
-      color: var(--primary);
-    }
-
-    /* ============================================================
-       RESPONSIVE
-       ============================================================ */
-    @media (max-width: 960px) {
-      .legal-layout {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 1.75rem;
-      }
-
-      .legal-toc {
-        position: static;
-        max-height: none;
-        overflow: visible;
-      }
-
-      .legal-toc ul {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0.4rem 0.5rem;
-      }
-
-      .legal-toc a {
-        font-size: 0.78rem;
-        padding: 0.4rem 0.75rem;
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: 60px;
-        align-items: center;
-      }
-
-      .legal-toc a::before {
-        margin-top: 0;
-        width: 4px;
-        height: 4px;
-      }
-
-      .legal-toc a:hover {
-        background: rgba(var(--primary-rgb), 0.08);
-        border-color: rgba(var(--primary-rgb), 0.25);
-      }
-    }
-
-    @media (max-width: 600px) {
-      .legal-hero {
-        padding-top: calc(var(--nav-h) + 1.75rem);
-        padding-bottom: 2rem;
-      }
-
-      .legal-hero h1 {
-        font-size: clamp(1.85rem, 8.5vw, 2.6rem);
-      }
-
-      .legal-hero .legal-meta {
-        gap: 0.5rem;
-      }
-
-      .legal-hero .legal-meta span {
-        font-size: 0.7rem;
-        padding: 0.35rem 0.7rem;
-      }
-
-      .legal-body {
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-      }
-
-      .legal-section-header {
-        gap: 0.75rem;
-      }
-
-      .legal-section-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 0.95rem;
-        border-radius: 12px;
-      }
-
-      .legal-section h2 {
-        font-size: 1.08rem;
-      }
-
-      .legal-highlight {
-        padding: 1rem 1.15rem;
-      }
-
-      .legal-highlight::before {
-        font-size: 1.1rem;
-        top: 1rem;
-        right: 1rem;
-      }
-
-      .legal-contact-card {
-        padding: 1rem;
-      }
-
-      .legal-contact-card .lcc-icon {
-        width: 42px;
-        height: 42px;
-        font-size: 1rem;
-        border-radius: 12px;
-      }
-
-      .legal-contact-card .lcc-body a,
-      .legal-contact-card .lcc-body span {
-        font-size: 0.9rem;
-      }
-    }
-
-    @media (max-width: 380px) {
-      .legal-hero h1 {
-        font-size: 1.7rem;
-      }
-
-      .legal-hero .section-eyebrow {
-        font-size: 0.64rem;
-        padding: 0.3rem 0.7rem;
-      }
-
-      .legal-hero .legal-meta span {
-        font-size: 0.66rem;
-        padding: 0.3rem 0.6rem;
-      }
-
-      .legal-section-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 0.85rem;
-      }
-
-      .legal-section h2 {
-        font-size: 1rem;
-      }
-
-      .legal-content p,
-      .legal-content ul li,
-      .legal-highlight {
-        font-size: 0.85rem;
-      }
-
-      .legal-toc a {
-        font-size: 0.72rem;
-        padding: 0.35rem 0.65rem;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      .legal-hero h1,
-      .legal-toc,
-      .legal-content { animation: none; }
-      .legal-hero h1 .accent::after { transform: scaleX(1); }
-      .legal-section:hover .legal-section-icon { transform: none; }
-      .legal-contact-card:hover { transform: none; }
-    }
-
-    /* focus visibility */
-    .legal-toc a:focus-visible,
-    .legal-content a:focus-visible,
-    .legal-contact-card .lcc-body a:focus-visible {
-      outline: 2px solid var(--primary);
-      outline-offset: 3px;
-      border-radius: 6px;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- nav placeholder (mimics base.html nav) -->
-  <div class="nav-placeholder">
-    <span>Sahil Panwar</span>
+{% extends "base.html" %}
+{% block title %}Terms of Service — {{ cfg.get('hero_name','Sahil Panwar') }}{% endblock %}
+{% block head %}
+<style>
+  .legal-hero {
+    position: relative;
+    padding: calc(var(--nav-h) + clamp(2.25rem, 6vw, 4rem)) 0 clamp(2rem, 5vw, 3.25rem);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .legal-hero::before {
+    content: "";
+    position: absolute;
+    top: -35%; right: -12%;
+    width: clamp(260px, 46vw, 620px);
+    height: clamp(260px, 46vw, 620px);
+    background: radial-gradient(circle, rgba(var(--primary-rgb), 0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .legal-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(var(--primary-rgb), 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--primary-rgb), 0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse at 50% 0%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 0%, #000 20%, transparent 75%);
+    pointer-events: none;
+    opacity: 0.7;
+  }
+  .legal-hero .container { position: relative; z-index: 2; }
+
+  .legal-hero .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: clamp(0.68rem, 1.6vw, 0.8rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--primary);
+    padding: 0.35rem 0.85rem;
+    background: rgba(var(--primary-rgb), 0.08);
+    border: 1px solid rgba(var(--primary-rgb), 0.16);
+    border-radius: 60px;
+  }
+  .legal-hero .section-eyebrow::before {
+    content: "";
+    width: 6px; height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 12px var(--primary);
+    animation: legal-dot 2s ease-in-out infinite;
+  }
+  @keyframes legal-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(1.35); }
+  }
+
+  .legal-hero h1 {
+    font-weight: 900;
+    font-size: clamp(2rem, 7.5vw, 4.25rem);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-top: 1rem;
+    animation: legal-fade-up 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+  .legal-hero h1 .accent {
+    color: var(--primary);
+    position: relative;
+    display: inline-block;
+  }
+  .legal-hero h1 .accent::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -6px;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, var(--primary), rgba(var(--primary-rgb), 0.3));
+    border-radius: 3px;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: legal-underline 0.9s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  @keyframes legal-underline { to { transform: scaleX(1); } }
+  @keyframes legal-fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .legal-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .legal-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text2);
+    font-size: clamp(0.72rem, 1.6vw, 0.84rem);
+    font-weight: 500;
+    padding: 0.4rem 0.9rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 60px;
+    transition: border-color var(--transition), color var(--transition);
+  }
+  .legal-meta span:hover { border-color: rgba(var(--primary-rgb), 0.3); color: var(--text); }
+  .legal-meta i { color: var(--primary); font-size: 0.8rem; }
+
+  /* layout */
+  .legal-body { padding: clamp(2.5rem, 7vw, 5rem) 0 clamp(3rem, 8vw, 6rem); }
+  .legal-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 3.5rem);
+    align-items: start;
+  }
+
+  /* TOC */
+  .legal-toc {
+    position: sticky;
+    top: calc(var(--nav-h) + 1.5rem);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.35rem 1.25rem;
+    box-shadow: var(--shadow);
+    animation: legal-fade-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    max-height: calc(100vh - var(--nav-h) - 3rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .legal-toc::-webkit-scrollbar { width: 6px; }
+  .legal-toc::-webkit-scrollbar-track { background: transparent; }
+  .legal-toc::-webkit-scrollbar-thumb { background: rgba(var(--primary-rgb), 0.25); border-radius: 3px; }
+
+  .legal-toc h3 {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+  }
+  .legal-toc h3::after { content: ""; flex: 1; height: 1px; background: rgba(var(--primary-rgb), 0.18); }
+
+  .legal-toc ul { display: flex; flex-direction: column; gap: 0.25rem; list-style: none; }
+  .legal-toc a {
+    color: var(--text3);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    transition: color var(--transition), background var(--transition);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .legal-toc a::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+    transition: background var(--transition), transform var(--transition);
+  }
+  .legal-toc a:hover { color: var(--primary); background: rgba(var(--primary-rgb), 0.05); }
+  .legal-toc a:hover::before { background: var(--primary); transform: scale(1.4); }
+
+  /* content */
+  .legal-content {
+    animation: legal-fade-up 0.7s 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    min-width: 0;
+  }
+  .legal-section {
+    margin-bottom: clamp(2rem, 5vw, 3rem);
+    padding-bottom: clamp(2rem, 5vw, 3rem);
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: calc(var(--nav-h) + 1.5rem);
+  }
+  .legal-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+  .legal-section-header { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 1.35rem; }
+  .legal-section-icon {
+    width: clamp(40px, 9vw, 48px);
+    height: clamp(40px, 9vw, 48px);
+    border-radius: 14px;
+    flex-shrink: 0;
+    background: rgba(var(--primary-rgb), 0.08);
+    border: 1px solid rgba(var(--primary-rgb), 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .legal-section:hover .legal-section-icon {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #000;
+    transform: scale(1.06) rotate(-3deg);
+    box-shadow: 0 8px 20px -6px rgba(var(--primary-rgb), 0.5);
+  }
+  .legal-section h2 {
+    font-size: clamp(1.1rem, 2.8vw, 1.4rem);
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .legal-content p { color: var(--text2); line-height: 1.8; font-size: clamp(0.9rem, 1.95vw, 0.98rem); margin-bottom: 0.9rem; }
+  .legal-content p:last-child { margin-bottom: 0; }
+  .legal-content ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin: 0.85rem 0 1rem; }
+  .legal-content ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    color: var(--text2);
+    font-size: clamp(0.88rem, 1.9vw, 0.96rem);
+    line-height: 1.65;
+    padding: 0.15rem 0;
+  }
+  .legal-content ul li::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    flex-shrink: 0;
+    margin-top: 0.6rem;
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.12);
+  }
+  .legal-content strong { color: var(--text); font-weight: 700; }
+  .legal-content a { color: var(--primary); font-weight: 500; transition: opacity var(--transition); text-decoration: none; border-bottom: 1px solid rgba(var(--primary-rgb), 0.3); }
+  .legal-content a:hover { opacity: 0.75; border-bottom-color: transparent; }
+
+  /* highlight */
+  .legal-highlight {
+    position: relative;
+    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.06), rgba(var(--primary-rgb), 0.02));
+    border: 1px solid rgba(var(--primary-rgb), 0.15);
+    border-left: 4px solid var(--primary);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 1.15rem 1.35rem;
+    margin: 0 0 2rem;
+    color: var(--text2);
+    font-size: clamp(0.88rem, 1.95vw, 0.98rem);
+    line-height: 1.7;
+  }
+  .legal-highlight::before {
+    content: "\f05a";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    top: 1.15rem; right: 1.25rem;
+    font-size: 1.4rem;
+    color: rgba(var(--primary-rgb), 0.18);
+  }
+  .legal-highlight strong { color: var(--primary); }
+  .legal-section .legal-highlight { margin: 1rem 0 0; }
+
+  /* contact card */
+  .legal-contact-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(1.15rem, 3vw, 1.6rem);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-top: 1rem;
+    transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+    box-shadow: var(--shadow);
+  }
+  .legal-contact-card:hover { border-color: rgba(var(--primary-rgb), 0.35); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .legal-contact-card .lcc-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    flex-shrink: 0;
+    background: rgba(var(--primary-rgb), 0.08);
+    border: 1px solid rgba(var(--primary-rgb), 0.18);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary);
+    font-size: 1.15rem;
+    transition: all var(--transition);
+  }
+  .legal-contact-card:hover .lcc-icon { background: var(--primary); color: #000; border-color: var(--primary); }
+  .legal-contact-card .lcc-body { min-width: 0; flex: 1; }
+  .legal-contact-card .lcc-body strong {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text3);
+    margin-bottom: 0.35rem;
+    font-weight: 700;
+  }
+  .legal-contact-card .lcc-body a,
+  .legal-contact-card .lcc-body span { color: var(--text); font-size: 0.98rem; font-weight: 600; word-break: break-word; text-decoration: none; }
+  .legal-contact-card .lcc-body a:hover { color: var(--primary); }
+
+  /* responsive */
+  @media (max-width: 960px) {
+    .legal-layout { grid-template-columns: minmax(0, 1fr); gap: 1.75rem; }
+    .legal-toc { position: static; max-height: none; overflow: visible; }
+    .legal-toc ul { flex-direction: row; flex-wrap: wrap; gap: 0.4rem 0.5rem; }
+    .legal-toc a { font-size: 0.78rem; padding: 0.4rem 0.75rem; background: var(--bg3); border: 1px solid var(--border); border-radius: 60px; align-items: center; }
+    .legal-toc a::before { margin-top: 0; width: 4px; height: 4px; }
+    .legal-toc a:hover { background: rgba(var(--primary-rgb), 0.08); border-color: rgba(var(--primary-rgb), 0.25); }
+  }
+  @media (max-width: 600px) {
+    .legal-hero h1 { font-size: clamp(1.85rem, 8.5vw, 2.6rem); }
+    .legal-meta { gap: 0.5rem; }
+    .legal-meta span { font-size: 0.7rem; padding: 0.35rem 0.7rem; }
+    .legal-body { padding-top: 2rem; padding-bottom: 3rem; }
+    .legal-section-icon { width: 40px; height: 40px; font-size: 0.95rem; border-radius: 12px; }
+    .legal-section h2 { font-size: 1.08rem; }
+    .legal-highlight { padding: 1rem 1.15rem; }
+    .legal-contact-card { padding: 1rem; }
+    .legal-contact-card .lcc-icon { width: 42px; height: 42px; font-size: 1rem; border-radius: 12px; }
+  }
+  @media (max-width: 380px) {
+    .legal-hero h1 { font-size: 1.7rem; }
+    .legal-section-icon { width: 36px; height: 36px; font-size: 0.85rem; }
+    .legal-section h2 { font-size: 1rem; }
+    .legal-content p, .legal-content ul li, .legal-highlight { font-size: 0.85rem; }
+    .legal-toc a { font-size: 0.72rem; padding: 0.35rem 0.65rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .legal-hero h1, .legal-toc, .legal-content { animation: none; }
+    .legal-hero h1 .accent::after { transform: scaleX(1); }
+    .legal-section:hover .legal-section-icon { transform: none; }
+    .legal-contact-card:hover { transform: none; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="legal-hero">
+  <div class="container">
+    <p class="section-eyebrow">Legal</p>
+    <h1>Terms of <span class="accent">Service</span></h1>
+    <div class="legal-meta">
+      <span><i class="fas fa-calendar-alt"></i> Last updated: January 2025</span>
+      <span><i class="fas fa-file-contract"></i> Please read carefully</span>
+    </div>
   </div>
+</section>
 
-  <!-- ============================================================
-       HERO
-       ============================================================ -->
-  <section class="legal-hero">
-    <div class="container">
-      <p class="section-eyebrow">Legal</p>
-      <h1>Terms of <span class="accent">Service</span></h1>
-      <div class="legal-meta">
-        <span><i class="fas fa-calendar-alt"></i> Last updated: January 2025</span>
-        <span><i class="fas fa-file-contract"></i> Please read carefully</span>
+<section class="legal-body">
+  <div class="container">
+    <div class="legal-layout">
+
+      <aside class="legal-toc" aria-label="Table of contents">
+        <h3>Contents</h3>
+        <ul>
+          <li><a href="#acceptance">Acceptance</a></li>
+          <li><a href="#services-desc">Services</a></li>
+          <li><a href="#accounts">Accounts</a></li>
+          <li><a href="#payments">Payments</a></li>
+          <li><a href="#health">Health Disclaimer</a></li>
+          <li><a href="#conduct">Conduct</a></li>
+          <li><a href="#ip">Intellectual Property</a></li>
+          <li><a href="#liability">Liability</a></li>
+          <li><a href="#termination">Termination</a></li>
+          <li><a href="#governing">Governing Law</a></li>
+          <li><a href="#contact-terms">Contact</a></li>
+        </ul>
+      </aside>
+
+      <div class="legal-content">
+
+        <div class="legal-highlight">
+          <strong>Important:</strong> By using this website or the client portal,
+          you agree to these Terms of Service. If you do not agree, please do not
+          use our services.
+        </div>
+
+        <div class="legal-section" id="acceptance">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-handshake"></i></div>
+            <h2>1. Acceptance of Terms</h2>
+          </div>
+          <p>By accessing or using the website and client portal operated by <strong>Sahil Panwar</strong> ("we", "us", "our"), you agree to be bound by these Terms of Service and our Privacy Policy. These terms apply to all visitors, clients, and users of the service.</p>
+        </div>
+
+        <div class="legal-section" id="services-desc">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-dumbbell"></i></div>
+            <h2>2. Description of Services</h2>
+          </div>
+          <p>We provide personal fitness training and nutrition coaching services, including but not limited to:</p>
+          <ul>
+            <li>Personalised workout programs and meal plans</li>
+            <li>One-on-one and online coaching sessions</li>
+            <li>Progress tracking, check-ins, and feedback via the client portal</li>
+            <li>Educational content through the blog and community</li>
+          </ul>
+          <p>We reserve the right to modify, suspend, or discontinue any part of the service at any time with reasonable notice.</p>
+        </div>
+
+        <div class="legal-section" id="accounts">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-user-circle"></i></div>
+            <h2>3. Client Accounts</h2>
+          </div>
+          <p>To access the client portal, you must register with a valid email address and password. You are responsible for:</p>
+          <ul>
+            <li>Maintaining the confidentiality of your login credentials</li>
+            <li>All activity that occurs under your account</li>
+            <li>Notifying us immediately of any unauthorised access</li>
+          </ul>
+          <p>You must be at least 16 years old to create an account. We reserve the right to suspend or terminate accounts that violate these terms.</p>
+        </div>
+
+        <div class="legal-section" id="payments">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-credit-card"></i></div>
+            <h2>4. Payments &amp; Refunds</h2>
+          </div>
+          <p>Payment terms are agreed upon individually for each coaching package. General conditions:</p>
+          <ul>
+            <li>Invoices are issued through the client portal and are due on the stated date</li>
+            <li>Accepted payment methods include UPI, bank transfer, and other methods as agreed</li>
+            <li>Refunds are considered on a case-by-case basis — please contact us within 7 days of payment if you have a concern</li>
+            <li>Sessions cancelled with less than 24 hours notice may be charged in full</li>
+          </ul>
+        </div>
+
+        <div class="legal-section" id="health">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-heartbeat"></i></div>
+            <h2>5. Health &amp; Medical Disclaimer</h2>
+          </div>
+          <p>Our services are for general fitness and wellness purposes only and do not constitute medical advice. By using our services, you acknowledge that:</p>
+          <ul>
+            <li>You should consult a qualified medical professional before starting any new exercise or nutrition programme</li>
+            <li>You are responsible for disclosing any pre-existing medical conditions, injuries, or limitations</li>
+            <li>We are not liable for any injury, illness, or adverse health outcome resulting from following our programmes</li>
+            <li>You participate in all physical activities at your own risk</li>
+          </ul>
+          <div class="legal-highlight">
+            <strong>Always consult your doctor</strong> before beginning a new fitness or diet programme, especially if you have a pre-existing health condition.
+          </div>
+        </div>
+
+        <div class="legal-section" id="conduct">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-shield-alt"></i></div>
+            <h2>6. Acceptable Use</h2>
+          </div>
+          <p>You agree not to:</p>
+          <ul>
+            <li>Use the service for any unlawful purpose</li>
+            <li>Harass, abuse, or harm other community members or staff</li>
+            <li>Share your account credentials with others</li>
+            <li>Attempt to gain unauthorised access to any part of the system</li>
+            <li>Post spam, offensive, or misleading content in the community</li>
+            <li>Reverse-engineer or scrape any part of the platform</li>
+          </ul>
+        </div>
+
+        <div class="legal-section" id="ip">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-copyright"></i></div>
+            <h2>7. Intellectual Property</h2>
+          </div>
+          <p>All content on this website — including workout programmes, meal plans, blog posts, images, and branding — is the intellectual property of <strong>Sahil Panwar</strong> unless otherwise stated.</p>
+          <p>You may not reproduce, distribute, or create derivative works from our content without prior written permission. Personal use for your own training is permitted.</p>
+        </div>
+
+        <div class="legal-section" id="liability">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-balance-scale"></i></div>
+            <h2>8. Limitation of Liability</h2>
+          </div>
+          <p>To the fullest extent permitted by law, we shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of our services, including but not limited to:</p>
+          <ul>
+            <li>Physical injury or health complications</li>
+            <li>Loss of data or service interruptions</li>
+            <li>Errors or inaccuracies in content</li>
+          </ul>
+          <p>Our total liability for any claim shall not exceed the amount you paid us in the 30 days preceding the claim.</p>
+        </div>
+
+        <div class="legal-section" id="termination">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-times-circle"></i></div>
+            <h2>9. Termination</h2>
+          </div>
+          <p>Either party may terminate the coaching relationship at any time with reasonable notice. We reserve the right to immediately suspend or terminate your account if you violate these terms. Upon termination, your access to the client portal will be revoked. You may request a copy of your data before termination.</p>
+        </div>
+
+        <div class="legal-section" id="governing">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-gavel"></i></div>
+            <h2>10. Governing Law</h2>
+          </div>
+          <p>These Terms of Service are governed by the laws of India. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the courts located in New Delhi, India.</p>
+        </div>
+
+        <div class="legal-section" id="contact-terms">
+          <div class="legal-section-header">
+            <div class="legal-section-icon"><i class="fas fa-envelope"></i></div>
+            <h2>11. Contact Us</h2>
+          </div>
+          <p>If you have any questions about these Terms of Service, please contact us:</p>
+
+          <div class="legal-contact-card">
+            <div class="lcc-icon"><i class="fas fa-envelope"></i></div>
+            <div class="lcc-body">
+              <strong>Email</strong>
+              <a href="mailto:{{ cfg.get('contact_email','sahil@example.com') }}">{{ cfg.get('contact_email','sahil@example.com') }}</a>
+            </div>
+          </div>
+
+          {% if cfg.get('contact_whatsapp') %}
+          <div class="legal-contact-card" style="margin-top:0.75rem">
+            <div class="lcc-icon"><i class="fab fa-whatsapp"></i></div>
+            <div class="lcc-body">
+              <strong>WhatsApp</strong>
+              <a href="https://wa.me/{{ cfg.contact_whatsapp|replace('+','')|replace(' ','') }}" target="_blank" rel="noopener">{{ cfg.contact_whatsapp }}</a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
       </div>
     </div>
-  </section>
-
-  <!-- ============================================================
-       BODY
-       ============================================================ -->
-  <section class="legal-body">
-    <div class="container">
-      <div class="legal-layout">
-
-        <!-- TOC -->
-        <aside class="legal-toc" aria-label="Table of contents">
-          <h3>Contents</h3>
-          <ul>
-            <li><a href="#acceptance">Acceptance</a></li>
-            <li><a href="#services-desc">Services</a></li>
-            <li><a href="#accounts">Accounts</a></li>
-            <li><a href="#payments">Payments</a></li>
-            <li><a href="#health">Health Disclaimer</a></li>
-            <li><a href="#conduct">Conduct</a></li>
-            <li><a href="#ip">Intellectual Property</a></li>
-            <li><a href="#liability">Liability</a></li>
-            <li><a href="#termination">Termination</a></li>
-            <li><a href="#governing">Governing Law</a></li>
-            <li><a href="#contact-terms">Contact</a></li>
-          </ul>
-        </aside>
-
-        <!-- Content -->
-        <div class="legal-content">
-
-          <div class="legal-highlight">
-            <strong>Important:</strong> By using this website or the client portal,
-            you agree to these Terms of Service. If you do not agree, please do not
-            use our services.
-          </div>
-
-          <!-- 1 -->
-          <div class="legal-section" id="acceptance">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-handshake"></i></div>
-              <h2>1. Acceptance of Terms</h2>
-            </div>
-            <p>By accessing or using the website and client portal operated by <strong>Sahil Panwar</strong> ("we", "us", "our"), you agree to be bound by these Terms of Service and our Privacy Policy. These terms apply to all visitors, clients, and users of the service.</p>
-          </div>
-
-          <!-- 2 -->
-          <div class="legal-section" id="services-desc">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-dumbbell"></i></div>
-              <h2>2. Description of Services</h2>
-            </div>
-            <p>We provide personal fitness training and nutrition coaching services, including but not limited to:</p>
-            <ul>
-              <li>Personalised workout programs and meal plans</li>
-              <li>One-on-one and online coaching sessions</li>
-              <li>Progress tracking, check-ins, and feedback via the client portal</li>
-              <li>Educational content through the blog and community</li>
-            </ul>
-            <p>We reserve the right to modify, suspend, or discontinue any part of the service at any time with reasonable notice.</p>
-          </div>
-
-          <!-- 3 -->
-          <div class="legal-section" id="accounts">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-user-circle"></i></div>
-              <h2>3. Client Accounts</h2>
-            </div>
-            <p>To access the client portal, you must register with a valid email address and password. You are responsible for:</p>
-            <ul>
-              <li>Maintaining the confidentiality of your login credentials</li>
-              <li>All activity that occurs under your account</li>
-              <li>Notifying us immediately of any unauthorised access</li>
-            </ul>
-            <p>You must be at least 16 years old to create an account. We reserve the right to suspend or terminate accounts that violate these terms.</p>
-          </div>
-
-          <!-- 4 -->
-          <div class="legal-section" id="payments">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-credit-card"></i></div>
-              <h2>4. Payments &amp; Refunds</h2>
-            </div>
-            <p>Payment terms are agreed upon individually for each coaching package. General conditions:</p>
-            <ul>
-              <li>Invoices are issued through the client portal and are due on the stated date</li>
-              <li>Accepted payment methods include UPI, bank transfer, and other methods as agreed</li>
-              <li>Refunds are considered on a case-by-case basis — please contact us within 7 days of payment if you have a concern</li>
-              <li>Sessions cancelled with less than 24 hours notice may be charged in full</li>
-            </ul>
-          </div>
-
-          <!-- 5 -->
-          <div class="legal-section" id="health">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-heartbeat"></i></div>
-              <h2>5. Health &amp; Medical Disclaimer</h2>
-            </div>
-            <p>Our services are for general fitness and wellness purposes only and do not constitute medical advice. By using our services, you acknowledge that:</p>
-            <ul>
-              <li>You should consult a qualified medical professional before starting any new exercise or nutrition programme</li>
-              <li>You are responsible for disclosing any pre-existing medical conditions, injuries, or limitations</li>
-              <li>We are not liable for any injury, illness, or adverse health outcome resulting from following our programmes</li>
-              <li>You participate in all physical activities at your own risk</li>
-            </ul>
-            <div class="legal-highlight">
-              <strong>Always consult your doctor</strong> before beginning a new fitness or diet programme, especially if you have a pre-existing health condition.
-            </div>
-          </div>
-
-          <!-- 6 -->
-          <div class="legal-section" id="conduct">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-shield-alt"></i></div>
-              <h2>6. Acceptable Use</h2>
-            </div>
-            <p>You agree not to:</p>
-            <ul>
-              <li>Use the service for any unlawful purpose</li>
-              <li>Harass, abuse, or harm other community members or staff</li>
-              <li>Share your account credentials with others</li>
-              <li>Attempt to gain unauthorised access to any part of the system</li>
-              <li>Post spam, offensive, or misleading content in the community</li>
-              <li>Reverse-engineer or scrape any part of the platform</li>
-            </ul>
-          </div>
-
-          <!-- 7 -->
-          <div class="legal-section" id="ip">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-copyright"></i></div>
-              <h2>7. Intellectual Property</h2>
-            </div>
-            <p>All content on this website — including workout programmes, meal plans, blog posts, images, and branding — is the intellectual property of <strong>Sahil Panwar</strong> unless otherwise stated.</p>
-            <p>You may not reproduce, distribute, or create derivative works from our content without prior written permission. Personal use for your own training is permitted.</p>
-          </div>
-
-          <!-- 8 -->
-          <div class="legal-section" id="liability">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-balance-scale"></i></div>
-              <h2>8. Limitation of Liability</h2>
-            </div>
-            <p>To the fullest extent permitted by law, we shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of our services, including but not limited to:</p>
-            <ul>
-              <li>Physical injury or health complications</li>
-              <li>Loss of data or service interruptions</li>
-              <li>Errors or inaccuracies in content</li>
-            </ul>
-            <p>Our total liability for any claim shall not exceed the amount you paid us in the 30 days preceding the claim.</p>
-          </div>
-
-          <!-- 9 -->
-          <div class="legal-section" id="termination">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-times-circle"></i></div>
-              <h2>9. Termination</h2>
-            </div>
-            <p>Either party may terminate the coaching relationship at any time with reasonable notice. We reserve the right to immediately suspend or terminate your account if you violate these terms. Upon termination, your access to the client portal will be revoked. You may request a copy of your data before termination.</p>
-          </div>
-
-          <!-- 10 -->
-          <div class="legal-section" id="governing">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-gavel"></i></div>
-              <h2>10. Governing Law</h2>
-            </div>
-            <p>These Terms of Service are governed by the laws of India. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the courts located in New Delhi, India.</p>
-          </div>
-
-          <!-- 11 -->
-          <div class="legal-section" id="contact-terms">
-            <div class="legal-section-header">
-              <div class="legal-section-icon"><i class="fas fa-envelope"></i></div>
-              <h2>11. Contact Us</h2>
-            </div>
-            <p>If you have any questions about these Terms of Service, please contact us:</p>
-
-            <div class="legal-contact-card">
-              <div class="lcc-icon"><i class="fas fa-envelope"></i></div>
-              <div class="lcc-body">
-                <strong>Email</strong>
-                <a href="mailto:sahil@example.com">sahil@example.com</a>
-              </div>
-            </div>
-
-            <div class="legal-contact-card" style="margin-top:0.75rem">
-              <div class="lcc-icon"><i class="fab fa-whatsapp"></i></div>
-              <div class="lcc-body">
-                <strong>WhatsApp</strong>
-                <a href="https://wa.me/919999999999" target="_blank" rel="noopener">
-                  +91 99999 99999
-                </a>
-              </div>
-            </div>
-
-          </div>
-
-        </div><!-- /legal-content -->
-      </div><!-- /legal-layout -->
-    </div>
-  </section>
-
-</body>
-</html>
+  </div>
+</section>
+{% endblock %}
