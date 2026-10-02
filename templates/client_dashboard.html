@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}My Dashboard — Sahil Panwar Fitness{% endblock %}
 
 {% block head %}
@@ -147,7 +147,7 @@
 }
 
 .portal-nav-btn.active {
-  background: rgba(232, 255, 0, 0.08);
+  background: rgba(var(--primary-rgb), 0.08);
   color: var(--primary);
   font-weight: 600;
 }
@@ -273,7 +273,7 @@
 .ov-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-  border-color: rgba(232, 255, 0, 0.15);
+  border-color: rgba(var(--primary-rgb), 0.15);
 }
 
 .ov-card.danger::before { background: var(--danger); }
@@ -332,7 +332,7 @@
 }
 
 .streak-card:hover {
-  border-color: rgba(232, 255, 0, 0.15);
+  border-color: rgba(var(--primary-rgb), 0.15);
   transform: translateY(-2px);
 }
 
@@ -410,7 +410,7 @@
 }
 
 .ring-card:hover {
-  border-color: rgba(232, 255, 0, 0.15);
+  border-color: rgba(var(--primary-rgb), 0.15);
   transform: translateY(-3px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
@@ -464,10 +464,10 @@
 .goal-banner {
   background: linear-gradient(
     135deg,
-    rgba(232, 255, 0, 0.08),
-    rgba(232, 255, 0, 0.02)
+    rgba(var(--primary-rgb), 0.08),
+    rgba(var(--primary-rgb), 0.02)
   );
-  border: 1px solid rgba(232, 255, 0, 0.2);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
   border-radius: var(--portal-radius);
   padding: clamp(1rem, 2.6vw, 1.25rem) clamp(1.1rem, 3vw, 1.5rem);
   margin-bottom: clamp(1rem, 2.6vw, 1.5rem);
@@ -479,7 +479,7 @@
 }
 
 .goal-banner:hover {
-  border-color: rgba(232, 255, 0, 0.35);
+  border-color: rgba(var(--primary-rgb), 0.35);
 }
 
 .goal-banner .goal-icon {
@@ -548,7 +548,7 @@
 }
 
 .tracker-input-card:hover {
-  border-color: rgba(232, 255, 0, 0.15);
+  border-color: rgba(var(--primary-rgb), 0.15);
 }
 
 .tracker-input-card label {
@@ -602,7 +602,7 @@
 }
 
 .weekly-card:hover {
-  border-color: rgba(232, 255, 0, 0.15);
+  border-color: rgba(var(--primary-rgb), 0.15);
   transform: translateY(-2px);
 }
 
@@ -643,10 +643,10 @@
 .setup-card {
   background: linear-gradient(
     135deg,
-    rgba(232, 255, 0, 0.07),
-    rgba(232, 255, 0, 0.01)
+    rgba(var(--primary-rgb), 0.07),
+    rgba(var(--primary-rgb), 0.01)
   );
-  border: 1px solid rgba(232, 255, 0, 0.25);
+  border: 1px solid rgba(var(--primary-rgb), 0.25);
   border-radius: var(--portal-radius);
   padding: clamp(1.25rem, 3.4vw, 2rem);
   text-align: center;
@@ -655,7 +655,7 @@
 }
 
 .setup-card:hover {
-  border-color: rgba(232, 255, 0, 0.45);
+  border-color: rgba(var(--primary-rgb), 0.45);
 }
 
 .setup-card i {
@@ -692,7 +692,7 @@
 }
 
 .log-row:hover {
-  border-color: rgba(232, 255, 0, 0.15);
+  border-color: rgba(var(--primary-rgb), 0.15);
   transform: translateX(4px);
 }
 
@@ -742,7 +742,7 @@
 }
 
 .chart-card:hover {
-  border-color: rgba(232, 255, 0, 0.1);
+  border-color: rgba(var(--primary-rgb), 0.1);
 }
 
 .chart-card h4 {
@@ -1083,8 +1083,8 @@
 }
 
 .badge-card.earned {
-  border-color: rgba(232, 255, 0, 0.4);
-  background: rgba(232, 255, 0, 0.05);
+  border-color: rgba(var(--primary-rgb), 0.4);
+  background: rgba(var(--primary-rgb), 0.05);
 }
 
 .badge-card.locked {
@@ -1115,10 +1115,10 @@
 .tip-card {
   background: linear-gradient(
     135deg,
-    rgba(232, 255, 0, 0.07),
-    rgba(232, 255, 0, 0.01)
+    rgba(var(--primary-rgb), 0.07),
+    rgba(var(--primary-rgb), 0.01)
   );
-  border: 1px solid rgba(232, 255, 0, 0.2);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
   border-radius: 12px;
   padding: clamp(0.85rem, 2.2vw, 1rem) clamp(1rem, 2.6vw, 1.25rem);
   margin-bottom: 0.75rem;
@@ -1229,7 +1229,7 @@
 }
 
 .meal-check-item:hover {
-  border-color: rgba(232, 255, 0, 0.2);
+  border-color: rgba(var(--primary-rgb), 0.2);
 }
 
 .meal-check-item.checked {
@@ -1370,7 +1370,7 @@
 }
 
 .goal-item:hover {
-  border-color: rgba(232, 255, 0, 0.2);
+  border-color: rgba(var(--primary-rgb), 0.2);
 }
 
 .goal-item .gi-header {
@@ -1455,7 +1455,7 @@
 }
 
 .form-section:hover {
-  border-color: rgba(232, 255, 0, 0.15);
+  border-color: rgba(var(--primary-rgb), 0.15);
 }
 
 .form-section h4 {
@@ -1539,7 +1539,7 @@
   border-radius: 50%;
   background: var(--primary);
   cursor: pointer;
-  box-shadow: 0 0 0 4px rgba(232, 255, 0, 0.15);
+  box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15);
 }
 
 .form-group input[type="range"]::-moz-range-thumb {
@@ -2546,7 +2546,7 @@
   }
 
   .portal-nav-btn.active:hover {
-    background: rgba(232, 255, 0, 0.08);
+    background: rgba(var(--primary-rgb), 0.08);
     color: var(--primary);
   }
 
@@ -2745,7 +2745,7 @@
         <div class="ring-card">
           <svg class="ring-svg" viewBox="0 0 120 120">
             <circle class="ring-bg" cx="60" cy="60" r="50"/>
-            <circle class="ring-fill" id="ringCalIn" cx="60" cy="60" r="50" stroke="#e8ff00"
+            <circle class="ring-fill" id="ringCalIn" cx="60" cy="60" r="50" stroke="var(--primary)"
               stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)"/>
             <text x="60" y="55" text-anchor="middle" fill="#f0f0f0" font-size="14" font-weight="800" id="ringCalInVal">0</text>
             <text x="60" y="70" text-anchor="middle" fill="#666" font-size="9">kcal eaten</text>
@@ -2828,7 +2828,7 @@
             <span class="unit">steps walked</span>
           </div>
           <div class="tracker-input-card">
-            <label><i class="fas fa-utensils" style="color:#e8ff00"></i> Calories Eaten</label>
+            <label><i class="fas fa-utensils" style="color:var(--primary)"></i> Calories Eaten</label>
             <input type="number" id="log_cal_in" min="0" max="10000" placeholder="2000"/>
             <span class="unit">kcal consumed</span>
           </div>
@@ -3213,10 +3213,16 @@
 {% block scripts %}
 <script>
 const api = async (url, method='GET', body=null) => {
-  const opts = { method, headers: {'Content-Type':'application/json'} };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(url, opts);
-  return { ok: res.ok, data: await res.json() };
+  try {
+    const opts = { method, headers: {'Content-Type':'application/json'} };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(url, opts);
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, data };
+  } catch (e) {
+    console.warn('API error', url, e);
+    return { ok: false, data: {} };
+  }
 };
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const fmt = n => n == null ? '—' : Number(n).toLocaleString();
@@ -3247,7 +3253,7 @@ function switchTab(name) {
   closeSidebar();
   if (name === 'checkins') loadCheckinHistory();
   if (name === 'progress') { loadProgress(); loadProgressPhotos(); }
-  if (name === 'messages') { loadMessages(); startMsgPolling(); } else { stopMsgPolling(); }
+  if (name === 'messages') { _lastMsgIds.clear(); document.getElementById('chatBox').innerHTML = '<p class="empty-state" id="chatEmpty">Loading messages...</p>'; loadMessages(); startMsgPolling(); } else { stopMsgPolling(); }
   if (name === 'workouts') loadWorkout();
   if (name === 'nutrition') { loadNutrition(); loadMealChecklist(); }
   if (name === 'schedule') loadSessions();
@@ -3544,7 +3550,7 @@ function renderLogCharts(logs) {
   if (calCtx) {
     if (_calChart) _calChart.destroy();
     _calChart = new Chart(calCtx, { type:'bar', data:{ labels, datasets:[
-      { label:'Eaten', data:last7.map(l=>l.calories_in||0), backgroundColor:'rgba(232,255,0,0.7)', borderRadius:4 },
+      { label:'Eaten', data:last7.map(l=>l.calories_in||0), backgroundColor:'rgba(var(--primary-rgb),0.7)', borderRadius:4 },
       { label:'Burned', data:last7.map(l=>l.calories_burned||0), backgroundColor:'rgba(255,112,67,0.7)', borderRadius:4 }
     ]}, options:chartOpts });
   }
@@ -3601,7 +3607,7 @@ async function deleteLog(date) {
 // ── FITNESS PROFILE ──────────────────────────────────────────────────────────
 async function loadFitnessProfile() {
   const { data } = await api('/api/client/fitness_profile');
-  if (!data || !data.height) return;
+  if (!data) return;
   document.getElementById('fp_height').value  = data.height || '';
   document.getElementById('fp_age').value     = data.age || '';
   document.getElementById('fp_weight').value  = data.weight || '';
@@ -3736,7 +3742,7 @@ async function loadCheckinHistory() {
         <span>🥗 Diet: ${c.adherence}/10</span>
       </div>
       ${c.notes ? `<p style="margin:0.5rem 0 0;font-size:0.85rem;color:var(--text2)">${esc(c.notes)}</p>` : ''}
-      ${c.feedback ? `<div style="margin-top:0.75rem;padding:0.75rem;background:rgba(232,255,0,0.06);border-left:3px solid var(--primary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:0.85rem"><strong style="color:var(--primary)">Trainer Feedback:</strong><br>${esc(c.feedback)}</div>` : ''}
+      ${c.feedback ? `<div style="margin-top:0.75rem;padding:0.75rem;background:rgba(var(--primary-rgb),0.06);border-left:3px solid var(--primary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:0.85rem"><strong style="color:var(--primary)">Trainer Feedback:</strong><br>${esc(c.feedback)}</div>` : ''}
     </div>`).join('');
 }
 
@@ -3764,7 +3770,7 @@ async function loadProgress() {
     const pts = [...data].reverse().filter(d => d.weight);
     _weightChart = new Chart(wCtx, { type:'line', data:{ labels: pts.map(d=>d.date), datasets:[{
       label:'Weight (kg)', data: pts.map(d=>d.weight),
-      borderColor:'#e8ff00', backgroundColor:'rgba(232,255,0,0.08)', tension:0.3, pointRadius:4
+      borderColor:'var(--primary)', backgroundColor:'rgba(var(--primary-rgb),0.08)', tension:0.3, pointRadius:4
     }]}, options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#aaa' } } }, scales:{ x:{ ticks:{ color:'#666' }, grid:{ color:'#1a1a1a' } }, y:{ ticks:{ color:'#666' }, grid:{ color:'#1a1a1a' } } } } });
   }
 
@@ -3830,28 +3836,44 @@ function openImgLightbox(src) {
   document.body.appendChild(ov);
 }
 
+let _lastMsgIds = new Set();
+
 async function loadMessages() {
   const box = document.getElementById('chatBox');
   if (!box) return;
-  const { data } = await api('/api/client/messages');
+  const { ok, data } = await api('/api/client/messages');
+  if (!ok) return;
   const empty = document.getElementById('chatEmpty');
-  if (!data.length) { if (empty) empty.style.display = 'block'; return; }
+  if (!data.length) {
+    if (empty) empty.style.display = 'block';
+    _lastMsgIds.clear();
+    return;
+  }
   if (empty) empty.style.display = 'none';
+
   const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
-  box.innerHTML = data.map(m => {
+  let appended = false;
+
+  data.forEach(m => {
+    if (_lastMsgIds.has(m._id)) return;
+    _lastMsgIds.add(m._id);
     const isMe = m.sender === 'client';
-    return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:0.2rem">
-      <div style="max-width:72%;background:${isMe?'var(--primary)':'var(--bg3)'};color:${isMe?'#000':'var(--text)'};padding:0.6rem 0.9rem;border-radius:${isMe?'12px 12px 2px 12px':'12px 12px 12px 2px'};font-size:0.9rem;word-break:break-word">
+    const div = document.createElement('div');
+    div.dataset.msgId = m._id;
+    div.style.cssText = `display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:0.2rem`;
+    div.innerHTML = `<div style="max-width:72%;background:${isMe?'var(--primary)':'var(--bg3)'};color:${isMe?'#000':'var(--text)'};padding:0.6rem 0.9rem;border-radius:${isMe?'12px 12px 2px 12px':'12px 12px 12px 2px'};font-size:0.9rem;word-break:break-word">
         ${m.image_url ? `<img src="${m.image_url}" onclick="openImgLightbox('${m.image_url}')" style="max-width:200px;border-radius:6px;display:block;cursor:zoom-in;margin-bottom:${m.text?'0.4rem':'0'}"/>` : ''}
         ${m.text ? esc(m.text) : ''}
       </div>
       <div style="font-size:0.7rem;color:var(--text3);display:flex;gap:0.5rem;align-items:center">
         ${m.date}
         ${isMe ? `<button onclick="deleteMessage('${m._id}')" style="color:var(--text3);font-size:0.7rem" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
-      </div>
-    </div>`;
-  }).join('');
-  if (atBottom) box.scrollTop = box.scrollHeight;
+      </div>`;
+    box.appendChild(div);
+    appended = true;
+  });
+
+  if (appended && atBottom) box.scrollTop = box.scrollHeight;
 }
 
 async function sendMessage() {
@@ -3876,7 +3898,9 @@ async function sendMessage() {
 
 async function deleteMessage(id) {
   await api('/api/client/messages/' + id, 'DELETE');
-  loadMessages();
+  const el = document.querySelector(`[data-msg-id="${id}"]`);
+  if (el) el.remove();
+  _lastMsgIds.delete(id);
 }
 
 function onChatImgPick() {
@@ -3894,7 +3918,16 @@ function clearChatImg() {
 
 // ── WORKOUTS ─────────────────────────────────────────────────────────────────
 async function loadWorkout() {
-  const { data } = await api('/api/client/program');
+  const [progRes, logRes] = await Promise.all([
+    api('/api/client/program'),
+    api('/api/client/workout_log'),
+  ]);
+  const data = progRes.data;
+  const completedToday = new Set(
+    (logRes.data || [])
+      .filter(l => l.date === new Date().toISOString().slice(0,10))
+      .map(l => l.day_label)
+  );
   const el = document.getElementById('workoutContent');
   if (!data || !data.name) { el.innerHTML = '<p class="empty-state">No workout program assigned yet. Your trainer will assign one soon.</p>'; return; }
   el.innerHTML = `
@@ -3907,11 +3940,16 @@ async function loadWorkout() {
         <a class="btn btn-outline btn-sm" href="/api/client/program/pdf"><i class="fas fa-file-pdf"></i> Download PDF</a>
       </div>
     </div>
-    ${(data.days||[]).map((day, dayIdx) => `
+    ${(data.days||[]).map((day, dayIdx) => {
+      const done = completedToday.has(day.day_label);
+      return `
       <div class="form-section" style="margin-bottom:1rem">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
           <h4 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--primary);margin:0">${esc(day.day_label)}</h4>
-          <button class="btn btn-sm btn-outline" onclick="logWorkoutDay('${data._id}','${esc(day.day_label)}',this)" style="font-size:0.78rem"><i class="fas fa-check"></i> Mark Complete</button>
+          <button class="btn btn-sm btn-outline" onclick="logWorkoutDay('${data._id}','${esc(day.day_label)}',this)"
+            style="font-size:0.78rem${done ? ';color:#44cc88;border-color:#44cc88' : ''}" ${done ? 'disabled' : ''}>
+            <i class="fas fa-check"></i> ${done ? 'Done' : 'Mark Complete'}
+          </button>
         </div>
         ${(day.exercises||[]).map(ex => `
           <div style="display:flex;gap:1rem;align-items:flex-start;padding:0.75rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
@@ -3925,7 +3963,8 @@ async function loadWorkout() {
             ${ex.notes ? `<div style="width:100%;font-size:0.8rem;color:var(--text3);margin-top:0.25rem">${esc(ex.notes)}</div>` : ''}
             ${ex.video_embed ? `<div class="ex-demo"><iframe src="${esc(ex.video_embed)}" title="${esc(ex.exercise_name)} demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>` : ''}
           </div>`).join('')}
-      </div>`).join('')}`;
+      </div>`;
+    }).join('')}`;
 }
 
 // ── NUTRITION ─────────────────────────────────────────────────────────────────
@@ -3944,7 +3983,7 @@ async function loadNutrition() {
         <a class="btn btn-outline btn-sm" href="/api/client/meal_plan/pdf"><i class="fas fa-file-pdf"></i> Download PDF</a>
       </div>
       ${(m.calories||m.protein) ? `<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.75rem">
-        ${m.calories ? `<span style="background:rgba(232,255,0,0.1);color:var(--primary);padding:0.3rem 0.75rem;border-radius:20px;font-size:0.82rem;font-weight:700">${m.calories} kcal</span>` : ''}
+        ${m.calories ? `<span style="background:rgba(var(--primary-rgb),0.1);color:var(--primary);padding:0.3rem 0.75rem;border-radius:20px;font-size:0.82rem;font-weight:700">${m.calories} kcal</span>` : ''}
         ${m.protein ? `<span style="background:rgba(68,204,136,0.1);color:#44cc88;padding:0.3rem 0.75rem;border-radius:20px;font-size:0.82rem;font-weight:700">P: ${m.protein}g</span>` : ''}
         ${m.carbs ? `<span style="background:rgba(255,183,77,0.1);color:#ffb74d;padding:0.3rem 0.75rem;border-radius:20px;font-size:0.82rem;font-weight:700">C: ${m.carbs}g</span>` : ''}
         ${m.fats ? `<span style="background:rgba(255,112,67,0.1);color:#ff7043;padding:0.3rem 0.75rem;border-radius:20px;font-size:0.82rem;font-weight:700">F: ${m.fats}g</span>` : ''}
@@ -3969,6 +4008,17 @@ async function loadNutrition() {
 // -- SESSIONS -----------------------------------------------------------------
 let _sessions = [];
 let _calYear, _calMonth;
+
+// Parse IST date strings like "15 Jan 2025, 09:00 AM" returned by the backend
+const _MONTHS = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function parseSessDate(raw) {
+  if (!raw) return null;
+  const m = raw.match(/(\d{1,2})\s+(\w{3})\s+(\d{4})/);
+  if (!m) return null;
+  const mon = _MONTHS[m[2]];
+  if (mon === undefined) return null;
+  return new Date(parseInt(m[3]), mon, parseInt(m[1]));
+}
 
 function calInit() {
   const now = new Date();
@@ -4002,10 +4052,8 @@ function renderCal() {
   // Build a map: "YYYY-MM-DD" -> sessions[]
   const sessMap = {};
   _sessions.forEach(s => {
-    const raw = s.datetime || '';
-    // datetime comes as "DD MMM YYYY, HH:MM" from backend IST
-    const d = new Date(raw);
-    if (!isNaN(d)) {
+    const d = parseSessDate(s.datetime || '');
+    if (d && !isNaN(d)) {
       const key = d.getFullYear() + '-' +
         String(d.getMonth()+1).padStart(2,'0') + '-' +
         String(d.getDate()).padStart(2,'0');
@@ -4046,8 +4094,8 @@ function calDayClick(key, day) {
   // Show sessions for this day if any
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const daySess = _sessions.filter(s => {
-    const d = new Date(s.datetime);
-    if (isNaN(d)) return false;
+    const d = parseSessDate(s.datetime || '');
+    if (!d || isNaN(d)) return false;
     const k = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     return k === key;
   });
@@ -4293,7 +4341,7 @@ async function loadBodyFatChart() {
   if (_bodyFatChart) _bodyFatChart.destroy();
   const chartOpts = { responsive:true, plugins:{ legend:{ labels:{ color:'#aaa', boxWidth:12 } } }, scales:{ x:{ ticks:{ color:'#666' }, grid:{ color:'#1a1a1a' } }, y:{ ticks:{ color:'#666' }, grid:{ color:'#1a1a1a' } } } };
   _bodyFatChart = new Chart(ctx, { type:'line', data:{ labels: pts.map(d=>d.date), datasets:[
-    { label:'Weight (kg)', data: pts.map(d=>d.weight||null), borderColor:'#e8ff00', backgroundColor:'rgba(232,255,0,0.06)', tension:0.3, pointRadius:3, yAxisID:'y' },
+    { label:'Weight (kg)', data: pts.map(d=>d.weight||null), borderColor:'var(--primary)', backgroundColor:'rgba(var(--primary-rgb),0.06)', tension:0.3, pointRadius:3, yAxisID:'y' },
     { label:'Body Fat %', data: pts.map(d=>d.body_fat||null), borderColor:'#ff7043', backgroundColor:'rgba(255,112,67,0.06)', tension:0.3, pointRadius:3, yAxisID:'y1' },
   ]}, options:{ ...chartOpts, scales:{ x:{ ticks:{ color:'#666' }, grid:{ color:'#1a1a1a' } }, y:{ ticks:{ color:'#666' }, grid:{ color:'#1a1a1a' } }, y1:{ position:'right', ticks:{ color:'#ff7043' }, grid:{ drawOnChartArea:false } } } } });
 }
