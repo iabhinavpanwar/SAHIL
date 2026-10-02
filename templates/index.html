@@ -16,9 +16,9 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   <div class="hero-content">
     <div class="hero-badge">
       <span class="hero-badge-dot"></span>
-      <span>Available for New Clients</span>
+      <span>{{ cfg.get('hero_badge_text','Available for New Clients') }}</span>
     </div>
-    <p class="hero-eyebrow">Personal Fitness Trainer</p>
+    <p class="hero-eyebrow">{{ cfg.get('hero_eyebrow','Personal Fitness Trainer') }}</p>
     <h1 class="hero-name">{{ cfg.get('hero_name','SAHIL PANWAR') }}</h1>
     <p class="hero-tagline">
       {{ cfg.get('hero_tagline','Transform Your Body. Transform Your Life.') }}
@@ -44,7 +44,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
           A
         </div>
       </div>
-      <span>Trusted by <strong>100+</strong> clients</span>
+      <span>Trusted by <strong>{{ cfg.get('hero_trust_count','100+') }}</strong> {{ cfg.get('hero_trust_text','clients') }}</span>
     </div>
   </div>
 
@@ -117,8 +117,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
       <p class="section-eyebrow">What I Offer</p>
       <h2>Training Programs</h2>
       <p class="section-desc">
-        Tailored programs designed to push your limits and deliver real, lasting
-        results.
+        {{ cfg.get('services_lead','Tailored programs designed to push your limits and deliver real, lasting results.') }}
       </p>
     </div>
     <div class="cards-grid">
@@ -170,33 +169,29 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
       <div class="why-item reveal">
         <div class="why-icon"><i class="fas fa-user-check"></i></div>
         <div>
-          <h4>Personalised Plans</h4>
-          <p>Every program is built around your body, goals, and lifestyle.</p>
+          <h4>{{ cfg.get('why_1_title','Personalised Plans') }}</h4>
+          <p>{{ cfg.get('why_1_desc','Every program is built around your body, goals, and lifestyle.') }}</p>
         </div>
       </div>
       <div class="why-item reveal" style="--delay: 0.08s">
         <div class="why-icon"><i class="fas fa-chart-line"></i></div>
         <div>
-          <h4>Proven Results</h4>
-          <p>150+ documented transformations with measurable progress.</p>
+          <h4>{{ cfg.get('why_2_title','Proven Results') }}</h4>
+          <p>{{ cfg.get('why_2_desc','150+ documented transformations with measurable progress.') }}</p>
         </div>
       </div>
       <div class="why-item reveal" style="--delay: 0.16s">
         <div class="why-icon"><i class="fas fa-comments"></i></div>
         <div>
-          <h4>24/7 Support</h4>
-          <p>
-            Direct access via WhatsApp for questions, check-ins, and motivation.
-          </p>
+          <h4>{{ cfg.get('why_3_title','24/7 Support') }}</h4>
+          <p>{{ cfg.get('why_3_desc','Direct access via WhatsApp for questions, check-ins, and motivation.') }}</p>
         </div>
       </div>
       <div class="why-item reveal" style="--delay: 0.24s">
         <div class="why-icon"><i class="fas fa-certificate"></i></div>
         <div>
-          <h4>Certified Expert</h4>
-          <p>
-            Nationally certified with 5+ years of hands-on coaching experience.
-          </p>
+          <h4>{{ cfg.get('why_4_title','Certified Expert') }}</h4>
+          <p>{{ cfg.get('why_4_desc','Nationally certified with 5+ years of hands-on coaching experience.') }}</p>
         </div>
       </div>
     </div>
@@ -312,9 +307,9 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   <div class="cta-orb cta-orb-2"></div>
   <div class="container cta-inner reveal">
     <div class="cta-text">
-      <p class="cta-eyebrow">Limited Spots Available</p>
-      <h2>Ready to Start Your Transformation?</h2>
-      <p>Book a free consultation and let's build your plan together.</p>
+      <p class="cta-eyebrow">{{ cfg.get('cta_eyebrow','Limited Spots Available') }}</p>
+      <h2>{{ cfg.get('cta_heading','Ready to Start Your Transformation?') }}</h2>
+      <p>{{ cfg.get('cta_subtext',"Book a free consultation and let's build your plan together.") }}</p>
     </div>
     <div class="cta-actions">
       <a href="{{ url_for('contact') }}" class="btn btn-cta-dark btn-lg">

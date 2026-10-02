@@ -1435,8 +1435,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     <p class="section-eyebrow">Training Programs</p>
     <h1>Services &amp; <span class="accent">Pricing</span></h1>
     <p class="lead">
-      Choose the program that fits your goals — from one-on-one coaching to
-      fully managed transformation plans. Every package is tailored to you.
+      {{ cfg.get('services_lead','Choose the program that fits your goals — from one-on-one coaching to fully managed transformation plans. Every package is tailored to you.') }}
     </p>
   </div>
 </section>
@@ -1450,8 +1449,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
         class="fas fa-info-circle"
         style="color: var(--primary); margin-right: 0.35rem"
       ></i>
-      All plans include a <strong>free consultation</strong> &amp; personalized
-      onboarding.
+      {{ cfg.get('services_billing_note','All plans include a <strong>free consultation</strong> &amp; personalized onboarding.')|safe }}
     </p>
 
     <div class="pricing-grid">
@@ -1501,14 +1499,14 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     <!-- trust strip -->
     <div class="trust-strip">
       <div class="trust-item">
-        <i class="fas fa-shield-alt"></i> Money-back guarantee
+        <i class="fas fa-shield-alt"></i> {{ cfg.get('trust_1','Money-back guarantee') }}
       </div>
-      <div class="trust-item"><i class="fas fa-clock"></i> Cancel anytime</div>
+      <div class="trust-item"><i class="fas fa-clock"></i> {{ cfg.get('trust_2','Cancel anytime') }}</div>
       <div class="trust-item">
-        <i class="fas fa-comments"></i> 24/7 WhatsApp support
+        <i class="fas fa-comments"></i> {{ cfg.get('trust_3','24/7 WhatsApp support') }}
       </div>
       <div class="trust-item">
-        <i class="fas fa-star"></i> 200+ happy clients
+        <i class="fas fa-star"></i> {{ cfg.get('trust_4','200+ happy clients') }}
       </div>
     </div>
 
@@ -1557,10 +1555,9 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
 <!-- ══ CTA BANNER ═════════════════════════════════════════════════════════ -->
 <section class="services-cta">
   <div class="container">
-    <h2>Not Sure Which Plan Is Right For You?</h2>
+    <h2>{{ cfg.get('services_cta_heading','Not Sure Which Plan Is Right For You?') }}</h2>
     <p>
-      Book a free consultation and I'll help you choose the perfect program for
-      your goals.
+      {{ cfg.get('services_cta_text',"Book a free consultation and I'll help you choose the perfect program for your goals.") }}
     </p>
     <a href="{{ url_for('contact') }}" class="btn-cta-dark">
       <i class="fas fa-bolt"></i>

@@ -1532,11 +1532,10 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
 <!-- ══ PAGE HERO ══════════════════════════════════════════════════════════ -->
 <section class="contact-hero">
   <div class="container">
-    <p class="section-eyebrow">Let's Talk</p>
-    <h1>Book Your <span class="accent">Free Consultation</span></h1>
+    <p class="section-eyebrow">{{ cfg.get('contact_eyebrow',"Let's Talk") }}</p>
+    <h1>{{ cfg.get('contact_heading','Book Your Free Consultation')|safe }}</h1>
     <p class="lead">
-      Have a question about training, nutrition, or which program fits you best?
-      Send a message — I usually reply within 24 hours.
+      {{ cfg.get('contact_lead',"Have a question about training, nutrition, or which program fits you best? Send a message — I usually reply within 24 hours.") }}
     </p>
   </div>
 </section>
@@ -1548,8 +1547,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     <div class="contact-info">
       <h2>Get In Touch</h2>
       <p class="info-sub">
-        Reach out through any channel below — or fill in the form and I'll get
-        back to you personally.
+        {{ cfg.get('contact_info_sub',"Reach out through any channel below — or fill in the form and I'll get back to you personally.") }}
       </p>
 
       <div class="contact-items">
@@ -1652,8 +1650,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     <div class="contact-form-wrap">
       <h2>Send a Message</h2>
       <p class="form-sub">
-        Fill in the details below and I'll get back to you personally within 24
-        hours.
+        {{ cfg.get('contact_form_sub',"Fill in the details below and I'll get back to you personally within 24 hours.") }}
       </p>
 
       <form id="contactForm" class="contact-form" novalidate>

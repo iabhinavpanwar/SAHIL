@@ -1109,7 +1109,7 @@ Panwar') }}{% endblock %} {% block head %}
             >+</sup
           ></span
         >
-        <span class="badge-lbl">Years Coaching</span>
+        <span class="badge-lbl">{{ cfg.get('about_badge_label','Years Coaching') }}</span>
       </div>
 
       {% if cfg.get('about_video') %}
@@ -1142,7 +1142,7 @@ Panwar') }}{% endblock %} {% block head %}
           alt="Logo"
           style="width: 20px; height: 20px; object-fit: contain"
         />
-        <span>Certified Personal Trainer</span>
+        <span>{{ cfg.get('about_role_label','Certified Personal Trainer') }}</span>
       </div>
 
       <p class="about-bio">{{ cfg.get('about_bio','') }}</p>
