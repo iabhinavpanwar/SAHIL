@@ -7633,7 +7633,7 @@
       let _communityPage = 0;
       async function loadCommunityPosts(reset = true) {
         if (reset) _communityPage = 0;
-        const { data } = await api(/api/admin/community/posts?page= + _communityPage);
+        const { data } = await api(`/api/admin/community/posts?page=${_communityPage}`);
         const list = document.getElementById('communityPostsList');
         const label = document.getElementById('communityTotalLabel');
         const moreWrap = document.getElementById('communityLoadMoreWrap');
