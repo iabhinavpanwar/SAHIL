@@ -3161,9 +3161,15 @@
               body: JSON.stringify({ email }),
             });
             const data = await res.json();
-            msg.textContent = res.ok
-              ? "🎉 Check your email for the free plan!"
-              : data.error || "Error. Try again.";
+            if (res.ok) {
+              if (data.pdf_url) {
+                msg.innerHTML = '🎉 <a href="' + data.pdf_url + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Click here to download your free plan!</a>';
+              } else {
+                msg.textContent = "🎉 You're in! Your trainer will be in touch soon.";
+              }
+            } else {
+              msg.textContent = data.error || "Error. Try again.";
+            }
             msg.className = "form-msg " + (res.ok ? "success" : "error");
             if (res.ok) this.reset();
           } catch {
