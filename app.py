@@ -467,6 +467,8 @@ SKIP = {
     '/sw.js',
     '/robots.txt',
     '/sitemap.xml',
+    '/privacy',
+    '/terms',
 }
 
 @app.before_request
@@ -3828,6 +3830,72 @@ def community_delete_post(pid):
         return jsonify({'error': 'Invalid id'}), 400
     community_col.delete_one({'_id': oid, 'client_id': session['client_id']})
     return jsonify({'status': 'deleted'})
+
+# ── LEGAL & UTILITY PAGES ────────────────────────────────────────────────
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html', cfg=get_config())
+
+@app.route('/terms')
+def terms():
+    return render_template('terms.html', cfg=get_config())
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html', cfg=get_config()), 404
+
+@app.route('/robots.txt')
+def robots_txt():
+    lines = [
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /admin',
+        'Disallow: /api/',
+        'Disallow: /client/',
+        f'Sitemap: {request.url_root}sitemap.xml',
+    ]
+    return '\n'.join(lines), 200, {'Content-Type': 'text/plain; charset=utf-8'}
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    base = request.url_root.rstrip('/')
+    static_urls = [
+        ('/', '1.0', 'daily'),
+        ('/about', '0.8', 'monthly'),
+        ('/services', '0.9', 'monthly'),
+        ('/transformations', '0.8', 'weekly'),
+        ('/gallery', '0.7', 'weekly'),
+        ('/blog', '0.8', 'daily'),
+        ('/contact', '0.9', 'monthly'),
+        ('/community', '0.6', 'weekly'),
+        ('/privacy', '0.3', 'yearly'),
+        ('/terms', '0.3', 'yearly'),
+    ]
+    urls = []
+    for path, priority, freq in static_urls:
+        urls.append(
+            f'  <url>\n'
+            f'    <loc>{base}{path}</loc>\n'
+            f'    <changefreq>{freq}</changefreq>\n'
+            f'    <priority>{priority}</priority>\n'
+            f'  </url>'
+        )
+    if blogs_col is not None:
+        for post in blogs_col.find({'published': True}, {'_id': 1, 'date': 1}):
+            date_str = post['date'].strftime('%Y-%m-%d') if post.get('date') else ''
+            urls.append(
+                f'  <url>\n'
+                f'    <loc>{base}/blog/{post["_id"]}</loc>\n'
+                + (f'    <lastmod>{date_str}</lastmod>\n' if date_str else '') +
+                f'    <changefreq>monthly</changefreq>\n'
+                f'    <priority>0.6</priority>\n'
+                f'  </url>'
+            )
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    xml += '\n'.join(urls)
+    xml += '\n</urlset>'
+    return xml, 200, {'Content-Type': 'application/xml; charset=utf-8'}
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

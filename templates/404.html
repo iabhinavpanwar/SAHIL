@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}404 — Page Not Found | {{ cfg.get('hero_name','Sahil Panwar') }}{% endblock %}
+{% block head %}
+<style>
+  .error-page {
+    min-height: calc(100vh - var(--nav-h));
+    min-height: calc(100dvh - var(--nav-h));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(var(--nav-h) + 2rem) clamp(1rem, 4vw, 1.5rem) 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .error-page::before {
+    content: "";
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(300px, 60vw, 700px);
+    height: clamp(300px, 60vw, 700px);
+    background: radial-gradient(circle, rgba(var(--primary-rgb), 0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .error-inner {
+    text-align: center;
+    max-width: 560px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    animation: err-fade-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  @keyframes err-fade-up {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .error-code {
+    font-family: var(--font-display);
+    font-size: clamp(6rem, 22vw, 14rem);
+    line-height: 1;
+    letter-spacing: 0.04em;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(var(--primary-rgb), 0.25);
+    position: relative;
+    user-select: none;
+  }
+
+  .error-code::after {
+    content: "404";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary) 0%, rgba(var(--primary-rgb), 0.4) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 0;
+    filter: blur(0);
+  }
+
+  .error-icon {
+    width: clamp(56px, 14vw, 72px);
+    height: clamp(56px, 14vw, 72px);
+    border-radius: 50%;
+    background: rgba(var(--primary-rgb), 0.08);
+    border: 1px solid rgba(var(--primary-rgb), 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: clamp(1.4rem, 4vw, 1.8rem);
+    color: var(--primary);
+    animation: err-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes err-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.15); }
+    50%       { box-shadow: 0 0 0 14px rgba(var(--primary-rgb), 0); }
+  }
+
+  .error-eyebrow {
+    color: var(--primary);
+    font-size: clamp(0.7rem, 1.7vw, 0.82rem);
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .error-title {
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .error-desc {
+    color: var(--text2);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    max-width: 420px;
+    margin-inline: auto;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+
+  .error-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    justify-content: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .error-links a {
+    color: var(--text3);
+    font-size: clamp(0.78rem, 1.7vw, 0.85rem);
+    transition: color var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .error-links a:hover { color: var(--primary); }
+  .error-links a i { font-size: 0.75rem; }
+
+  @media (max-width: 480px) {
+    .error-actions { flex-direction: column; align-items: stretch; }
+    .error-actions .btn { width: 100%; justify-content: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .error-inner { animation: none; }
+    .error-icon  { animation: none; }
+  }
+</style>
+{% endblock %}
+{% block content %}
+<section class="error-page">
+  <div class="error-inner">
+    <div class="error-code">404</div>
+    <div class="error-icon"><i class="fas fa-dumbbell"></i></div>
+    <p class="error-eyebrow">Oops — Wrong Rep</p>
+    <h1 class="error-title">Page Not Found</h1>
+    <p class="error-desc">
+      Looks like this page skipped leg day and disappeared. Let's get you back
+      on track.
+    </p>
+    <div class="error-actions">
+      <a href="{{ url_for('index') }}" class="btn btn-primary">
+        <i class="fas fa-home"></i> Back to Home
+      </a>
+      <a href="{{ url_for('contact') }}" class="btn btn-outline">
+        <i class="fas fa-envelope"></i> Contact Me
+      </a>
+    </div>
+    <div class="error-links">
+      <a href="{{ url_for('services') }}"><i class="fas fa-bolt"></i> Services</a>
+      <a href="{{ url_for('transformations') }}"><i class="fas fa-images"></i> Results</a>
+      <a href="{{ url_for('blog') }}"><i class="fas fa-newspaper"></i> Blog</a>
+      <a href="{{ url_for('gallery') }}"><i class="fas fa-camera"></i> Gallery</a>
+      <a href="{{ url_for('client_login') }}"><i class="fas fa-user"></i> Client Portal</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
