@@ -3220,10 +3220,33 @@ def client_upload_image():
         return jsonify({'error': err}), 400
     return jsonify({'url': url})
 
-# -- PWA MANIFEST -------------------------------------------------------------
+# -- PWA MANIFEST (dynamic — theme_color from MongoDB cfg) -------------------
 @app.route('/manifest.json')
 def pwa_manifest():
-    return app.send_static_file('manifest.json')
+    cfg = get_config()
+    color = cfg.get('theme_color', '#e8ff00')
+    name  = cfg.get('hero_name', 'Sahil Panwar')
+    manifest = {
+        'name':             name,
+        'short_name':       name.split()[0] if name else 'Sahil',
+        'description':      'Your personal fitness training portal',
+        'start_url':        '/client/dashboard',
+        'display':          'standalone',
+        'background_color': '#0a0a0a',
+        'theme_color':      color,
+        'orientation':      'portrait-primary',
+        'icons': [
+            {'src': '/static/IMAGE/favicon.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any maskable'},
+            {'src': '/static/IMAGE/favicon.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any maskable'},
+        ],
+        'categories': ['health', 'fitness'],
+        'screenshots': [],
+    }
+    return Response(
+        json.dumps(manifest),
+        mimetype='application/manifest+json',
+        headers={'Cache-Control': 'no-cache'},
+    )
 
 @app.route('/sw.js')
 def service_worker():
