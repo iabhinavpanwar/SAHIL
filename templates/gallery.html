@@ -3,9 +3,9 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block content %}
 
 <section class="gallery-hero">
   <div class="container">
-    <p class="section-eyebrow">In Action</p>
-    <h1>Gallery</h1>
-    <p class="gallery-hero-sub">Photos &amp; Videos from training sessions</p>
+    <p class="section-eyebrow">{{ cfg.get('gallery_eyebrow','In Action') }}</p>
+    <h1>{{ cfg.get('gallery_heading','Gallery') }}</h1>
+    <p class="gallery-hero-sub">{{ cfg.get('gallery_hero_sub','Photos &amp; Videos from training sessions') }}</p>
   </div>
 </section>
 

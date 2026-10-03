@@ -352,11 +352,11 @@
 {% block content %}
 <section class="legal-hero">
   <div class="container">
-    <p class="section-eyebrow">Legal</p>
+    <p class="section-eyebrow">{{ cfg.get('terms_eyebrow','Legal') }}</p>
     <h1>Terms of <span class="accent">Service</span></h1>
     <div class="legal-meta">
-      <span><i class="fas fa-calendar-alt"></i> Last updated: January 2025</span>
-      <span><i class="fas fa-file-contract"></i> Please read carefully</span>
+      <span><i class="fas fa-calendar-alt"></i> {{ cfg.get('terms_last_updated','Last updated: January 2025') }}</span>
+      <span><i class="fas fa-file-contract"></i> {{ cfg.get('terms_read_note','Please read carefully') }}</span>
     </div>
   </div>
 </section>

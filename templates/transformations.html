@@ -1341,11 +1341,10 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
 <!-- ══ PAGE HERO ══════════════════════════════════════════════════════════ -->
 <section class="trans-hero">
   <div class="container">
-    <p class="section-eyebrow">Proof It Works</p>
-    <h1>Client <span class="accent">Transformations</span></h1>
+    <p class="section-eyebrow">{{ cfg.get('trans_eyebrow','Proof It Works') }}</p>
+    <h1>{{ cfg.get('trans_heading','Client Transformations') }}</h1>
     <p class="lead">
-      Real people. Real results. Drag the slider on any photo to see the before
-      &amp; after — no filters, no shortcuts.
+      {{ cfg.get('trans_lead','Real people. Real results. Drag the slider on any photo to see the before &amp; after — no filters, no shortcuts.') }}
     </p>
   </div>
 </section>
@@ -1497,7 +1496,7 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
     {% else %}
     <div class="trans-empty">
       <i class="fas fa-images"></i>
-      <p>Transformations coming soon. Ready to write your own story?</p>
+      <p>{{ cfg.get('trans_empty_text','Transformations coming soon. Ready to write your own story?') }}</p>
       <a href="{{ url_for('contact') }}" class="btn btn-primary"
         >Start Yours Today</a
       >
@@ -1509,10 +1508,9 @@ cfg.get('hero_name','Sahil Panwar') }}{% endblock %} {% block head %}
 <!-- ══ CTA BANNER ═════════════════════════════════════════════════════════ -->
 <section class="trans-cta">
   <div class="container">
-    <h2>Your Transformation Starts Here</h2>
+    <h2>{{ cfg.get('trans_cta_heading','Your Transformation Starts Here') }}</h2>
     <p>
-      Book a free consultation — let's talk goals, build a plan, and get you
-      results.
+      {{ cfg.get('trans_cta_text',"Book a free consultation — let's talk goals, build a plan, and get you results.") }}
     </p>
     <a href="{{ url_for('contact') }}" class="btn-cta-dark"
       >{{ cfg.get('hero_cta','Book Free Consultation') }}</a

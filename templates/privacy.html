@@ -352,11 +352,11 @@
 {% block content %}
 <section class="legal-hero">
   <div class="container">
-    <p class="section-eyebrow">Legal</p>
+    <p class="section-eyebrow">{{ cfg.get('privacy_eyebrow','Legal') }}</p>
     <h1>Privacy <span class="accent">Policy</span></h1>
     <div class="legal-meta">
-      <span><i class="fas fa-calendar-alt"></i> Last updated: January 2025</span>
-      <span><i class="fas fa-shield-alt"></i> Your data is safe with us</span>
+      <span><i class="fas fa-calendar-alt"></i> {{ cfg.get('privacy_last_updated','Last updated: January 2025') }}</span>
+      <span><i class="fas fa-shield-alt"></i> {{ cfg.get('privacy_data_note','Your data is safe with us') }}</span>
     </div>
   </div>
 </section>
