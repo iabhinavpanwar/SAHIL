@@ -943,6 +943,73 @@
     .comment-bubble { border: 1px solid #ddd; background: #f9f9f9; }
     .comments-section { display: block !important; }
   }
+
+  /* ── LEADERBOARD ── */
+  .leaderboard-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(1rem,2.6vw,1.25rem);
+    margin-bottom: clamp(1.25rem,3vw,1.75rem);
+  }
+  .leaderboard-box h3 {
+    font-size: clamp(0.78rem,1.8vw,0.88rem);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    margin-bottom: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .lb-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-rank {
+    font-size: clamp(0.78rem,1.8vw,0.88rem);
+    font-weight: 800;
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+    color: var(--text3);
+  }
+  .lb-rank.gold   { color: #ffd700; }
+  .lb-rank.silver { color: #c0c0c0; }
+  .lb-rank.bronze { color: #cd7f32; }
+  .lb-av {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--bg3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700; color: var(--text3);
+    border: 1px solid var(--border);
+  }
+  .lb-av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  .lb-name {
+    flex: 1;
+    font-size: clamp(0.8rem,1.9vw,0.88rem);
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lb-stats {
+    font-size: clamp(0.7rem,1.6vw,0.78rem);
+    color: var(--text3);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .lb-stats strong { color: var(--primary); }
+  .lb-empty { font-size: 0.82rem; color: var(--text3); text-align: center; padding: 0.75rem 0; }
+  .lb-month { font-size: 0.72rem; color: var(--text3); margin-top: 0.5rem; text-align: right; }
 </style>
 {% endblock %}
 
@@ -1017,6 +1084,13 @@
     <a href="{{ url_for('register') }}" class="btn btn-outline btn-sm" style="margin-left:.5rem">Register</a>
   </div>
   {% endif %}
+
+  <!-- leaderboard -->
+  <div class="leaderboard-box">
+    <h3><span>🏆</span> Monthly Workout Leaderboard</h3>
+    <div id="leaderboardList"><p class="lb-empty">Loading...</p></div>
+    <div class="lb-month" id="lbMonth"></div>
+  </div>
 
   <!-- feed -->
   <div class="feed" id="feed"></div>
@@ -1246,6 +1320,34 @@ async function loadPosts() {
       btn.classList.toggle('liked', d.liked);
     } finally { btn.disabled = false; }
   }
+
+  // ── leaderboard ──────────────────────────────────────────────────────────────
+  async function loadLeaderboard() {
+    const r = await fetch('/api/community/leaderboard');
+    const data = r.ok ? await r.json() : [];
+    const el = document.getElementById('leaderboardList');
+    const monthEl = document.getElementById('lbMonth');
+    const now = new Date();
+    if (monthEl) monthEl.textContent = 'Resets after ' + now.toLocaleString('default',{month:'long'}) + ' · based on daily workout logs';
+    if (!data.length) { el.innerHTML = '<p class="lb-empty">No workouts logged this month yet. Be the first!</p>'; return; }
+    const rankClass = ['gold','silver','bronze'];
+    const rankIcon  = ['🥇','🥈','🥉'];
+    el.innerHTML = data.map((r, i) => {
+      const cls = rankClass[i] || '';
+      const icon = rankIcon[i] || r.rank;
+      const av = r.avatar_url
+        ? `<div class="lb-av"><img src="${r.avatar_url}" alt="${r.client_name}"/></div>`
+        : `<div class="lb-av">${(r.client_name||'?')[0].toUpperCase()}</div>`;
+      const dur = r.total_duration ? ` · ${r.total_duration}min` : '';
+      return `<div class="lb-row">
+        <div class="lb-rank ${cls}">${icon}</div>
+        ${av}
+        <div class="lb-name">${r.client_name}</div>
+        <div class="lb-stats"><strong>${r.workout_count}</strong> workouts${dur}</div>
+      </div>`;
+    }).join('');
+  }
+  loadLeaderboard();
 
   // ── toggle comments ───────────────────────────────────────────────────────
   function toggleComments(pid) {

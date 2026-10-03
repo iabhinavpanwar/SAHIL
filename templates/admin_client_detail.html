@@ -1812,6 +1812,14 @@
           </div>
           <div id="secMessages"><p class="empty">Loading…</p></div>
         </div>
+
+        <!-- DAILY UPDATES -->
+        <div class="sec" style="animation-delay: 0.45s">
+          <div class="sec-header">
+            <h3><i class="fas fa-calendar-check" aria-hidden="true"></i> Daily Updates</h3>
+          </div>
+          <div id="secDailyUpdates"><p class="empty">Loading…</p></div>
+        </div>
       </div>
     </div>
 
@@ -2003,6 +2011,30 @@
           `).join('');
         } else {
           iEl.innerHTML = emptyState('No invoices yet.');
+        }
+
+        /* ── DAILY UPDATES ── */
+        const duEl = document.getElementById('secDailyUpdates');
+        const dailyUpdates = await api(`/api/admin/clients/${CID}/daily_updates`);
+        const recent10du = dailyUpdates.slice(0, 10);
+        if (recent10du.length) {
+          duEl.innerHTML = recent10du.map(u => `
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:0.65rem 0.85rem;margin-bottom:0.5rem">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.35rem">
+                <strong style="font-size:0.85rem">${esc(u.date)}</strong>
+                ${u.workout_done ? `<span style="background:rgba(232,255,0,0.1);color:var(--primary);padding:0.15rem 0.5rem;border-radius:20px;font-size:0.72rem;font-weight:700">💪 Workout${u.workout_duration ? ' ' + u.workout_duration + 'min' : ''}</span>` : ''}
+              </div>
+              <div style="display:flex;gap:0.75rem;flex-wrap:wrap;font-size:0.78rem;color:var(--text3)">
+                ${u.steps ? `<span>👟 ${u.steps.toLocaleString()} steps</span>` : ''}
+                ${u.calories_in ? `<span>🍽️ ${u.calories_in} kcal</span>` : ''}
+                ${u.calories_burned ? `<span>🔥 ${u.calories_burned} burned</span>` : ''}
+                ${u.water ? `<span>💧 ${u.water} glasses</span>` : ''}
+                ${u.weight ? `<span>⚖️ ${u.weight} kg</span>` : ''}
+              </div>
+              ${u.photo_url ? `<img src="${u.photo_url}" onclick="window.open('${u.photo_url}','_blank')" style="max-width:100%;max-height:100px;object-fit:cover;border-radius:6px;margin-top:0.4rem;cursor:zoom-in"/>` : ''}
+            </div>`).join('');
+        } else {
+          duEl.innerHTML = emptyState('No daily updates yet.');
         }
 
         /* ── MESSAGES ────────────────────────────────────────────────────── */

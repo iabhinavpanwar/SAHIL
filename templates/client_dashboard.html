@@ -2863,6 +2863,34 @@
             <input type="number" id="log_weight" step="0.1" min="30" max="300" placeholder="75.5"/>
             <span class="unit">kg</span>
           </div>
+          <div class="tracker-input-card" style="grid-column:span 2">
+            <label><i class="fas fa-dumbbell" style="color:var(--primary)"></i> Did Workout Today?</label>
+            <div style="display:flex;align-items:center;gap:1rem;margin-top:0.25rem">
+              <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.9rem;cursor:pointer;text-transform:none;letter-spacing:0">
+                <input type="checkbox" id="log_workout_done" style="width:18px;height:18px;accent-color:var(--primary)"/> Yes, I worked out
+              </label>
+            </div>
+            <span class="unit">check if you trained today</span>
+          </div>
+          <div class="tracker-input-card" id="workoutDurationCard" style="display:none">
+            <label><i class="fas fa-clock" style="color:#a78bfa"></i> Workout Duration</label>
+            <input type="number" id="log_workout_duration" min="0" max="300" placeholder="45"/>
+            <span class="unit">minutes</span>
+          </div>
+          <div class="tracker-input-card" style="grid-column:span 2">
+            <label><i class="fas fa-camera" style="color:#4fc3f7"></i> Day Photo (optional)</label>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.25rem">
+              <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('log_photo_gallery').click()" style="font-size:0.75rem"><i class="fas fa-image"></i> Gallery</button>
+              <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('log_photo_camera').click()" style="font-size:0.75rem"><i class="fas fa-camera"></i> Camera</button>
+              <input type="file" id="log_photo_gallery" accept="image/*" style="display:none" onchange="previewLogPhoto(this)"/>
+              <input type="file" id="log_photo_camera" accept="image/*" capture="environment" style="display:none" onchange="previewLogPhoto(this)"/>
+            </div>
+            <div id="logPhotoPreview" style="display:none;margin-top:0.5rem;position:relative;display:none">
+              <img id="logPhotoThumb" style="max-height:80px;border-radius:6px;object-fit:cover"/>
+              <button onclick="clearLogPhoto()" style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.6);color:#fff;border-radius:3px;padding:1px 5px;font-size:0.7rem">&times;</button>
+            </div>
+            <span class="unit">upload a photo of your day</span>
+          </div>
         </div>
         <p id="logMsg" class="form-msg"></p>
       </div>
@@ -3360,6 +3388,8 @@ async function loadOverview() {
   }
 
   const today = new Date().toISOString().slice(0,10);
+  _dailyLogs = logs;
+  _dailyLogs = logs;
   const todayLog = logs.find(l => l.date === today) || {};
   document.getElementById('ov_steps').textContent = fmt(todayLog.steps || 0);
 
@@ -3471,6 +3501,14 @@ async function loadTracker() {
   document.getElementById('log_cal_burn').value = todayLog.calories_burned || '';
   document.getElementById('log_water').value    = todayLog.water || '';
   document.getElementById('log_weight').value   = todayLog.weight || '';
+  const wdCb = document.getElementById('log_workout_done');
+  if (wdCb) { wdCb.checked = !!todayLog.workout_done; document.getElementById('workoutDurationCard').style.display = wdCb.checked ? '' : 'none'; }
+  const wdDur = document.getElementById('log_workout_duration');
+  if (wdDur) wdDur.value = todayLog.workout_duration || '';
+  const wdCb = document.getElementById('log_workout_done');
+  if (wdCb) { wdCb.checked = !!todayLog.workout_done; document.getElementById('workoutDurationCard').style.display = wdCb.checked ? '' : 'none'; }
+  const wdDur = document.getElementById('log_workout_duration');
+  if (wdDur) wdDur.value = todayLog.workout_duration || '';
 
   renderTodaySummary(todayLog, fp);
   renderWeeklyPrediction(logs, fp);
@@ -3592,26 +3630,81 @@ function renderLogHistory(logs) {
         ${l.calories_burned ? `<span><i class="fas fa-fire"></i> ${fmt(l.calories_burned)} burned</span>` : ''}
         ${l.water ? `<span><i class="fas fa-tint" style="color:#4fc3f7"></i> ${l.water} glasses</span>` : ''}
         ${l.weight ? `<span><i class="fas fa-weight" style="color:#ffb74d"></i> ${l.weight} kg</span>` : ''}
+        ${l.workout_done ? `<span style="color:var(--primary)"><i class="fas fa-dumbbell"></i> Workout${l.workout_duration ? ' ' + l.workout_duration + 'min' : ''}</span>` : ''}
+        ${l.photo_url ? `<span><img src="${l.photo_url}" onclick="openImgLightbox('${l.photo_url}')" style="height:28px;border-radius:4px;cursor:zoom-in;vertical-align:middle"/></span>` : ''}
       </div>
       <button onclick="deleteLog('${l.date}')" style="color:var(--text3);font-size:0.8rem;padding:0.2rem 0.4rem;border-radius:3px" title="Delete"><i class="fas fa-trash"></i></button>
     </div>`).join('');
 }
 
+function previewLogPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const wrap = document.getElementById('logPhotoPreview');
+  const thumb = document.getElementById('logPhotoThumb');
+  thumb.src = URL.createObjectURL(file);
+  wrap.style.display = 'block';
+  // sync to the other input
+  const other = input.id === 'log_photo_gallery' ? document.getElementById('log_photo_camera') : document.getElementById('log_photo_gallery');
+  // can't sync FileList, just keep reference
+  wrap._file = file;
+}
+
+function clearLogPhoto() {
+  document.getElementById('log_photo_gallery').value = '';
+  document.getElementById('log_photo_camera').value = '';
+  const wrap = document.getElementById('logPhotoPreview');
+  wrap.style.display = 'none';
+  wrap._file = null;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const cb = document.getElementById('log_workout_done');
+  if (cb) cb.addEventListener('change', () => {
+    document.getElementById('workoutDurationCard').style.display = cb.checked ? '' : 'none';
+  });
+});
+
 async function saveLog() {
   const today = new Date().toISOString().slice(0,10);
-  const body = {
-    date:             today,
-    steps:            parseInt(document.getElementById('log_steps').value) || 0,
-    calories_in:      parseInt(document.getElementById('log_cal_in').value) || 0,
-    calories_burned:  parseInt(document.getElementById('log_cal_burn').value) || 0,
-    water:            parseInt(document.getElementById('log_water').value) || 0,
-    weight:           document.getElementById('log_weight').value || null,
-  };
-  const { ok } = await api('/api/client/daily_log', 'POST', body);
+  const workoutDone = document.getElementById('log_workout_done').checked;
+  const photoWrap = document.getElementById('logPhotoPreview');
+  const photoFile = photoWrap && photoWrap._file ? photoWrap._file : (
+    document.getElementById('log_photo_gallery').files[0] ||
+    document.getElementById('log_photo_camera').files[0] || null
+  );
+
+  let ok;
+  if (photoFile) {
+    const fd = new FormData();
+    fd.append('date', today);
+    fd.append('steps', parseInt(document.getElementById('log_steps').value) || 0);
+    fd.append('calories_in', parseInt(document.getElementById('log_cal_in').value) || 0);
+    fd.append('calories_burned', parseInt(document.getElementById('log_cal_burn').value) || 0);
+    fd.append('water', parseInt(document.getElementById('log_water').value) || 0);
+    fd.append('weight', document.getElementById('log_weight').value || '');
+    fd.append('workout_done', workoutDone ? 'true' : 'false');
+    fd.append('workout_duration', parseInt(document.getElementById('log_workout_duration').value) || 0);
+    fd.append('photo', photoFile);
+    const res = await fetch('/api/client/daily_log', { method: 'POST', body: fd });
+    ok = res.ok;
+  } else {
+    const r = await api('/api/client/daily_log', 'POST', {
+      date:             today,
+      steps:            parseInt(document.getElementById('log_steps').value) || 0,
+      calories_in:      parseInt(document.getElementById('log_cal_in').value) || 0,
+      calories_burned:  parseInt(document.getElementById('log_cal_burn').value) || 0,
+      water:            parseInt(document.getElementById('log_water').value) || 0,
+      weight:           document.getElementById('log_weight').value || null,
+      workout_done:     workoutDone,
+      workout_duration: parseInt(document.getElementById('log_workout_duration').value) || 0,
+    });
+    ok = r.ok;
+  }
   const el = document.getElementById('logMsg');
   el.textContent = ok ? '✓ Saved!' : '✗ Failed';
   el.className = 'form-msg ' + (ok ? 'success' : 'error');
-  if (ok) { loadTracker(); loadOverview(); setTimeout(() => el.textContent = '', 2000); }
+  if (ok) { clearLogPhoto(); loadTracker(); loadOverview(); setTimeout(() => el.textContent = '', 2000); }
 }
 
 async function deleteLog(date) {
@@ -4023,6 +4116,7 @@ async function loadNutrition() {
 
 // -- SESSIONS -----------------------------------------------------------------
 let _sessions = [];
+let _dailyLogs = [];
 let _calYear, _calMonth;
 
 // Parse IST date strings like "15 Jan 2025, 09:00 AM" returned by the backend
@@ -4088,15 +4182,31 @@ function renderCal() {
     const isToday = d === today.getDate() && _calMonth === today.getMonth() && _calYear === today.getFullYear();
     const isPast  = new Date(_calYear, _calMonth, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-    html += `<div class="cal-cell${isToday?' cal-today':''}${isPast?' cal-past':''}" onclick="calDayClick('${key}',${d})">
+    const dayLog = _dailyLogs.find(l => l.date === key);
+    const hasWorkout = dayLog && dayLog.workout_done;
+    const hasPhoto = dayLog && dayLog.photo_url;
+    let cellTitle = '';
+    if (dayLog) {
+      const parts = [];
+      if (hasWorkout) parts.push('Workout' + (dayLog.workout_duration ? ' ' + dayLog.workout_duration + 'min' : ''));
+      if (dayLog.steps) parts.push(dayLog.steps + ' steps');
+      cellTitle = parts.join(' · ');
+    }
+    html += `<div class="cal-cell${isToday?' cal-today':''}${isPast?' cal-past':''}" onclick="calDayClick('${key}',${d})" title="${cellTitle}">
       <span class="cal-day-num">${d}</span>`;
 
-    daySess.slice(0,2).forEach(s => {
+    if (hasWorkout) {
+      html += `<div class="cal-dot" style="background:var(--primary)" title="Workout${dayLog.workout_duration?' '+dayLog.workout_duration+'min':''}">💪</div>`;
+    }
+    if (hasPhoto) {
+      html += `<div style="width:100%;height:22px;overflow:hidden;border-radius:3px;margin-top:1px"><img src="${dayLog.photo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:3px"/></div>`;
+    }
+    daySess.slice(0,1).forEach(s => {
       const colors = { confirmed:'#44cc88', pending:'#ffb74d', cancelled:'var(--danger)', completed:'#4fc3f7' };
       const c = colors[s.status] || '#aaa';
       html += `<div class="cal-dot" style="background:${c}" title="${esc(s.session_type)}">${esc(s.session_type.split(' ')[0])}</div>`;
     });
-    if (daySess.length > 2) html += `<div class="cal-dot-more">+${daySess.length-2}</div>`;
+    if (daySess.length > 1) html += `<div class="cal-dot-more">+${daySess.length-1}</div>`;
 
     html += '</div>';
   }
@@ -4116,12 +4226,21 @@ function calDayClick(key, day) {
     return k === key;
   });
 
-  if (!daySess.length) return;
+  const dayLog = _dailyLogs.find(l => l.date === key);
+  if (!daySess.length && !dayLog) return;
 
   const colors = { confirmed:'#44cc88', pending:'#ffb74d', cancelled:'var(--danger)', completed:'#4fc3f7' };
   const label = `${day} ${months[_calMonth]} ${_calYear}`;
   document.getElementById('calPopupContent').innerHTML = `
     <h4 style="margin-bottom:1rem;font-size:1rem">${label}</h4>
+    ${dayLog ? `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.75rem">
+      <div style="font-weight:700;font-size:0.88rem;margin-bottom:0.4rem;color:var(--primary)">Daily Log</div>
+      ${dayLog.workout_done ? `<div style="font-size:0.82rem;margin-bottom:0.3rem">💪 Workout${dayLog.workout_duration ? ' — ' + dayLog.workout_duration + ' min' : ''}</div>` : ''}
+      ${dayLog.steps ? `<div style="font-size:0.82rem;color:var(--text2)">👟 ${dayLog.steps.toLocaleString()} steps</div>` : ''}
+      ${dayLog.calories_in ? `<div style="font-size:0.82rem;color:var(--text2)">🍽️ ${dayLog.calories_in} kcal eaten</div>` : ''}
+      ${dayLog.water ? `<div style="font-size:0.82rem;color:var(--text2)">💧 ${dayLog.water} glasses</div>` : ''}
+      ${dayLog.photo_url ? `<img src="${dayLog.photo_url}" onclick="openImgLightbox('${dayLog.photo_url}')" style="max-width:100%;max-height:120px;object-fit:cover;border-radius:6px;margin-top:0.5rem;cursor:zoom-in"/>` : ''}
+    </div>` : ''}
     ${daySess.map(s => `
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.6rem">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap">

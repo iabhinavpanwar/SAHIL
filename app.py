@@ -2706,50 +2706,120 @@ def client_log_workout():
     )
     return jsonify({'status': 'logged'})
 
-# -- CLIENT API � DAILY LOG ----------------------------------------------------
+# -- CLIENT API  DAILY LOG ----------------------------------------------------
 @app.route('/api/client/daily_log', methods=['GET'])
 @client_login_required
 def client_get_daily_log():
     if db is None:
         return jsonify([]), 500
-    items = list(db['daily_log'].find({'client_id': session['client_id']}).sort('date', -1).limit(30))
+    items = list(db['daily_log'].find({'client_id': session['client_id']}).sort('date', -1).limit(90))
     for i in items:
         i['_id'] = str(i['_id'])
     return jsonify(items)
 
 @app.route('/api/client/daily_log', methods=['POST'])
 @client_login_required
-@limiter.limit('10 per hour')
+@limiter.limit('20 per hour')
 def client_save_daily_log():
     if db is None:
         return jsonify({'error': 'DB unavailable'}), 500
-    d = request.json or {}
+    # support both multipart (with photo) and JSON
+    if request.content_type and 'multipart' in request.content_type:
+        d = request.form
+        photo_url = None
+        file = request.files.get('photo')
+        if file and file.filename:
+            photo_url, err = _handle_upload(file)
+            if err:
+                return jsonify({'error': err}), 400
+    else:
+        d = request.json or {}
+        photo_url = None
     date_str = s(d.get('date', ''), 12)
     if not date_str:
         date_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
     try:
-        steps    = max(0, int(d.get('steps', 0)))
-        cal_in   = max(0, int(d.get('calories_in', 0)))
-        cal_burn = max(0, int(d.get('calories_burned', 0)))
-        water    = max(0, min(20, int(d.get('water', 0))))
-        weight   = round(float(d.get('weight', 0)), 1) if d.get('weight') else None
+        steps         = max(0, int(d.get('steps', 0) or 0))
+        cal_in        = max(0, int(d.get('calories_in', 0) or 0))
+        cal_burn      = max(0, int(d.get('calories_burned', 0) or 0))
+        water         = max(0, min(20, int(d.get('water', 0) or 0)))
+        weight        = round(float(d.get('weight', 0)), 1) if d.get('weight') else None
+        workout_done  = str(d.get('workout_done', 'false')).lower() in ('true', '1', 'yes')
+        workout_mins  = max(0, int(d.get('workout_duration', 0) or 0))
     except (ValueError, TypeError):
         return jsonify({'error': 'Invalid values'}), 400
+    update_doc = {
+        'client_id':        session['client_id'],
+        'client_name':      session.get('client_name', ''),
+        'date':             date_str,
+        'steps':            steps,
+        'calories_in':      cal_in,
+        'calories_burned':  cal_burn,
+        'water':            water,
+        'weight':           weight,
+        'workout_done':     workout_done,
+        'workout_duration': workout_mins,
+        'updated':          datetime.now(timezone.utc),
+    }
+    if photo_url:
+        update_doc['photo_url'] = photo_url
     db['daily_log'].update_one(
         {'client_id': session['client_id'], 'date': date_str},
-        {'$set': {
-            'client_id':       session['client_id'],
-            'date':            date_str,
-            'steps':           steps,
-            'calories_in':     cal_in,
-            'calories_burned': cal_burn,
-            'water':           water,
-            'weight':          weight,
-            'updated':         datetime.now(timezone.utc),
-        }},
+        {'$set': update_doc},
         upsert=True
     )
     return jsonify({'status': 'saved'})
+
+# -- ADMIN API  CLIENT DAILY UPDATES ------------------------------------------
+@app.route('/api/admin/clients/<cid>/daily_updates')
+@login_required
+def admin_client_daily_updates(cid):
+    if db is None:
+        return jsonify([]), 500
+    items = list(db['daily_log'].find({'client_id': cid}).sort('date', -1).limit(60))
+    for i in items:
+        i['_id'] = str(i['_id'])
+    return jsonify(items)
+
+# -- COMMUNITY LEADERBOARD -----------------------------------------------------
+@app.route('/api/community/leaderboard')
+def community_leaderboard():
+    if db is None:
+        return jsonify([]), 500
+    now = datetime.now(timezone.utc)
+    month_start_str = now.strftime('%Y-%m-01')
+    pipeline = [
+        {'$match': {
+            'workout_done': True,
+            'date': {'$gte': month_start_str},
+        }},
+        {'$group': {
+            '_id':            '$client_id',
+            'client_name':    {'$first': '$client_name'},
+            'workout_count':  {'$sum': 1},
+            'total_duration': {'$sum': '$workout_duration'},
+        }},
+        {'$sort': {'workout_count': -1, 'total_duration': -1}},
+        {'$limit': 10},
+    ]
+    rows = list(db['daily_log'].aggregate(pipeline))
+    result = []
+    for i, r in enumerate(rows):
+        name = r.get('client_name') or ''
+        avatar = ''
+        if users_col is not None:
+            u = users_col.find_one({'_id': safe_oid(r['_id'])}, {'name': 1, 'avatar_url': 1})
+            if u:
+                name = name or u.get('name', 'Member')
+                avatar = u.get('avatar_url', '') or ''
+        result.append({
+            'rank':           i + 1,
+            'client_name':    name or 'Member',
+            'avatar_url':     avatar,
+            'workout_count':  r['workout_count'],
+            'total_duration': r['total_duration'],
+        })
+    return jsonify(result)
 
 @app.route('/api/client/daily_log/<date_str>', methods=['DELETE'])
 @client_login_required
