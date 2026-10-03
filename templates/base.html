@@ -3115,6 +3115,9 @@
           <a href="{{ url_for('client_login') }}">Client Portal</a>
           <a href="{{ url_for('privacy') }}">Privacy</a>
           <a href="{{ url_for('terms') }}">Terms</a>
+          <a href="{{ url_for('bug_report') }}" style="display:inline-flex;align-items:center;gap:.35rem;color:var(--text3);transition:color .25s">
+            <i class="fas fa-bug" style="font-size:.75rem"></i> Report a Bug
+          </a>
         </div>
         <p class="footer-made">{{ cfg.get('footer_made_text','Made with ♥ for fitness') }}</p>
       </div>

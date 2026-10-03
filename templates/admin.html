@@ -766,6 +766,11 @@
         flex-shrink: 0;
       }
 
+      .status-open { background: rgba(255,68,68,.12); color: #ff4444; border: 1px solid rgba(255,68,68,.25); }
+      .status-in_progress { background: rgba(255,183,77,.12); color: #ffb74d; border: 1px solid rgba(255,183,77,.25); }
+      .status-resolved { background: rgba(68,204,136,.12); color: #44cc88; border: 1px solid rgba(68,204,136,.25); }
+      .status-closed { background: rgba(255,255,255,.04); color: var(--text3); border: 1px solid var(--border); }
+
       .item-badge.published,
       .item-badge.active {
         background: rgba(68, 204, 136, 0.12);
@@ -2562,6 +2567,10 @@
             <i class="fas fa-users"></i> Community
             <span class="badge-count" id="communityCount"></span>
           </button>
+          <button class="sidebar-btn" data-tab="bugs">
+            <i class="fas fa-bug"></i> Bug Reports
+            <span class="badge-count" id="bugsCount"></span>
+          </button>
         </nav>
         <a href="{{ url_for('logout') }}" class="sidebar-logout"
           ><i class="fas fa-sign-out-alt"></i> Logout</a
@@ -3541,6 +3550,30 @@
             <div style="text-align:center;margin-top:1rem" id="communityLoadMoreWrap" style="display:none">
               <button class="btn btn-outline btn-sm" onclick="loadCommunityPosts()">Load more</button>
             </div>
+          </div>
+
+          <!-- BUG REPORTS -->
+          <div class="tab-panel" id="tab-bugs">
+            <div class="panel-header">
+              <h3>Bug Reports</h3>
+              <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+                <select id="bugStatusFilter" onchange="loadAdminBugs()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:.45rem .75rem;font-size:.85rem">
+                  <option value="">All Statuses</option>
+                  <option value="open">Open</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="closed">Closed</option>
+                </select>
+                <select id="bugSevFilter" onchange="loadAdminBugs()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:.45rem .75rem;font-size:.85rem">
+                  <option value="">All Severities</option>
+                  <option value="critical">Critical</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+            </div>
+            <div class="items-list" id="bugsList"></div>
           </div>
 
           <div class="tab-panel" id="tab-nutrition">
@@ -4617,6 +4650,36 @@
       </div>
     </div>
 
+    <!-- Bug Update Modal -->
+    <div class="modal" id="bugModal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Update Bug Report</h3>
+          <button onclick="closeModal('bugModal')">&times;</button>
+        </div>
+        <input type="hidden" id="bugId" />
+        <div id="bugDetail" style="background:var(--bg3);border-radius:var(--radius-sm);padding:1rem;font-size:.88rem;color:var(--text2);margin-bottom:.5rem;line-height:1.6"></div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="bugStatus" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:.75rem 1rem;font-size:.95rem;width:100%">
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Admin Action / Note (shown publicly)</label>
+          <textarea id="bugAction" rows="4" maxlength="1000" placeholder="e.g. Fixed in latest deploy. The contact form now submits correctly on mobile."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('bugModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveBugUpdate()">Save Update</button>
+        </div>
+        <p id="bugMsg" class="form-msg"></p>
+      </div>
+    </div>
+
     <!-- Mark Paid Modal -->
     <div class="modal" id="markPaidModal">
       <div class="modal-box">
@@ -5126,6 +5189,7 @@
           musclemap: loadMuscleMapTab,
           announcements: loadAnnouncements,
           community: loadCommunityPosts,
+          bugs: loadAdminBugs,
         };
         loaders[name]?.();
       }
@@ -7755,6 +7819,101 @@
         await act(btnEl, async () => {
           await api('/api/admin/community/posts/' + pid + '/hide', 'POST', { hidden: !hidden });
           await loadCommunityPosts();
+        });
+      }
+
+      // BUG REPORTS
+      const SEV_COLORS = { low:'#44cc88', medium:'#ffb74d', high:'#ff6432', critical:'#ff4444' };
+      const BUG_TYPE_LABELS = { ui:'UI Glitch', functional:'Feature Broken', performance:'Performance', crash:'Crash/Error', mobile:'Mobile Layout', other:'Other' };
+
+      async function loadAdminBugs() {
+        const list = document.getElementById('bugsList');
+        if (!list) return;
+        const statusFilter = document.getElementById('bugStatusFilter') ? document.getElementById('bugStatusFilter').value : '';
+        const sevFilter = document.getElementById('bugSevFilter') ? document.getElementById('bugSevFilter').value : '';
+        list.innerHTML = '<div class="loading-spinner"></div>';
+        const { data } = await api('/api/admin/bugs');
+        const bugs = (data || []).filter(function(b) {
+          return (!statusFilter || b.status === statusFilter) && (!sevFilter || b.severity === sevFilter);
+        });
+        const openCount = (data || []).filter(function(b) { return b.status === 'open'; }).length;
+        const badge = document.getElementById('bugsCount');
+        if (badge) { badge.textContent = openCount || ''; badge.style.display = openCount ? '' : 'none'; }
+        if (!bugs.length) { list.innerHTML = '<div class="empty-state">No bug reports found.</div>'; return; }
+        const statusLabels = { open:'Open', in_progress:'In Progress', resolved:'Resolved', closed:'Closed' };
+        const statusClasses = { open:'status-open', in_progress:'status-in_progress', resolved:'status-resolved', closed:'status-closed' };
+        list.innerHTML = bugs.map(function(b) {
+          const sevColor = SEV_COLORS[b.severity] || '#aaa';
+          const typeLabel = BUG_TYPE_LABELS[b.bug_type] || b.bug_type || '';
+          const statusLabel = statusLabels[b.status] || 'Open';
+          const statusClass = statusClasses[b.status] || 'status-open';
+          const desc120 = esc(b.description.slice(0,120)) + (b.description.length > 120 ? '&hellip;' : '');
+          const actionHtml = b.admin_action
+            ? '<div style="padding:.65rem .9rem;background:rgba(var(--primary-rgb),.05);border-left:3px solid var(--primary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:.82rem;color:var(--text2)"><strong style="color:var(--primary);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.2rem">&#9889; Admin Note</strong>' + esc(b.admin_action) + '</div>'
+            : '';
+          const emailHtml = b.email ? '<span><i class="fas fa-envelope" style="margin-right:.25rem"></i>' + esc(b.email) + '</span>' : '';
+          const typeHtml = typeLabel ? '<span><i class="fas fa-tag" style="margin-right:.25rem"></i>' + esc(typeLabel) + '</span>' : '';
+          const escapedAction = esc(b.admin_action || '').replace(/'/g, "\\'");
+          const escapedDesc = esc(b.description).replace(/'/g, "\\'");
+          const escapedName = esc(b.name).replace(/'/g, "\\'");
+          const escapedPage = esc(b.page).replace(/'/g, "\\'");
+          return '<div class="item-row" style="flex-direction:column;align-items:stretch;gap:.6rem">'
+            + '<div style="display:flex;align-items:flex-start;gap:.75rem;flex-wrap:wrap">'
+            + '<div style="flex:1;min-width:0">'
+            + '<div style="font-weight:600;font-size:.92rem;margin-bottom:.25rem;overflow-wrap:break-word">' + desc120 + '</div>'
+            + '<div style="display:flex;gap:.6rem;flex-wrap:wrap;font-size:.75rem;color:var(--text3)">'
+            + '<span><i class="fas fa-user" style="margin-right:.25rem"></i>' + esc(b.name) + '</span>'
+            + '<span><i class="fas fa-map-marker-alt" style="margin-right:.25rem"></i>' + esc(b.page) + '</span>'
+            + typeHtml + emailHtml
+            + '<span><i class="fas fa-clock" style="margin-right:.25rem"></i>' + esc(b.date || '') + '</span>'
+            + '</div></div>'
+            + '<div style="display:flex;gap:.5rem;align-items:center;flex-shrink:0">'
+            + '<span style="font-size:.68rem;font-weight:700;padding:.2rem .55rem;border-radius:6px;background:' + sevColor + '22;color:' + sevColor + ';border:1px solid ' + sevColor + '44">' + (b.severity || 'low').toUpperCase() + '</span>'
+            + '<span class="' + statusClass + '" style="font-size:.68rem;font-weight:700;padding:.2rem .65rem;border-radius:20px;text-transform:uppercase">' + statusLabel + '</span>'
+            + '<button class="btn btn-outline btn-sm" onclick="openBugModal(\'' + b._id + '\',\'' + esc(b.status) + '\',\'' + escapedAction + '\',\'' + escapedDesc + '\',\'' + escapedName + '\',\'' + escapedPage + '\')">'
+            + '<i class="fas fa-edit"></i> Update</button>'
+            + '<button class="btn btn-sm" style="background:rgba(255,68,68,.1);color:#ff4444;border:1px solid rgba(255,68,68,.2)" onclick="deleteBug(\'' + b._id + '\',this)">'
+            + '<i class="fas fa-trash"></i></button>'
+            + '</div></div>'
+            + actionHtml
+            + '</div>';
+        }).join('');
+      }
+
+      function openBugModal(id, status, action, desc, name, page) {
+        document.getElementById('bugId').value = id;
+        document.getElementById('bugStatus').value = status;
+        document.getElementById('bugAction').value = action;
+        document.getElementById('bugDetail').innerHTML = '<strong>' + esc(name) + '</strong> &mdash; <em>' + esc(page) + '</em><br><span style="color:var(--text2)">' + esc(desc) + '</span>';
+        document.getElementById('bugMsg').textContent = '';
+        openModal('bugModal');
+      }
+
+      async function saveBugUpdate() {
+        const id = document.getElementById('bugId').value;
+        const status = document.getElementById('bugStatus').value;
+        const action = document.getElementById('bugAction').value.trim();
+        const msgEl = document.getElementById('bugMsg');
+        const btn = document.querySelector('#bugModal .btn-primary');
+        await act(btn, async function() {
+          const { ok, data } = await api('/api/admin/bugs/' + id, 'POST', { status: status, admin_action: action });
+          if (ok) {
+            msgEl.textContent = 'Updated!';
+            msgEl.className = 'form-msg success';
+            setTimeout(function() { closeModal('bugModal'); }, 900);
+            await loadAdminBugs();
+          } else {
+            msgEl.textContent = (data && data.error) || 'Failed';
+            msgEl.className = 'form-msg error';
+          }
+        });
+      }
+
+      async function deleteBug(id, btnEl) {
+        if (!confirm('Delete this bug report?')) return;
+        await act(btnEl, async function() {
+          await api('/api/admin/bugs/' + id, 'DELETE');
+          await loadAdminBugs();
         });
       }
     </script>

@@ -324,6 +324,7 @@ try:
     payments_col     = db['payments']
     announcements_col= db['announcements']
     push_subs_col    = db['push_subscriptions']
+    bugs_col         = db['bug_reports']
     tips_col         = db['daily_tips']
     goals_col        = db['client_goals']
     report_cards_col = db['report_cards']
@@ -336,7 +337,7 @@ except Exception as e:
     blogs_col = faqs_col = certs_col = leads_col = visits_col = gallery_col = None
     users_col = exercises_col = programs_col = checkins_col = None
     messages_col = sessions_col = measurements_col = payments_col = announcements_col = None
-    push_subs_col = tips_col = goals_col = report_cards_col = supplements_col = None
+    push_subs_col = bugs_col = tips_col = goals_col = report_cards_col = supplements_col = None
 
 atexit.register(lambda: mongo_client.close() if mongo_client else None)
 
@@ -3917,6 +3918,101 @@ def client_notification_unread_count():
         {'client_id': session['client_id'], 'read': False}
     )
     return jsonify({'count': count})
+
+# ── BUG REPORTS ──────────────────────────────────────────────────────────────
+@app.route('/bug-report')
+def bug_report():
+    return render_template('bug_report.html', cfg=get_config())
+
+@app.route('/api/bugs', methods=['POST'])
+@limiter.limit('5 per hour')
+def submit_bug():
+    if bugs_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    d = request.json or {}
+    name = s(d.get('name', ''), 100)
+    desc = s(d.get('description', ''), 2000)
+    page = s(d.get('page', ''), 200)
+    if not name or not desc or not page:
+        return jsonify({'error': 'Name, page and description are required'}), 400
+    bug_type = s(d.get('bug_type', 'other'), 30)
+    severity = s(d.get('severity', 'low'), 20)
+    if severity not in ('low', 'medium', 'high', 'critical'):
+        severity = 'low'
+    bugs_col.insert_one({
+        'name':        name,
+        'email':       s(d.get('email', ''), 200),
+        'page':        page,
+        'bug_type':    bug_type,
+        'description': desc,
+        'severity':    severity,
+        'status':      'open',
+        'admin_action': '',
+        'date':        datetime.now(timezone.utc),
+    })
+    return jsonify({'status': 'submitted'})
+
+@app.route('/api/bugs', methods=['GET'])
+def get_bugs_public():
+    if bugs_col is None:
+        return jsonify({'bugs': [], 'total': 0})
+    try:
+        skip  = max(0, int(request.args.get('skip', 0)))
+        limit = min(20, max(1, int(request.args.get('limit', 10))))
+    except (ValueError, TypeError):
+        skip, limit = 0, 10
+    status_filter = request.args.get('status', '')
+    query = {}
+    if status_filter in ('open', 'in_progress', 'resolved', 'closed'):
+        query['status'] = status_filter
+    total = bugs_col.count_documents(query)
+    items = list(bugs_col.find(query, {'email': 0}).sort('date', -1).skip(skip).limit(limit))
+    for i in items:
+        i['_id']  = str(i['_id'])
+        i['date'] = to_ist(i.get('date'))
+    return jsonify({'bugs': items, 'total': total})
+
+@app.route('/api/admin/bugs', methods=['GET'])
+@login_required
+def admin_get_bugs():
+    if bugs_col is None:
+        return jsonify([]), 500
+    items = list(bugs_col.find({}).sort('date', -1))
+    for i in items:
+        i['_id']  = str(i['_id'])
+        i['date'] = to_ist(i.get('date'))
+    return jsonify(items)
+
+@app.route('/api/admin/bugs/<bid>', methods=['POST'])
+@login_required
+def admin_update_bug(bid):
+    if bugs_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    oid = safe_oid(bid)
+    if not oid:
+        return jsonify({'error': 'Invalid id'}), 400
+    d = request.json or {}
+    status = s(d.get('status', ''), 20)
+    if status not in ('open', 'in_progress', 'resolved', 'closed'):
+        return jsonify({'error': 'Invalid status'}), 400
+    action = s(d.get('admin_action', ''), 1000)
+    bugs_col.update_one({'_id': oid}, {'$set': {
+        'status':       status,
+        'admin_action': action,
+        'updated':      datetime.now(timezone.utc),
+    }})
+    return jsonify({'status': 'updated'})
+
+@app.route('/api/admin/bugs/<bid>', methods=['DELETE'])
+@login_required
+def admin_delete_bug(bid):
+    if bugs_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    oid = safe_oid(bid)
+    if not oid:
+        return jsonify({'error': 'Invalid id'}), 400
+    bugs_col.delete_one({'_id': oid})
+    return jsonify({'status': 'deleted'})
 
 # ── LEGAL & UTILITY PAGES ────────────────────────────────────────────────
 @app.route('/privacy')

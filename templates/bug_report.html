@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+{% block title %}Report a Bug — {{ cfg.get('hero_name','Sahil Panwar') }}{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="container">
+    <a href="{{ url_for('index') }}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    <p class="section-eyebrow">Help Us Improve</p>
+    <h1>Report a Bug</h1>
+    <p style="color:var(--text2);margin-top:0.5rem;font-size:clamp(0.9rem,2vw,1rem)">
+      Found something broken? Let us know and we'll fix it fast.
+    </p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container" style="max-width:860px">
+
+    <!-- SUBMIT FORM -->
+    <div class="br-card" id="submitSection">
+      <div class="br-card-header">
+        <div class="br-card-icon"><i class="fas fa-bug"></i></div>
+        <div>
+          <h3>Submit a Bug Report</h3>
+          <p>All fields marked * are required</p>
+        </div>
+      </div>
+
+      <form id="bugForm" class="br-form" autocomplete="off">
+        <div class="br-form-row">
+          <div class="form-group">
+            <label>Your Name *</label>
+            <input type="text" id="brName" maxlength="100" placeholder="e.g. Rahul Sharma" required />
+          </div>
+          <div class="form-group">
+            <label>Email (optional)</label>
+            <input type="email" id="brEmail" maxlength="200" placeholder="For follow-up updates" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Page / Section where bug occurred *</label>
+          <input type="text" id="brPage" maxlength="200" placeholder="e.g. /services, Client Dashboard, Contact Form" required />
+        </div>
+
+        <div class="form-group">
+          <label>Bug Type *</label>
+          <select id="brType" required>
+            <option value="">— Select type —</option>
+            <option value="ui">UI / Visual glitch</option>
+            <option value="functional">Feature not working</option>
+            <option value="performance">Slow / Performance issue</option>
+            <option value="crash">Page crash / Error</option>
+            <option value="mobile">Mobile layout issue</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Describe the bug *</label>
+          <textarea id="brDesc" rows="5" maxlength="2000" placeholder="What happened? What did you expect to happen? Steps to reproduce..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Severity</label>
+          <div class="br-severity-row">
+            <label class="br-sev-opt">
+              <input type="radio" name="severity" value="low" checked />
+              <span class="br-sev-pill sev-low"><i class="fas fa-circle"></i> Low</span>
+            </label>
+            <label class="br-sev-opt">
+              <input type="radio" name="severity" value="medium" />
+              <span class="br-sev-pill sev-medium"><i class="fas fa-circle"></i> Medium</span>
+            </label>
+            <label class="br-sev-opt">
+              <input type="radio" name="severity" value="high" />
+              <span class="br-sev-pill sev-high"><i class="fas fa-circle"></i> High</span>
+            </label>
+            <label class="br-sev-opt">
+              <input type="radio" name="severity" value="critical" />
+              <span class="br-sev-pill sev-critical"><i class="fas fa-skull"></i> Critical</span>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="brSubmitBtn" style="min-width:160px">
+          <i class="fas fa-paper-plane"></i> Submit Report
+        </button>
+        <p id="brMsg" class="form-msg" style="margin-top:0.75rem"></p>
+      </form>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div id="brSuccess" style="display:none" class="br-success-box">
+      <div class="br-success-icon"><i class="fas fa-check-circle"></i></div>
+      <h3>Report Submitted!</h3>
+      <p>Thanks for helping improve the site. We'll look into it shortly.</p>
+      <button class="btn btn-outline" onclick="resetBugForm()" style="margin-top:1rem">
+        <i class="fas fa-plus"></i> Submit Another
+      </button>
+    </div>
+
+    <!-- PUBLIC BUG HISTORY -->
+    <div style="margin-top:3rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.5rem">
+        <div>
+          <p class="section-eyebrow" style="margin-bottom:0.25rem">Transparency Log</p>
+          <h2 style="font-size:clamp(1.1rem,2.8vw,1.5rem)">Bug History</h2>
+        </div>
+        <div class="br-filter-row" id="brFilters">
+          <button class="br-filter active" data-filter="all">All</button>
+          <button class="br-filter" data-filter="open">Open</button>
+          <button class="br-filter" data-filter="in_progress">In Progress</button>
+          <button class="br-filter" data-filter="resolved">Resolved</button>
+        </div>
+      </div>
+
+      <div id="bugHistoryList">
+        <div class="br-skeleton"></div>
+        <div class="br-skeleton"></div>
+        <div class="br-skeleton"></div>
+      </div>
+      <div id="brLoadMoreWrap" style="text-align:center;margin-top:1.25rem;display:none">
+        <button class="btn btn-outline btn-sm" onclick="loadBugHistory(true)">Load More</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  /* ── BUG REPORT PAGE ──────────────────────────────────────────────────── */
+  .br-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(1.5rem,4vw,2.25rem);
+  }
+
+  .br-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .br-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(var(--primary-rgb),.08);
+    border: 1px solid rgba(var(--primary-rgb),.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .br-card-header h3 { font-size: clamp(1rem,2.4vw,1.2rem); margin-bottom:.2rem; }
+  .br-card-header p  { font-size:.82rem; color:var(--text3); margin:0; }
+
+  .br-form { display:flex; flex-direction:column; gap:1.1rem; }
+
+  .br-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .br-severity-row {
+    display: flex;
+    gap: .6rem;
+    flex-wrap: wrap;
+    margin-top: .25rem;
+  }
+
+  .br-sev-opt input { display:none; }
+
+  .br-sev-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .4rem .9rem;
+    border-radius: 20px;
+    font-size: .8rem;
+    font-weight: 600;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all .2s ease;
+    user-select: none;
+  }
+
+  .sev-low      { background:rgba(68,204,136,.1);  color:#44cc88; border-color:rgba(68,204,136,.2); }
+  .sev-medium   { background:rgba(255,183,77,.1);  color:#ffb74d; border-color:rgba(255,183,77,.2); }
+  .sev-high     { background:rgba(255,100,50,.1);  color:#ff6432; border-color:rgba(255,100,50,.2); }
+  .sev-critical { background:rgba(255,68,68,.1);   color:#ff4444; border-color:rgba(255,68,68,.2); }
+
+  .br-sev-opt input:checked + .br-sev-pill {
+    border-color: currentColor;
+    box-shadow: 0 0 0 3px rgba(currentColor,.1);
+    transform: translateY(-1px);
+  }
+
+  /* success box */
+  .br-success-box {
+    text-align: center;
+    padding: clamp(2rem,6vw,3.5rem) 1.5rem;
+    background: var(--card);
+    border: 1px solid rgba(68,204,136,.25);
+    border-radius: var(--radius);
+  }
+
+  .br-success-icon {
+    font-size: 3rem;
+    color: var(--success);
+    margin-bottom: 1rem;
+    animation: popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+
+  @keyframes popIn {
+    from { transform:scale(0); opacity:0; }
+    to   { transform:scale(1); opacity:1; }
+  }
+
+  .br-success-box h3 { font-size:1.3rem; margin-bottom:.5rem; }
+  .br-success-box p  { color:var(--text2); }
+
+  /* filter row */
+  .br-filter-row { display:flex; gap:.5rem; flex-wrap:wrap; }
+
+  .br-filter {
+    padding: .4rem .9rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
+    background: transparent;
+  }
+
+  .br-filter:hover, .br-filter.active {
+    background: var(--primary);
+    color: #000;
+    border-color: var(--primary);
+  }
+
+  /* bug history item */
+  .br-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: clamp(1rem,2.6vw,1.35rem);
+    margin-bottom: .75rem;
+    transition: border-color .25s ease;
+    animation: fadeUp .35s ease both;
+  }
+
+  .br-item:hover { border-color: rgba(var(--primary-rgb),.2); }
+
+  .br-item-top {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    flex-wrap: wrap;
+    margin-bottom: .6rem;
+  }
+
+  .br-item-title {
+    flex: 1;
+    font-weight: 600;
+    font-size: clamp(.88rem,2vw,.95rem);
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+
+  .br-status-badge {
+    font-size: .68rem;
+    font-weight: 700;
+    padding: .2rem .65rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .status-open        { background:rgba(255,183,77,.12); color:#ffb74d; border:1px solid rgba(255,183,77,.25); }
+  .status-in_progress { background:rgba(var(--primary-rgb),.1); color:var(--primary); border:1px solid rgba(var(--primary-rgb),.2); }
+  .status-resolved    { background:rgba(68,204,136,.1); color:#44cc88; border:1px solid rgba(68,204,136,.2); }
+  .status-closed      { background:rgba(255,255,255,.05); color:var(--text3); border:1px solid var(--border); }
+
+  .br-sev-tag {
+    font-size: .65rem;
+    font-weight: 700;
+    padding: .15rem .5rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    flex-shrink: 0;
+  }
+
+  .br-item-meta {
+    display: flex;
+    gap: .75rem;
+    flex-wrap: wrap;
+    font-size: .75rem;
+    color: var(--text3);
+    margin-bottom: .5rem;
+  }
+
+  .br-item-meta i { margin-right:.25rem; }
+
+  .br-item-desc {
+    font-size: .85rem;
+    color: var(--text2);
+    line-height: 1.6;
+    overflow-wrap: break-word;
+  }
+
+  /* admin action note */
+  .br-action-note {
+    margin-top: .75rem;
+    padding: .75rem 1rem;
+    background: rgba(var(--primary-rgb),.05);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: .82rem;
+    color: var(--text2);
+    line-height: 1.55;
+  }
+
+  .br-action-note strong {
+    color: var(--primary);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    display: block;
+    margin-bottom: .2rem;
+  }
+
+  /* skeleton */
+  .br-skeleton {
+    height: 100px;
+    background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: var(--radius-sm);
+    margin-bottom: .75rem;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(12px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* responsive */
+  @media (max-width:560px) {
+    .br-form-row { grid-template-columns:1fr; }
+    .br-card-header { flex-direction:column; gap:.75rem; }
+  }
+</style>
+
+<script>
+  const TYPE_LABELS = { ui:'UI Glitch', functional:'Feature Broken', performance:'Performance', crash:'Crash/Error', mobile:'Mobile Layout', other:'Other' };
+  const SEV_COLORS  = { low:'#44cc88', medium:'#ffb74d', high:'#ff6432', critical:'#ff4444' };
+
+  let _brSkip = 0, _brFilter = 'all', _brTotal = 0;
+
+  /* ── SUBMIT ─────────────────────────────────────────────────────────── */
+  document.getElementById('bugForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('brSubmitBtn');
+    const msgEl = document.getElementById('brMsg');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting…';
+
+    const severity = document.querySelector('input[name="severity"]:checked')?.value || 'low';
+    const body = {
+      name:     document.getElementById('brName').value.trim(),
+      email:    document.getElementById('brEmail').value.trim(),
+      page:     document.getElementById('brPage').value.trim(),
+      bug_type: document.getElementById('brType').value,
+      description: document.getElementById('brDesc').value.trim(),
+      severity,
+    };
+
+    try {
+      const res  = await fetch('/api/bugs', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('submitSection').style.display = 'none';
+        document.getElementById('brSuccess').style.display = 'block';
+        _brSkip = 0;
+        loadBugHistory();
+      } else {
+        msgEl.textContent = data.error || 'Submission failed. Try again.';
+        msgEl.className = 'form-msg error';
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    } catch {
+      msgEl.textContent = 'Network error. Please try again.';
+      msgEl.className = 'form-msg error';
+      btn.disabled = false;
+      btn.innerHTML = orig;
+    }
+  });
+
+  function resetBugForm() {
+    document.getElementById('brSuccess').style.display = 'none';
+    document.getElementById('submitSection').style.display = 'block';
+    document.getElementById('bugForm').reset();
+    document.getElementById('brMsg').textContent = '';
+  }
+
+  /* ── FILTERS ────────────────────────────────────────────────────────── */
+  document.querySelectorAll('.br-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.br-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _brFilter = btn.dataset.filter;
+      _brSkip = 0;
+      loadBugHistory();
+    });
+  });
+
+  /* ── LOAD HISTORY ───────────────────────────────────────────────────── */
+  async function loadBugHistory(append = false) {
+    const list = document.getElementById('bugHistoryList');
+    const moreWrap = document.getElementById('brLoadMoreWrap');
+
+    if (!append) {
+      _brSkip = 0;
+      list.innerHTML = '<div class="br-skeleton"></div><div class="br-skeleton"></div><div class="br-skeleton"></div>';
+    }
+
+    try {
+      const params = new URLSearchParams({ skip: _brSkip, limit: 10 });
+      if (_brFilter !== 'all') params.set('status', _brFilter);
+      const res  = await fetch('/api/bugs?' + params);
+      const data = await res.json();
+      const bugs = data.bugs || [];
+      _brTotal   = data.total || 0;
+
+      if (!append) list.innerHTML = '';
+
+      if (!bugs.length && !append) {
+        list.innerHTML = '<div class="empty-state">No bug reports yet in this category.</div>';
+        moreWrap.style.display = 'none';
+        return;
+      }
+
+      bugs.forEach(bug => list.insertAdjacentHTML('beforeend', renderBugItem(bug)));
+      _brSkip += bugs.length;
+      moreWrap.style.display = _brSkip < _brTotal ? 'block' : 'none';
+    } catch {
+      if (!append) list.innerHTML = '<div class="empty-state">Could not load bug history.</div>';
+    }
+  }
+
+  function renderBugItem(b) {
+    const sevColor = SEV_COLORS[b.severity] || '#aaa';
+    const typeLabel = TYPE_LABELS[b.bug_type] || b.bug_type || '';
+    const statusClass = 'status-' + (b.status || 'open');
+    const statusLabel = { open:'Open', in_progress:'In Progress', resolved:'Resolved', closed:'Closed' }[b.status] || 'Open';
+
+    const actionHtml = b.admin_action
+      ? `<div class="br-action-note"><strong>&#9889; Admin Update</strong>${esc(b.admin_action)}</div>`
+      : '';
+
+    return `<div class="br-item">
+      <div class="br-item-top">
+        <span class="br-item-title">${esc(b.description.slice(0,90))}${b.description.length > 90 ? '…' : ''}</span>
+        <span class="br-status-badge ${statusClass}">${statusLabel}</span>
+        <span class="br-sev-tag" style="background:${sevColor}22;color:${sevColor};border:1px solid ${sevColor}44">${(b.severity||'low').toUpperCase()}</span>
+      </div>
+      <div class="br-item-meta">
+        <span><i class="fas fa-user"></i>${esc(b.name)}</span>
+        <span><i class="fas fa-map-marker-alt"></i>${esc(b.page)}</span>
+        ${typeLabel ? `<span><i class="fas fa-tag"></i>${esc(typeLabel)}</span>` : ''}
+        <span><i class="fas fa-clock"></i>${esc(b.date || '')}</span>
+      </div>
+      ${actionHtml}
+    </div>`;
+  }
+
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  loadBugHistory();
+</script>
+{% endblock %}
