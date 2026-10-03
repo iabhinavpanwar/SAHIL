@@ -3505,10 +3505,6 @@ async function loadTracker() {
   if (wdCb) { wdCb.checked = !!todayLog.workout_done; document.getElementById('workoutDurationCard').style.display = wdCb.checked ? '' : 'none'; }
   const wdDur = document.getElementById('log_workout_duration');
   if (wdDur) wdDur.value = todayLog.workout_duration || '';
-  const wdCb = document.getElementById('log_workout_done');
-  if (wdCb) { wdCb.checked = !!todayLog.workout_done; document.getElementById('workoutDurationCard').style.display = wdCb.checked ? '' : 'none'; }
-  const wdDur = document.getElementById('log_workout_duration');
-  if (wdDur) wdDur.value = todayLog.workout_duration || '';
 
   renderTodaySummary(todayLog, fp);
   renderWeeklyPrediction(logs, fp);
