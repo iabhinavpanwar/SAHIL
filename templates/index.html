@@ -32,7 +32,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     {% if cfg.get('hero_video_mp4') %}
     <div class="hero-name-canvas-wrap">
       <canvas id="heroNameCanvas" aria-label="{{ cfg.get('hero_name','SAHIL PANWAR') }}" role="img"></canvas>
-      <video id="heroNameVideo" autoplay muted loop playsinline style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
+      <video id="heroNameVideo" autoplay muted loop playsinline style="visibility:hidden;width:0;height:0;position:absolute">
         <source src="{{ cfg.hero_video_mp4 }}" type="video/mp4">
       </video>
     </div>
@@ -2524,7 +2524,11 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
 
     window.addEventListener('resize', resize);
     var fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
-    fontsReady.then(function() { resize(); requestAnimationFrame(draw); });
+    fontsReady.then(function() {
+      resize();
+      video.play().catch(function() {});
+      requestAnimationFrame(draw);
+    });
   })();
 
   </script>
