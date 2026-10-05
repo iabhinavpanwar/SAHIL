@@ -497,28 +497,16 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   }
 
   /* video-in-text hero name */
-  .hero-name-video-wrap {
-    position: relative;
-    display: inline-block;
-    isolation: isolate;
+  .hero-name-canvas-wrap {
+    display: block;
+    width: 100%;
+    text-align: center;
+    animation: fadeDown 0.7s 0.2s ease both;
+    margin-bottom: clamp(0.75rem, 2vw, 1rem);
   }
-  .hero-name-video-wrap .hero-name-vid {
-    position: absolute;
-    inset: -10% -2%;
-    width: 104%;
-    height: 120%;
-    object-fit: cover;
-    pointer-events: none;
-    mix-blend-mode: lighten;
-  }
-  .hero-name-mask {
-    position: relative;
-    -webkit-text-fill-color: transparent !important;
-    color: transparent !important;
-    background: #000 !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    animation: fadeDown 0.7s 0.2s ease both !important;
+  #heroNameCanvas {
+    display: block;
+    width: 100% !important;
   }
 
   .hero-tagline {
@@ -2490,9 +2478,13 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     function resize() {
       name = (canvas.getAttribute('aria-label') || 'SAHIL PANWAR').toUpperCase();
       dpr  = window.devicePixelRatio || 1;
-      W    = Math.min(window.innerWidth * 0.88, 900);
-      fs   = Math.min(W * 0.17, 108);
-      H    = fs * 1.4;
+      W    = canvas.parentElement.offsetWidth || window.innerWidth;
+      // fit font size so text fills ~90% of width
+      fs   = Math.min(W * 0.22, 140);
+      ctx.font = fs + 'px "Bebas Neue", Impact, sans-serif';
+      var tw = ctx.measureText(name).width;
+      if (tw > W * 0.92) fs = fs * (W * 0.92 / tw);
+      H    = fs * 1.25;
       canvas.width  = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       canvas.style.width  = W + 'px';
