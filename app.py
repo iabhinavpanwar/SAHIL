@@ -558,6 +558,8 @@ def inject_globals():
 @app.route('/')
 def index():
     cfg   = get_config()
+    if cfg.get('hero_video'):
+        cfg['hero_video'] = youtube_embed(cfg['hero_video'])
     tests = list(testimonials_col.find({'active': True}).sort('order', 1)) if testimonials_col is not None else []
     svcs  = list(services_col.find({}).sort('order', 1)) if services_col is not None else []
     trans = list(transforms_col.find({}).sort('order', 1)) if transforms_col is not None else []
@@ -930,7 +932,7 @@ def admin_update_config():
         return jsonify({'error': 'DB unavailable'}), 500
     d = request.json or {}
     allowed = {
-        'hero_name','hero_tagline','hero_cta','hero_image',
+        'hero_name','hero_tagline','hero_cta','hero_image','hero_video',
         'stat_years','stat_clients','stat_transformations',
         'about_bio','about_photo','about_video',
         'contact_email','contact_phone','contact_whatsapp',

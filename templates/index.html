@@ -3,7 +3,17 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
 
 <!-- HERO -->
 <section class="hero" id="hero">
-  {% if cfg.get('hero_image') %}
+  {% if cfg.get('hero_video') %}
+  <div class="hero-bg hero-video-bg">
+    <iframe
+      src="{{ cfg.hero_video }}?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+      frameborder="0"
+      allow="autoplay; encrypted-media"
+      allowfullscreen
+      aria-hidden="true"
+    ></iframe>
+  </div>
+  {% elif cfg.get('hero_image') %}
   <div
     class="hero-bg"
     style="background-image:url('{{ cfg.hero_image }}')"
@@ -351,6 +361,27 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     width: 100%;
     height: 100%;
     display: block;
+  }
+
+  /* hero youtube video background */
+  .hero-video-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: #000;
+  }
+  .hero-video-bg iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* 16:9 — ensure it always covers the hero */
+    width: max(100%, calc(100vh * 16 / 9));
+    height: max(100%, calc(100vw * 9 / 16));
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    filter: brightness(0.45) saturate(1.1);
+    border: 0;
   }
 
   .hero-grid {
