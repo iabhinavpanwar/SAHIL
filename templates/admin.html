@@ -2679,7 +2679,14 @@
                     ><input type="text" id="cfg_hero_cta" maxlength="100" />
                   </div>
                   <div class="form-group">
-                    <label>Hero Image</label>
+                    <label>Hero Video URL (YouTube)</label>
+                    <input type="url" id="cfg_hero_video" placeholder="https://www.youtube.com/watch?v=..." />
+                    <small style="color:var(--text3);font-size:0.75rem">Paste any YouTube URL. Overrides the hero image when set.</small>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Hero Image (fallback)</label>
                     <input type="hidden" id="cfg_hero_image" />
                     <div
                       style="
@@ -5425,6 +5432,7 @@
         "hero_tagline",
         "hero_cta",
         "hero_image",
+        "hero_video",
         "stat_years",
         "stat_clients",
         "stat_transformations",
