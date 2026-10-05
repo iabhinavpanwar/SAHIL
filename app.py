@@ -932,7 +932,7 @@ def admin_update_config():
         return jsonify({'error': 'DB unavailable'}), 500
     d = request.json or {}
     allowed = {
-        'hero_name','hero_tagline','hero_cta','hero_image','hero_video',
+        'hero_name','hero_tagline','hero_cta','hero_image','hero_video','hero_video_mp4',
         'stat_years','stat_clients','stat_transformations',
         'about_bio','about_photo','about_video',
         'contact_email','contact_phone','contact_whatsapp',

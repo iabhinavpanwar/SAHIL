@@ -29,7 +29,19 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
       <span>{{ cfg.get('hero_badge_text','Available for New Clients') }}</span>
     </div>
     <p class="hero-eyebrow">{{ cfg.get('hero_eyebrow','Personal Fitness Trainer') }}</p>
-    <h1 class="hero-name">{{ cfg.get('hero_name','SAHIL PANWAR') }}</h1>
+    <h1 class="hero-name">
+      {% if cfg.get('hero_video') %}
+      <span class="hero-name-video-wrap" aria-hidden="true">
+        <video class="hero-name-video" autoplay muted loop playsinline>
+          <source src="{{ cfg.get('hero_video_mp4','') }}" type="video/mp4" />
+        </video>
+        <span class="hero-name-text">{{ cfg.get('hero_name','SAHIL PANWAR') }}</span>
+      </span>
+      <span class="hero-name-fallback">{{ cfg.get('hero_name','SAHIL PANWAR') }}</span>
+      {% else %}
+      {{ cfg.get('hero_name','SAHIL PANWAR') }}
+      {% endif %}
+    </h1>
     <p class="hero-tagline">
       {{ cfg.get('hero_tagline','Transform Your Body. Transform Your Life.') }}
     </p>
@@ -380,7 +392,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     height: max(100%, calc(100vw * 9 / 16));
     transform: translate(-50%, -50%);
     pointer-events: none;
-    filter: brightness(0.45) saturate(1.1);
+    filter: brightness(0.65) saturate(1.1);
     border: 0;
   }
 
@@ -463,6 +475,85 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     letter-spacing: 0.02em;
     overflow-wrap: break-word;
     margin-bottom: clamp(0.75rem, 2vw, 1rem);
+  }
+
+  /* video clipped into text */
+  .hero-name-video-wrap {
+    position: relative;
+    display: inline-block;
+  }
+  .hero-name-video {
+    position: absolute;
+    inset: -20% -5%;
+    width: 110%;
+    height: 140%;
+    object-fit: cover;
+    border-radius: 0;
+  }
+  .hero-name-text {
+    position: relative;
+    display: block;
+    background: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    /* the video is painted as background via mix-blend-mode trick */
+  }
+  /* The actual clip trick: video sits behind, text punches through */
+  .hero-name-video-wrap {
+    isolation: isolate;
+  }
+  .hero-name-video {
+    mix-blend-mode: normal;
+    z-index: 0;
+    border-radius: 0;
+  }
+  .hero-name-text {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-display);
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    background: transparent;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: none;
+    /* Use mix-blend-mode to reveal video through text */
+    mix-blend-mode: screen;
+    color: #fff;
+    -webkit-text-fill-color: #fff;
+  }
+  /* Fallback text hidden when video wrap is shown */
+  .hero-name-fallback {
+    display: none;
+  }
+  /* If video fails to load, show fallback */
+  .hero-name-video:not([src]),
+  .hero-name-video[src=""] {
+    display: none;
+  }
+  /* Animated shimmer fallback when no mp4 */
+  .hero-name-video-wrap:not(:has(video[src])) .hero-name-text,
+  .hero-name-video-wrap:has(video[src=""]) .hero-name-text {
+    background-image: linear-gradient(
+      110deg,
+      var(--primary) 0%,
+      #fff 40%,
+      var(--primary) 60%,
+      #fff 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+    mix-blend-mode: normal;
+  }
+  @keyframes shimmer {
+    to { background-position: 200% center; }
   }
 
   .hero-tagline {
