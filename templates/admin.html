@@ -2686,9 +2686,14 @@
                 </div>
                 <div class="form-row">
                   <div class="form-group">
-                    <label>Hero Name Text Video (MP4 URL)</label>
-                    <input type="url" id="cfg_hero_video_mp4" placeholder="https://example.com/video.mp4" />
-                    <small style="color:var(--text3);font-size:0.75rem">Direct MP4 link — plays inside the name letters. Use a Cloudinary/S3/CDN hosted file.</small>
+                    <label>Hero Name Text Video (MP4)</label>
+                    <input type="hidden" id="cfg_hero_video_mp4" />
+                    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+                      <input type="url" id="cfg_hero_video_mp4_url" placeholder="https://example.com/video.mp4" style="flex:1;min-width:0" oninput="document.getElementById('cfg_hero_video_mp4').value=this.value" />
+                      <input type="file" id="cfg_hero_video_mp4_file" accept="video/mp4,video/webm" style="flex:1;min-width:0" onchange="uploadCfgVideo('cfg_hero_video_mp4_file','cfg_hero_video_mp4','cfg_hero_video_mp4_url')" />
+                      <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('cfg_hero_video_mp4').value='';document.getElementById('cfg_hero_video_mp4_url').value='';document.getElementById('cfg_hero_video_mp4_file').value=''">Clear</button>
+                    </div>
+                    <small style="color:var(--text3);font-size:0.75rem">Paste a direct MP4 URL or upload a file (max 50 MB). Plays inside the name letters.</small>
                   </div>
                 </div>
                 <div class="form-row">
@@ -5136,6 +5141,24 @@
         else {
           preview.style.display = "none";
           alert("Image upload failed");
+        }
+      }
+
+      async function uploadCfgVideo(inputId, hiddenId, urlInputId) {
+        const file = document.getElementById(inputId).files[0];
+        if (!file) return;
+        const fd = new FormData();
+        fd.append("file", file);
+        const btn = event.target;
+        btn.disabled = true;
+        const res = await fetch("/api/upload", { method: "POST", body: fd });
+        btn.disabled = false;
+        const d = await res.json();
+        if (res.ok && d.url) {
+          document.getElementById(hiddenId).value = d.url;
+          document.getElementById(urlInputId).value = d.url;
+        } else {
+          alert("Upload failed: " + (d.error || "unknown error"));
         }
       }
 

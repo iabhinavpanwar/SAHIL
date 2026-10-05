@@ -3187,7 +3187,9 @@ def admin_save_muscle_assignments(client_id):
 
 # ── IMAGE UPLOAD ─────────────────────────────────────────────────────────────
 ALLOWED_MIME = {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
+ALLOWED_VIDEO_MIME = {'video/mp4', 'video/webm'}
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
+MAX_VIDEO_BYTES = 50 * 1024 * 1024  # 50 MB
 
 if db is not None:
     community_col = db['community_posts']
@@ -3218,6 +3220,15 @@ def _compress_image(data, mime):
 def _handle_upload(file):
     if not file or not file.filename:
         return None, 'No file'
+    if file.mimetype in ALLOWED_VIDEO_MIME:
+        data = file.read(MAX_VIDEO_BYTES + 1)
+        if len(data) > MAX_VIDEO_BYTES:
+            return None, 'File too large (max 50 MB)'
+        if images_col is None:
+            return None, 'DB unavailable'
+        image_id = secrets.token_hex(8)
+        images_col.insert_one({'image_id': image_id, 'data': data, 'mime': file.mimetype})
+        return f'/api/img/{image_id}', None
     if file.mimetype not in ALLOWED_MIME:
         return None, 'Invalid file type'
     data = file.read(MAX_UPLOAD_BYTES + 1)
@@ -3227,11 +3238,7 @@ def _handle_upload(file):
         return None, 'DB unavailable'
     data, mime = _compress_image(data, file.mimetype)
     image_id = secrets.token_hex(8)
-    images_col.insert_one({
-        'image_id': image_id,
-        'data': data,
-        'mime': mime,
-    })
+    images_col.insert_one({'image_id': image_id, 'data': data, 'mime': mime})
     return f'/api/img/{image_id}', None
 
 @app.route('/api/img/<image_id>')

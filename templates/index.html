@@ -29,7 +29,16 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
       <span>{{ cfg.get('hero_badge_text','Available for New Clients') }}</span>
     </div>
     <p class="hero-eyebrow">{{ cfg.get('hero_eyebrow','Personal Fitness Trainer') }}</p>
+    {% if cfg.get('hero_video_mp4') %}
+    <h1 class="hero-name hero-name-video" id="heroNameVideo">
+      <span class="hero-name-text">{{ cfg.get('hero_name','SAHIL PANWAR') }}</span>
+      <video autoplay muted loop playsinline aria-hidden="true" class="hero-name-vid">
+        <source src="{{ cfg.hero_video_mp4 }}" type="video/mp4">
+      </video>
+    </h1>
+    {% else %}
     <h1 class="hero-name hero-name-shimmer">{{ cfg.get('hero_name','SAHIL PANWAR') }}</h1>
+    {% endif %}
     <p class="hero-tagline">
       {{ cfg.get('hero_tagline','Transform Your Body. Transform Your Life.') }}
     </p>
@@ -485,6 +494,30 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
   @keyframes nameShimmer {
     0%   { background-position: 0% center; }
     100% { background-position: 250% center; }
+  }
+
+  /* video-in-text hero name */
+  .hero-name-video {
+    position: relative;
+    display: block;
+  }
+  .hero-name-video .hero-name-vid {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    -webkit-mask-image: -webkit-linear-gradient(transparent, transparent);
+  }
+  .hero-name-video .hero-name-text {
+    position: relative;
+    display: block;
+    background: var(--primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
 
   .hero-tagline {
