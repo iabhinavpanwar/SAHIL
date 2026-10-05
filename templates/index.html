@@ -2488,7 +2488,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     var W, H, fs, dpr, name;
 
     function resize() {
-      name = canvas.getAttribute('aria-label') || 'SAHIL PANWAR';
+      name = (canvas.getAttribute('aria-label') || 'SAHIL PANWAR').toUpperCase();
       dpr  = window.devicePixelRatio || 1;
       W    = Math.min(window.innerWidth * 0.88, 900);
       fs   = Math.min(W * 0.17, 108);
@@ -2505,7 +2505,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
       ctx.clearRect(0, 0, W, H);
       if (video.videoWidth === 0) {
         // video not decoded yet - draw shimmer placeholder
-        ctx.font = '900 ' + fs + 'px Montserrat, Arial Black, sans-serif';
+        ctx.font = fs + 'px "Bebas Neue", Impact, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = 'var(--primary, #e8ff00)';
@@ -2514,7 +2514,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
       }
       ctx.drawImage(video, 0, 0, W, H);
       ctx.globalCompositeOperation = 'destination-in';
-      ctx.font = '900 ' + fs + 'px Montserrat, Arial Black, sans-serif';
+      ctx.font = fs + 'px "Bebas Neue", Impact, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#fff';
