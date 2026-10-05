@@ -32,7 +32,7 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     {% if cfg.get('hero_video_mp4') %}
     <div class="hero-name-canvas-wrap">
       <canvas id="heroNameCanvas" aria-label="{{ cfg.get('hero_name','SAHIL PANWAR') }}" role="img"></canvas>
-      <video id="heroNameVideo" autoplay muted loop playsinline style="display:none">
+      <video id="heroNameVideo" autoplay muted loop playsinline style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
         <source src="{{ cfg.hero_video_mp4 }}" type="video/mp4">
       </video>
     </div>
@@ -2484,7 +2484,6 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     var canvas = document.getElementById('heroNameCanvas');
     var video  = document.getElementById('heroNameVideo');
     if (!canvas || !video) return;
-    var raf = null;
     var ctx = canvas.getContext('2d');
     var W, H, fs, dpr, name;
 
@@ -2501,13 +2500,19 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
     }
 
     function draw() {
-      raf = requestAnimationFrame(draw);
-      if (video.readyState < 2) return;
+      requestAnimationFrame(draw);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
-      // draw video frame
+      if (video.videoWidth === 0) {
+        // video not decoded yet - draw shimmer placeholder
+        ctx.font = '900 ' + fs + 'px Montserrat, Arial Black, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'var(--primary, #e8ff00)';
+        ctx.fillText(name, W / 2, H / 2);
+        return;
+      }
       ctx.drawImage(video, 0, 0, W, H);
-      // cut to text shape only
       ctx.globalCompositeOperation = 'destination-in';
       ctx.font = '900 ' + fs + 'px Montserrat, Arial Black, sans-serif';
       ctx.textAlign = 'center';
@@ -2517,25 +2522,9 @@ Panwar') }} — Personal Fitness Trainer{% endblock %} {% block content %}
       ctx.globalCompositeOperation = 'source-over';
     }
 
-    function start() {
-      resize();
-      if (raf) cancelAnimationFrame(raf);
-      draw();
-    }
-
-    window.addEventListener('resize', function() { resize(); });
-
-    // start as soon as fonts + video are ready
+    window.addEventListener('resize', resize);
     var fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
-    fontsReady.then(function() {
-      resize();
-      if (video.readyState >= 2) {
-        draw();
-      } else {
-        video.addEventListener('canplay', function() { draw(); }, {once: true});
-        video.load();
-      }
-    });
+    fontsReady.then(function() { resize(); requestAnimationFrame(draw); });
   })();
 
   </script>

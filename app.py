@@ -3224,11 +3224,14 @@ def _handle_upload(file):
         data = file.read(MAX_VIDEO_BYTES + 1)
         if len(data) > MAX_VIDEO_BYTES:
             return None, 'File too large (max 50 MB)'
-        if images_col is None:
-            return None, 'DB unavailable'
-        image_id = secrets.token_hex(8)
-        images_col.insert_one({'image_id': image_id, 'data': data, 'mime': file.mimetype})
-        return f'/api/img/{image_id}', None
+        ext = 'webm' if file.mimetype == 'video/webm' else 'mp4'
+        vid_id = secrets.token_hex(8)
+        upload_dir = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+        os.makedirs(upload_dir, exist_ok=True)
+        fpath = os.path.join(upload_dir, f'{vid_id}.{ext}')
+        with open(fpath, 'wb') as fout:
+            fout.write(data)
+        return f'/static/uploads/{vid_id}.{ext}', None
     if file.mimetype not in ALLOWED_MIME:
         return None, 'Invalid file type'
     data = file.read(MAX_UPLOAD_BYTES + 1)
