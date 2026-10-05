@@ -3277,8 +3277,9 @@ def pwa_manifest():
         'theme_color':      color,
         'orientation':      'portrait-primary',
         'icons': [
-            {'src': '/static/IMAGE/favicon.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any maskable'},
-            {'src': '/static/IMAGE/favicon.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any maskable'},
+            {'src': '/static/IMAGE/favicon.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'},
+            {'src': '/static/IMAGE/favicon.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'},
+            {'src': '/static/IMAGE/favicon.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'},
         ],
         'categories': ['health', 'fitness'],
         'screenshots': [],

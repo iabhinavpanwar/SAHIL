@@ -3273,6 +3273,27 @@
         });
     </script>
 
+    <script>
+      (function () {
+        var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        var isStandalone = window.navigator.standalone === true;
+        var dismissed = sessionStorage.getItem('iosBannerDismissed');
+        if (isIos && !isStandalone && !dismissed) {
+          var b = document.createElement('div');
+          b.id = 'ios-install-banner';
+          b.innerHTML =
+            '<i class="fas fa-share-square" style="color:var(--primary);font-size:1.2rem;flex-shrink:0"></i>' +
+            '<span style="flex:1">Tap <strong>Share</strong> then <strong>"Add to Home Screen"</strong> to install this app.</span>' +
+            '<button onclick="sessionStorage.setItem(\'iosBannerDismissed\',\'1\');document.getElementById(\'ios-install-banner\').remove()" ' +
+            'style="background:none;border:none;color:#aaa;font-size:1.4rem;cursor:pointer;line-height:1;padding:0">&times;</button>';
+          b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;border-top:1px solid #333;' +
+            'padding:.85rem 1rem;z-index:9998;display:flex;align-items:center;gap:.75rem;font-size:.85rem;' +
+            'box-shadow:0 -4px 20px rgba(0,0,0,.5)';
+          document.body.appendChild(b);
+        }
+      })();
+    </script>
+
     {% if cfg.get('contact_whatsapp') %}
     <a
       href="https://wa.me/{{ cfg.contact_whatsapp|replace('+','')|replace(' ','') }}?text={{ cfg.get('whatsapp_default_message','Hi! I am interested in your training programs.') | urlencode }}"
