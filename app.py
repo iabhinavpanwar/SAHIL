@@ -3249,8 +3249,29 @@ def serve_image(image_id):
     if not doc:
         return '', 404
     from flask import Response
-    return Response(doc['data'], content_type=doc['mime'],
-                    headers={'Cache-Control': 'public, max-age=31536000'})
+    data = doc['data']
+    mime = doc['mime']
+    total = len(data)
+    range_header = request.headers.get('Range')
+    if range_header and mime.startswith('video/'):
+        import re as _re
+        m = _re.match(r'bytes=(\d+)-(\d*)', range_header)
+        if m:
+            start = int(m.group(1))
+            end   = int(m.group(2)) if m.group(2) else total - 1
+            end   = min(end, total - 1)
+            chunk = data[start:end + 1]
+            return Response(chunk, status=206, content_type=mime, headers={
+                'Content-Range':  f'bytes {start}-{end}/{total}',
+                'Accept-Ranges':  'bytes',
+                'Content-Length': str(len(chunk)),
+                'Cache-Control':  'public, max-age=31536000',
+            })
+    return Response(data, content_type=mime, headers={
+        'Accept-Ranges':  'bytes',
+        'Content-Length': str(total),
+        'Cache-Control':  'public, max-age=31536000',
+    })
 
 @app.route('/api/upload', methods=['POST'])
 @login_required
