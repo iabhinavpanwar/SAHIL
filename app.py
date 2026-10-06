@@ -3957,7 +3957,7 @@ def community_react_post(pid):
     if emoji not in VALID:
         return jsonify({'error': 'Invalid emoji'}), 400
     cid = session['client_id']
-    post = community_col.find_one({'_id': oid}, {'reactions': 1})
+    post = community_col.find_one({'_id': oid}, {'reactions': 1, 'reactors': 1})
     if not post:
         return jsonify({'error': 'Not found'}), 404
     reactions = post.get('reactions') or {}
