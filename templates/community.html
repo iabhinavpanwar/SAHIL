@@ -582,6 +582,34 @@
     transform: none;
   }
 
+  /* ── SORT TABS ─────────────────────────────────────────────────────────── */
+  .sort-tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: clamp(1.1rem, 3vw, 1.5rem);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+  .sort-tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.45rem 0.85rem 0.55rem;
+    font-size: clamp(0.78rem, 1.8vw, 0.88rem);
+    font-weight: 600;
+    color: var(--text3);
+    cursor: pointer;
+    font-family: var(--font);
+    transition: color var(--transition), border-color var(--transition);
+    margin-bottom: -1px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sort-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+  .sort-tab:hover:not(.active) { color: var(--text); }
+
   /* ── LOAD MORE ─────────────────────────────────────────────────────────── */
   .load-more-wrap {
     text-align: center;
@@ -1011,6 +1039,138 @@
   .lb-stats strong { color: var(--primary); }
   .lb-empty { font-size: 0.82rem; color: var(--text3); text-align: center; padding: 0.75rem 0; }
   .lb-month { font-size: 0.72rem; color: var(--text3); margin-top: 0.5rem; text-align: right; }
+
+  /* ── HEART BURST ── */
+  @keyframes heartBurst {
+    0%   { transform: scale(1); }
+    25%  { transform: scale(1.55); }
+    50%  { transform: scale(0.88); }
+    75%  { transform: scale(1.22); }
+    100% { transform: scale(1); }
+  }
+  .action-btn.burst i { animation: heartBurst 0.42s cubic-bezier(0.36,0.07,0.19,0.97); }
+
+  /* ── EMOJI REACTIONS ── */
+  .reactions-wrap {
+    position: relative;
+    display: inline-flex;
+  }
+  .emoji-picker {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 0.3rem 0.5rem;
+    display: none;
+    gap: 0.2rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 10;
+    white-space: nowrap;
+  }
+  .emoji-picker.open { display: flex; animation: emojiPop 0.18s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes emojiPop {
+    from { opacity:0; transform: scale(0.7) translateY(6px); }
+    to   { opacity:1; transform: scale(1) translateY(0); }
+  }
+  .emoji-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.2rem 0.25rem;
+    border-radius: 8px;
+    transition: transform 0.15s ease, background 0.15s ease;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .emoji-btn:hover { transform: scale(1.35); background: rgba(var(--primary-rgb),0.08); }
+  .reaction-summary {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+    min-height: 0;
+  }
+  .reaction-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all var(--transition);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .reaction-pill:hover, .reaction-pill.mine {
+    border-color: var(--primary);
+    background: rgba(var(--primary-rgb),0.08);
+  }
+  .reaction-pill .rcount { color: var(--text2); font-size: 0.72rem; }
+
+  /* ── COMMENT SLIDE ── */
+  .comments-section {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.38s cubic-bezier(0.25,0.46,0.45,0.94),
+                opacity    0.28s ease,
+                margin-top 0.28s ease;
+    opacity: 0;
+    margin-top: 0;
+  }
+  .comments-section.open {
+    max-height: 1200px;
+    opacity: 1;
+    margin-top: clamp(0.75rem,2vw,1rem);
+  }
+
+  /* ── COMPOSE EXPAND ── */
+  #postText {
+    transition: min-height 0.25s ease, border-color var(--transition), box-shadow var(--transition);
+  }
+  #postText.expanded { min-height: 110px; }
+
+  /* ── LEADERBOARD ROW HOVER ── */
+  .lb-row {
+    transition: background var(--transition), padding-left var(--transition);
+    border-radius: var(--radius-sm);
+    position: relative;
+  }
+  .lb-row::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 15%; bottom: 15%;
+    width: 3px;
+    background: var(--primary);
+    border-radius: 0 3px 3px 0;
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+  }
+  .lb-row:hover { background: rgba(var(--primary-rgb),0.04); padding-left: 6px; }
+  .lb-row:hover::before { transform: scaleY(1); }
+
+  /* ── ONLINE DOT ── */
+  .online-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--success, #44cc88);
+    box-shadow: 0 0 0 0 rgba(68,204,136,0.6);
+    animation: onlinePulse 2.2s ease-in-out infinite;
+    vertical-align: middle;
+    margin-left: 0.35rem;
+  }
+  @keyframes onlinePulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(68,204,136,0.6); }
+    50%      { box-shadow: 0 0 0 5px rgba(68,204,136,0); }
+  }
+
+  /* ── POST STAGGER ── */
+  .post-card { animation: fadeUp 0.35s ease both; }
 </style>
 {% endblock %}
 
@@ -1024,7 +1184,7 @@
   <div class="comm-stats">
     <div class="comm-stat">
       <strong id="memberCount">{{ member_count }}</strong>
-      <span>{{ cfg.get('community_members_label','Members') }}</span>
+      <span>{{ cfg.get('community_members_label','Members') }}<span class="online-dot" title="Community active"></span></span>
     </div>
     <div class="comm-stat">
       <strong id="postCount">{{ post_count }}</strong>
@@ -1093,6 +1253,12 @@
     <div class="lb-month" id="lbMonth"></div>
   </div>
 
+  <!-- sort tabs -->
+  <div class="sort-tabs">
+    <button class="sort-tab active" id="tab-newest" onclick="setSort('newest')">✨ Newest</button>
+    <button class="sort-tab" id="tab-top" onclick="setSort('top')">🔥 Top</button>
+  </div>
+
   <!-- feed -->
   <div class="feed" id="feed"></div>
 
@@ -1117,9 +1283,11 @@
 <script>
   const IS_LOGGED_IN = {{ (session.get('client_id') is not none and session.get('client_id') != '') | tojson }};
   const MY_ID        = {{ session.get('client_id', '') | tojson }};
+  const EMOJIS       = ['🔥','💪','👏','❤️'];
   let   _skip        = 0;
   let   _loading     = false;
   let   _hasMore     = true;
+  let   _sort        = 'newest';
 
   // ── helpers ──────────────────────────────────────────────────────────────
   function avatar(url, name, size = 40) {
@@ -1145,14 +1313,18 @@
   })();
   {% endif %}
 
-  // ── char counter ──────────────────────────────────────────────────────────
+  // ── char counter + compose expand ────────────────────────────────────────
   const postText = document.getElementById('postText');
   const charCount = document.getElementById('charCount');
   if (postText) {
+    postText.addEventListener('focus', () => postText.classList.add('expanded'));
     postText.addEventListener('input', () => {
       const n = postText.value.length;
       charCount.textContent = `${n} / 1000`;
       charCount.classList.toggle('warn', n > 900);
+      // auto-expand height
+      postText.style.height = 'auto';
+      postText.style.height = postText.scrollHeight + 'px';
     });
     postText.addEventListener('keydown', e => {
       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
@@ -1160,6 +1332,14 @@
       }
     });
   }
+
+  // ── comment input auto-expand ─────────────────────────────────────────────
+  document.addEventListener('input', e => {
+    if (e.target.classList.contains('comment-input')) {
+      e.target.style.height = 'auto';
+      e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+    }
+  });
 
   // ── image picker ──────────────────────────────────────────────────────────
   let _pendingFile = null;
@@ -1220,7 +1400,7 @@ async function submitPost(btn) {
   });
 
   // ── render post ───────────────────────────────────────────────────────────
-  function renderPost(p) {
+  function renderPost(p, delay) {
     const isMine = IS_LOGGED_IN && p.client_id === MY_ID;
     const likeClass = p.liked ? 'liked' : '';
     const likeIcon  = p.liked ? 'fas fa-heart' : 'far fa-heart';
@@ -1228,8 +1408,14 @@ async function submitPost(btn) {
     const imgHtml   = p.image_url
       ? `<img class="post-img" src="${esc(p.image_url)}" alt="post image" loading="lazy" onclick="openLightbox('${esc(p.image_url)}')">`
       : '';
+    const reactions = p.reactions || {};
+    const myReaction = p.my_reaction || null;
+    const reactionPills = Object.entries(reactions).filter(([,c])=>c>0)
+      .map(([emoji,count]) => `<span class="reaction-pill ${myReaction===emoji?'mine':''}" onclick="sendReaction('${p._id}','${emoji}')">${emoji} <span class="rcount">${count}</span></span>`).join('');
+    const emojiButtons = EMOJIS.map(e => `<button class="emoji-btn" onclick="sendReaction('${p._id}','${e}')" title="React ${e}">${e}</button>`).join('');
+    const delayStyle = delay ? `style="animation-delay:${delay}s"` : '';
     return `
-    <div class="post-card" id="post-${p._id}">
+    <div class="post-card" id="post-${p._id}" ${delayStyle}>
       <div class="post-header">
         <div class="post-avatar">${avatar(p.avatar_url, p.author_name, 40)}</div>
         <div class="post-meta">
@@ -1240,15 +1426,22 @@ async function submitPost(btn) {
       </div>
       ${imgHtml}
       ${p.text ? `<div class="post-body">${esc(p.text)}</div>` : ''}
+      <div class="reaction-summary" id="reactions-${p._id}">${reactionPills}</div>
       <div class="post-actions">
         <button class="action-btn ${likeClass}" id="like-${p._id}" onclick="toggleLike('${p._id}',this)">
           <i class="${likeIcon}"></i> <span class="like-count">${p.like_count}</span>
         </button>
+        <div class="reactions-wrap">
+          <button class="action-btn" onclick="toggleEmojiPicker('${p._id}')" title="React">
+            <i class="far fa-smile"></i>
+          </button>
+          <div class="emoji-picker" id="epicker-${p._id}">${emojiButtons}</div>
+        </div>
         <button class="action-btn" onclick="toggleComments('${p._id}')">
           <i class="far fa-comment"></i> <span class="cmt-count">${(p.comments||[]).length}</span>
         </button>
       </div>
-      <div class="comments-section" id="cmts-${p._id}" style="display:none">
+      <div class="comments-section" id="cmts-${p._id}">
         <div class="comment-list" id="clist-${p._id}">${comments}</div>
         ${IS_LOGGED_IN ? `
         <div class="comment-form">
@@ -1274,13 +1467,25 @@ async function submitPost(btn) {
   }
 
   // ── load posts ────────────────────────────────────────────────────────────
+  function setSort(sort) {
+    if (_sort === sort) return;
+    _sort = sort;
+    document.querySelectorAll('.sort-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`tab-${sort}`)?.classList.add('active');
+    _skip = 0;
+    _hasMore = true;
+    document.getElementById('feed').innerHTML = '';
+    document.getElementById('feedEmpty').style.display = 'none';
+    loadPosts();
+  }
+
 async function loadPosts() {
   if (_loading || !_hasMore) return;
   _loading = true;
   const wrap = document.getElementById('loadMoreWrap');
   if (wrap) wrap.innerHTML = '<button class="btn btn-outline btn-sm" disabled><span class="spin"></span> Loading…</button>';
   try {
-    const r = await fetch(`/api/community/posts?skip=${_skip}`);
+    const r = await fetch(`/api/community/posts?skip=${_skip}&sort=${_sort}`);
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     const posts = data.posts;
@@ -1291,7 +1496,7 @@ async function loadPosts() {
       if (wrap) wrap.style.display = 'none';
     } else {
       document.getElementById('feedEmpty').style.display = 'none';
-      posts.forEach(p => feed.insertAdjacentHTML('beforeend', renderPost(p)));
+      posts.forEach((p, i) => feed.insertAdjacentHTML('beforeend', renderPost(p, i * 0.06)));
       _skip += posts.length;
       _hasMore = posts.length === 10;
       if (wrap) {
@@ -1309,7 +1514,7 @@ async function loadPosts() {
   }
 }
 
-  // ── toggle like ───────────────────────────────────────────────────────────
+  // ── toggle like (with heart burst) ───────────────────────────────────────
   async function toggleLike(pid, btn) {
     if (!IS_LOGGED_IN) { window.location = '/client/login'; return; }
     btn.disabled = true;
@@ -1319,8 +1524,58 @@ async function loadPosts() {
       btn.querySelector('.like-count').textContent = d.like_count;
       btn.querySelector('i').className = d.liked ? 'fas fa-heart' : 'far fa-heart';
       btn.classList.toggle('liked', d.liked);
+      if (d.liked) {
+        btn.classList.remove('burst');
+        void btn.offsetWidth; // reflow to restart animation
+        btn.classList.add('burst');
+        btn.addEventListener('animationend', () => btn.classList.remove('burst'), {once:true});
+      }
     } finally { btn.disabled = false; }
   }
+
+  // ── emoji reactions ───────────────────────────────────────────────────────
+  function toggleEmojiPicker(pid) {
+    if (!IS_LOGGED_IN) { window.location = '/client/login'; return; }
+    const picker = document.getElementById(`epicker-${pid}`);
+    if (!picker) return;
+    const isOpen = picker.classList.contains('open');
+    // close all others
+    document.querySelectorAll('.emoji-picker.open').forEach(p => p.classList.remove('open'));
+    if (!isOpen) picker.classList.add('open');
+  }
+
+  async function sendReaction(pid, emoji) {
+    document.getElementById(`epicker-${pid}`)?.classList.remove('open');
+    try {
+      const r = await fetch(`/api/community/posts/${pid}/react`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({emoji}),
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      renderReactions(pid, d.reactions, d.my_reaction);
+    } catch(e) { console.error(e); }
+  }
+
+  function renderReactions(pid, reactions, myReaction) {
+    const el = document.getElementById(`reactions-${pid}`);
+    if (!el) return;
+    if (!reactions || !Object.keys(reactions).length) { el.innerHTML = ''; return; }
+    el.innerHTML = Object.entries(reactions)
+      .filter(([,c]) => c > 0)
+      .map(([emoji, count]) => {
+        const mine = myReaction === emoji ? 'mine' : '';
+        return `<span class="reaction-pill ${mine}" onclick="sendReaction('${pid}','${emoji}')">${emoji} <span class="rcount">${count}</span></span>`;
+      }).join('');
+  }
+
+  // close emoji pickers on outside click
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.reactions-wrap')) {
+      document.querySelectorAll('.emoji-picker.open').forEach(p => p.classList.remove('open'));
+    }
+  });
 
   // ── leaderboard ──────────────────────────────────────────────────────────────
   async function loadLeaderboard() {
@@ -1350,13 +1605,13 @@ async function loadPosts() {
   }
   loadLeaderboard();
 
-  // ── toggle comments ───────────────────────────────────────────────────────
+  // ── toggle comments (smooth slide) ───────────────────────────────────────
   function toggleComments(pid) {
     const el = document.getElementById(`cmts-${pid}`);
     if (!el) return;
-    const open = el.style.display === 'none' || el.style.display === '';
-    el.style.display = open ? 'block' : 'none';
-    if (open) el.querySelector('.comment-input')?.focus();
+    const isOpen = el.classList.contains('open');
+    el.classList.toggle('open', !isOpen);
+    if (!isOpen) setTimeout(() => el.querySelector('.comment-input')?.focus(), 120);
   }
 
   // ── submit comment ────────────────────────────────────────────────────────

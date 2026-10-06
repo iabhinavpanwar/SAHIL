@@ -3798,9 +3798,20 @@ def community_get_posts():
         skip = max(0, int(request.args.get('skip', 0)))
     except (ValueError, TypeError):
         skip = 0
+    sort_by = request.args.get('sort', 'newest')
     try:
-        total = community_col.count_documents({})
-        posts = list(community_col.find({'hidden': {'$ne': True}}).sort('created', -1).skip(skip).limit(10))
+        total = community_col.count_documents({'hidden': {'$ne': True}})
+        if sort_by == 'top':
+            pipeline = [
+                {'$match': {'hidden': {'$ne': True}}},
+                {'$addFields': {'like_count': {'$size': {'$ifNull': ['$likes', []]}}}},
+                {'$sort': {'like_count': -1, 'created': -1}},
+                {'$skip': skip},
+                {'$limit': 10},
+            ]
+            posts = list(community_col.aggregate(pipeline))
+        else:
+            posts = list(community_col.find({'hidden': {'$ne': True}}).sort('created', -1).skip(skip).limit(10))
         cid = session.get('client_id', '')
         for p in posts:
             p['_id'] = str(p['_id'])
@@ -3811,7 +3822,7 @@ def community_get_posts():
             for c in p.get('comments') or []:
                 c['_id'] = str(c['_id'])
                 c['created'] = to_ist(c.get('created'))
-        return jsonify({'posts': posts, 'total': total})   # ← changed shape
+        return jsonify({'posts': posts, 'total': total})
     except Exception as e:
         logger.error('community_get_posts error: %s', e)
         return jsonify({'error': 'Server error'}), 500
