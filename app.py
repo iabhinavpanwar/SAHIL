@@ -63,7 +63,7 @@ def set_security_headers(response):
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; "
         "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
         "img-src 'self' data: blob: https:; "
-        "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://calendly.com https://maps.google.com https://maps.app.goo.gl https://www.google.com/maps/; "
+        "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.instagram.com https://calendly.com https://maps.google.com https://maps.app.goo.gl https://www.google.com/maps/; "
         "connect-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com;"
     )
     return response
@@ -136,6 +136,23 @@ def youtube_embed(url):
     if not m:
         return ''
     return f'https://www.youtube.com/embed/{m.group(1)}'
+
+_INSTA_RE = re.compile(
+    r'instagram\.com/(?:reel|p|tv)/([A-Za-z0-9_-]+)'
+)
+
+def parse_video_url(url):
+    """Return (embed_url, platform) or (None, None) for unsupported URLs."""
+    if not url:
+        return None, None
+    url = str(url).strip()
+    yt = youtube_embed(url)
+    if yt:
+        return yt, 'youtube'
+    m = _INSTA_RE.search(url)
+    if m:
+        return f'https://www.instagram.com/p/{m.group(1)}/embed/', 'instagram'
+    return None, None
 
 def _exercise_video_index():
     by_id, by_name = {}, {}
@@ -3844,6 +3861,8 @@ def community_get_posts():
             p['like_count'] = len(p.get('likes') or [])
             p['reactions'] = p.get('reactions') or {}
             p['my_reaction'] = (p.get('reactors') or {}).get(cid)
+            p['video_embed'] = p.get('video_embed') or ''
+            p['video_platform'] = p.get('video_platform') or ''
             p.pop('likes', None)
             p.pop('reactors', None)
             for c in p.get('comments') or []:
@@ -3863,6 +3882,7 @@ def community_create_post():
     if community_col is None:
         return jsonify({'error': 'DB unavailable'}), 500
     try:
+        video_embed, video_platform = None, None
         if request.content_type and 'multipart' in request.content_type:
             text = s((request.form.get('text') or ''), 1000)
             image_url = None
@@ -3875,7 +3895,9 @@ def community_create_post():
             body = request.get_json(silent=True) or {}
             text = s(body.get('text', ''), 1000)
             image_url = None
-        if not text and not image_url:
+            raw_video = s(body.get('video_url', ''), 300)
+            video_embed, video_platform = parse_video_url(raw_video)
+        if not text and not image_url and not video_embed:
             return jsonify({'error': 'Post cannot be empty'}), 400
         cid = session.get('client_id')
         if not cid:
@@ -3885,9 +3907,11 @@ def community_create_post():
             'client_id':   cid,
             'author_name': (user or {}).get('name', session.get('client_name', 'Member')),
             'avatar_url':  (user or {}).get('avatar_url', ''),
-            'text':        text,
-            'image_url':   image_url,
-            'likes':       [],
+            'text':          text,
+            'image_url':     image_url,
+            'video_embed':   video_embed,
+            'video_platform': video_platform,
+            'likes':         [],
             'comments':    [],
             'created':     datetime.now(timezone.utc),
         })

@@ -1230,6 +1230,28 @@
     50%      { box-shadow: 0 0 0 5px rgba(68,204,136,0); }
   }
 
+  /* ── VIDEO EMBED ── */
+  .post-video {
+    position: relative; width: 100%; padding-top: 56.25%;
+    border-radius: var(--radius-sm); overflow: hidden;
+    border: 1px solid var(--border); margin-bottom: clamp(.75rem,2vw,1rem);
+  }
+  .post-video iframe {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: none;
+  }
+  .video-input-wrap {
+    display: none; margin-top: .5rem;
+    padding-left: calc(clamp(34px,8vw,38px) + clamp(.6rem,2vw,.75rem));
+  }
+  .video-input-wrap input {
+    width: 100%; padding: .4rem .65rem; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--bg);
+    color: var(--text1); font-size: .82rem; font-family: var(--font);
+    outline: none; transition: border-color var(--transition);
+  }
+  .video-input-wrap input:focus { border-color: var(--primary); }
+  .video-input-wrap input::placeholder { color: var(--text3); }
+
 </style>
 {% endblock %}
 
@@ -1286,6 +1308,9 @@
       <img id="imgPreview" src="" alt="preview">
       <button class="img-remove-btn" onclick="removeImage()" title="Remove image"><i class="fas fa-times"></i></button>
     </div>
+    <div class="video-input-wrap" id="videoInputWrap">
+      <input type="text" id="videoUrlInput" placeholder="🔗 Paste YouTube, Shorts or Instagram Reels URL…" autocomplete="off">
+    </div>
     <div class="compose-footer">
       <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
         <span class="char-count" id="charCount">0 / 1000</span>
@@ -1293,6 +1318,9 @@
           <i class="fas fa-image"></i> Photo
         </button>
         <input type="file" id="postImageInput" accept="image/*" style="display:none" onchange="previewImage(this)">
+        <button type="button" class="img-pick-btn" onclick="toggleVideoInput()">
+          <i class="fab fa-youtube"></i> Video
+        </button>
       </div>
       <button class="btn btn-primary btn-sm" id="submitPost" onclick="submitPost(this)">Post</button>
     </div>
@@ -1431,6 +1459,13 @@
     document.getElementById('imgPreview').src = '';
     document.getElementById('imgPreviewWrap').style.display = 'none';
   }
+  function toggleVideoInput() {
+    const wrap = document.getElementById('videoInputWrap');
+    const shown = wrap.style.display === 'block';
+    wrap.style.display = shown ? 'none' : 'block';
+    if (!shown) document.getElementById('videoUrlInput').focus();
+    else document.getElementById('videoUrlInput').value = '';
+  }
 
   // ── submit post ───────────────────────────────────────────────────────────
 async function submitPost(btn) {
@@ -1443,7 +1478,8 @@ async function submitPost(btn) {
       body.append('text', text);
       body.append('image', _pendingFile);
     } else {
-      body = JSON.stringify({text});
+      const video_url = document.getElementById('videoUrlInput')?.value.trim() || '';
+      body = JSON.stringify({text, video_url});
       headers['Content-Type'] = 'application/json';
     }
     const r = await fetch('/api/community/posts', { method:'POST', headers, body });
@@ -1454,6 +1490,8 @@ async function submitPost(btn) {
     charCount.textContent = '0 / 1000';
     charCount.classList.remove('warn');
     removeImage();
+    document.getElementById('videoUrlInput').value = '';
+    document.getElementById('videoInputWrap').style.display = 'none';
     _skip = 0;
     _hasMore = true;
     document.getElementById('feed').innerHTML = '';
@@ -1509,6 +1547,9 @@ async function submitPost(btn) {
     const imgHtml   = p.image_url
       ? `<img class="post-img" src="${esc(p.image_url)}" alt="post image" loading="lazy" onclick="openLightbox('${esc(p.image_url)}')">`
       : '';
+    const videoHtml = p.video_embed
+      ? `<div class="post-video"><iframe src="${esc(p.video_embed)}" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div>`
+      : '';
     const reactions  = p.reactions || {};
     const myReaction = p.my_reaction || null;
     const reactionPills = Object.entries(reactions).filter(([,c])=>c>0)
@@ -1528,6 +1569,7 @@ async function submitPost(btn) {
         ${isMine ? `<button class="post-delete-btn" title="Delete post" onclick="deletePost('${p._id}',this)"><i class="fas fa-trash-alt"></i></button>` : ''}
       </div>
       ${imgHtml}
+      ${videoHtml}
       ${p.text ? `<div class="post-body">${esc(p.text)}</div>` : ''}
       <div class="reaction-summary" id="reactions-${p._id}">${reactionPills}</div>
       <div class="post-actions">
