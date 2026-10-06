@@ -3852,6 +3852,10 @@ def community_get_posts():
         else:
             posts = list(community_col.find({'hidden': {'$ne': True}}).sort('created', -1).skip(skip).limit(10))
         cid = session.get('client_id', '')
+        saved_posts = set()
+        if cid and users_col is not None:
+            u = users_col.find_one({'_id': safe_oid(cid)}, {'saved_posts': 1})
+            saved_posts = set((u or {}).get('saved_posts') or [])
         for p in posts:
             p['_id'] = str(p['_id'])
             raw_dt = p.get('created')
@@ -3863,6 +3867,7 @@ def community_get_posts():
             p['my_reaction'] = (p.get('reactors') or {}).get(cid)
             p['video_embed'] = p.get('video_embed') or ''
             p['video_platform'] = p.get('video_platform') or ''
+            p['bookmarked'] = p['_id'] in saved_posts
             p.pop('likes', None)
             p.pop('reactors', None)
             for c in p.get('comments') or []:
@@ -3915,10 +3920,35 @@ def community_create_post():
             'comments':    [],
             'created':     datetime.now(timezone.utc),
         })
+        # notify @mentions in post text
+        for uid in _resolve_mentions(text):
+            if uid != cid:
+                poster_name = (user or {}).get('name', session.get('client_name', 'Member'))
+                _push_notify(uid, f'👋 {poster_name} mentioned you', text[:80], '/community', 'mention')
         return jsonify({'status': 'posted', '_id': str(result.inserted_id)})
     except Exception as e:
         logger.exception('community_create_post error: %s', e)
         return jsonify({'error': 'Server error'}), 500
+
+_MENTION_RE = re.compile(r'@(\w+)')
+
+def _resolve_mentions(text):
+    """Return list of client_ids whose name matches @mention tokens in text."""
+    if not text or users_col is None:
+        return []
+    tokens = {t.lower() for t in _MENTION_RE.findall(text)}
+    if not tokens:
+        return []
+    notified = []
+    for tok in tokens:
+        user = users_col.find_one(
+            {'role': 'client', 'active': True,
+             'name': re.compile(r'^' + re.escape(tok), re.IGNORECASE)},
+            {'_id': 1}
+        )
+        if user:
+            notified.append(str(user['_id']))
+    return notified
 
 @app.route('/api/community/posts/<pid>/like', methods=['POST'])
 @client_login_required
@@ -3929,7 +3959,7 @@ def community_like_post(pid):
     if not oid:
         return jsonify({'error': 'Invalid id'}), 400
     cid = session['client_id']
-    post = community_col.find_one({'_id': oid}, {'likes': 1})
+    post = community_col.find_one({'_id': oid}, {'likes': 1, 'client_id': 1})
     if not post:
         return jsonify({'error': 'Not found'}), 404
     likes = post.get('likes') or []
@@ -3941,6 +3971,10 @@ def community_like_post(pid):
         community_col.update_one({'_id': oid}, {'$addToSet': {'likes': cid}})
         liked = True
         count = len(likes) + 1
+        author_id = post.get('client_id')
+        if author_id and author_id != cid:
+            liker_name = session.get('client_name', 'Someone')
+            _push_notify(author_id, '❤️ New Like', f'{liker_name} liked your post', '/community', 'like')
     return jsonify({'liked': liked, 'like_count': count})
 
 @app.route('/api/community/posts/<pid>/react', methods=['POST'])
@@ -3991,23 +4025,91 @@ def community_add_comment(pid):
     oid = safe_oid(pid)
     if not oid:
         return jsonify({'error': 'Invalid id'}), 400
-    text = s((request.json or {}).get('text', ''), 500)
+    body = request.json or {}
+    text = s(body.get('text', ''), 500)
     if not text:
         return jsonify({'error': 'Comment cannot be empty'}), 400
+    reply_to = s(body.get('reply_to', ''), 100)   # optional: comment _id being replied to
+    reply_to_name = s(body.get('reply_to_name', ''), 100)
     cid = session['client_id']
     user = users_col.find_one({'_id': safe_oid(cid)}, {'name': 1, 'avatar_url': 1}) if users_col is not None else None
+    commenter_name = (user or {}).get('name', session.get('client_name', 'Member'))
     comment = {
-        '_id':         ObjectId(),
-        'client_id':   cid,
-        'author_name': (user or {}).get('name', session.get('client_name', 'Member')),
-        'avatar_url':  (user or {}).get('avatar_url', ''),
-        'text':        text,
-        'created':     datetime.now(timezone.utc),
+        '_id':           ObjectId(),
+        'client_id':     cid,
+        'author_name':   commenter_name,
+        'avatar_url':    (user or {}).get('avatar_url', ''),
+        'text':          text,
+        'reply_to':      reply_to,
+        'reply_to_name': reply_to_name,
+        'created':       datetime.now(timezone.utc),
     }
+    post = community_col.find_one({'_id': oid}, {'client_id': 1, 'text': 1})
     community_col.update_one({'_id': oid}, {'$push': {'comments': comment}})
+    # notify post author
+    if post and post.get('client_id') and post['client_id'] != cid:
+        _push_notify(post['client_id'], '💬 New Comment', f'{commenter_name} commented on your post', '/community', 'comment')
+    # notify @mentions in comment text
+    for uid in _resolve_mentions(text):
+        if uid != cid:
+            _push_notify(uid, f'💬 {commenter_name} mentioned you', text[:80], '/community', 'mention')
     comment['_id'] = str(comment['_id'])
+    comment['created_iso'] = comment['created'].isoformat() + 'Z'
     comment['created'] = to_ist(comment['created'])
     return jsonify({'status': 'commented', 'comment': comment})
+
+@app.route('/api/community/posts/<pid>/bookmark', methods=['POST'])
+@client_login_required
+def community_bookmark_post(pid):
+    if community_col is None or users_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    oid = safe_oid(pid)
+    if not oid:
+        return jsonify({'error': 'Invalid id'}), 400
+    if not community_col.find_one({'_id': oid}):
+        return jsonify({'error': 'Not found'}), 404
+    cid = session['client_id']
+    user = users_col.find_one({'_id': safe_oid(cid)}, {'saved_posts': 1})
+    saved = user.get('saved_posts') or [] if user else []
+    if pid in saved:
+        users_col.update_one({'_id': safe_oid(cid)}, {'$pull': {'saved_posts': pid}})
+        return jsonify({'bookmarked': False})
+    else:
+        users_col.update_one({'_id': safe_oid(cid)}, {'$addToSet': {'saved_posts': pid}})
+        return jsonify({'bookmarked': True})
+
+@app.route('/api/community/saved')
+@client_login_required
+def community_get_saved():
+    if community_col is None or users_col is None:
+        return jsonify({'posts': []})
+    cid = session['client_id']
+    user = users_col.find_one({'_id': safe_oid(cid)}, {'saved_posts': 1})
+    saved_ids = (user or {}).get('saved_posts') or []
+    if not saved_ids:
+        return jsonify({'posts': []})
+    oids = [safe_oid(pid) for pid in saved_ids if safe_oid(pid)]
+    posts = list(community_col.find({'_id': {'$in': oids}, 'hidden': {'$ne': True}}).sort('created', -1))
+    saved_set = set(saved_ids)
+    for p in posts:
+        p['_id'] = str(p['_id'])
+        raw_dt = p.get('created')
+        p['created_iso'] = raw_dt.isoformat() + 'Z' if hasattr(raw_dt, 'isoformat') else ''
+        p['created'] = to_ist(raw_dt)
+        p['liked'] = cid in (p.get('likes') or [])
+        p['like_count'] = len(p.get('likes') or [])
+        p['reactions'] = p.get('reactions') or {}
+        p['my_reaction'] = (p.get('reactors') or {}).get(cid)
+        p['video_embed'] = p.get('video_embed') or ''
+        p['bookmarked'] = True
+        p.pop('likes', None)
+        p.pop('reactors', None)
+        for c in p.get('comments') or []:
+            c['_id'] = str(c['_id'])
+            raw_c = c.get('created')
+            c['created_iso'] = raw_c.isoformat() + 'Z' if hasattr(raw_c, 'isoformat') else ''
+            c['created'] = to_ist(raw_c)
+    return jsonify({'posts': posts})
 
 @app.route('/api/community/posts/<pid>', methods=['DELETE'])
 @client_login_required

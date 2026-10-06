@@ -609,6 +609,13 @@
     border-bottom-color: var(--primary);
   }
   .sort-tab:hover:not(.active) { color: var(--text); }
+  .mention { color: var(--primary); font-weight: 600; }
+  .action-btn.bookmarked { color: var(--primary); border-color: var(--primary); background: rgba(var(--primary-rgb),0.08); }
+  .reply-to-label { font-size: 0.72rem; color: var(--text3); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem; }
+  .reply-to-label strong { color: var(--primary); }
+  .comment-reply-btn { background: none; border: none; font-size: 0.7rem; color: var(--text3); cursor: pointer; padding: 0.1rem 0.25rem; font-family: var(--font); transition: color var(--transition); }
+  .comment-reply-btn:hover { color: var(--primary); }
+  .comment-reply-ctx { font-size: 0.7rem; color: var(--text3); font-style: italic; margin-bottom: 0.1rem; display: block; }
 
   /* ── SKELETON LOADERS ─────────────────────────────────────────────────────────── */
   @keyframes shimmer {
@@ -1352,6 +1359,7 @@
   <div class="sort-tabs">
     <button class="sort-tab active" id="tab-newest" onclick="setSort('newest')">✨ Newest</button>
     <button class="sort-tab" id="tab-top" onclick="setSort('top')">🔥 Top</button>
+    {% if session.get('client_id') %}<button class="sort-tab" id="tab-saved" onclick="setSort('saved')">🔖 Saved</button>{% endif %}
   </div>
 
   <!-- feed -->
@@ -1539,11 +1547,17 @@ async function submitPost(btn) {
   }
 
   // ── render post ───────────────────────────────────────────────────────────
+  function highlightMentions(text) {
+    return esc(text).replace(/@(\w+)/g, '<span class="mention">@$1</span>');
+  }
+
   function renderPost(p, delay) {
     const isMine    = IS_LOGGED_IN && p.client_id === MY_ID;
     const likeClass = p.liked ? 'liked' : '';
     const likeIcon  = p.liked ? 'fas fa-heart' : 'far fa-heart';
-    const comments  = (p.comments || []).map(renderComment).join('');
+    const bmClass   = p.bookmarked ? 'bookmarked' : '';
+    const bmIcon    = p.bookmarked ? 'fas fa-bookmark' : 'far fa-bookmark';
+    const comments  = (p.comments || []).map(c => renderComment(c, p._id)).join('');
     const imgHtml   = p.image_url
       ? `<img class="post-img" src="${esc(p.image_url)}" alt="post image" loading="lazy" onclick="openLightbox('${esc(p.image_url)}')">`
       : '';
@@ -1570,7 +1584,7 @@ async function submitPost(btn) {
       </div>
       ${imgHtml}
       ${videoHtml}
-      ${p.text ? `<div class="post-body">${esc(p.text)}</div>` : ''}
+      ${p.text ? `<div class="post-body">${highlightMentions(p.text)}</div>` : ''}
       <div class="reaction-summary" id="reactions-${p._id}">${reactionPills}</div>
       <div class="post-actions">
         <button class="action-btn ${likeClass}" id="like-${p._id}" onclick="toggleLike('${p._id}',this)">
@@ -1585,6 +1599,7 @@ async function submitPost(btn) {
         <button class="action-btn" onclick="toggleComments('${p._id}')">
           <i class="far fa-comment"></i> <span class="cmt-count">${(p.comments||[]).length}</span>
         </button>
+        ${IS_LOGGED_IN ? `<button class="action-btn ${bmClass}" id="bm-${p._id}" onclick="toggleBookmark('${p._id}',this)" title="Bookmark"><i class="${bmIcon}"></i></button>` : ''}
       </div>
       <div class="comments-section" id="cmts-${p._id}">
         <div class="comment-list" id="clist-${p._id}">${comments}</div>
@@ -1599,16 +1614,22 @@ async function submitPost(btn) {
     </div>`;
   }
 
-  function renderComment(c) {
+  function renderComment(c, pid) {
     const relTime  = timeAgo(c.created_iso);
     const fullTime = esc(c.created);
+    const replyCtx = c.reply_to_name ? `<span class="comment-reply-ctx">↩ replying to ${esc(c.reply_to_name)}</span>` : '';
+    const replyBtn = (IS_LOGGED_IN && pid) ? `<button class="comment-reply-btn" onclick="openReply('${pid}','${esc(c._id)}','${esc(c.author_name)}')">Reply</button>` : '';
     return `
-    <div class="comment-item">
+    <div class="comment-item" id="cmt-${esc(c._id)}">
       ${avatar(c.avatar_url, c.author_name, 28)}
       <div class="comment-bubble">
         <strong>${esc(c.author_name)}</strong>
-        <p>${esc(c.text)}</p>
-        <time title="${fullTime}">${relTime || fullTime}</time>
+        ${replyCtx}
+        <p>${highlightMentions(c.text)}</p>
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <time title="${fullTime}">${relTime || fullTime}</time>
+          ${replyBtn}
+        </div>
       </div>
     </div>`;
   }
@@ -1623,7 +1644,23 @@ async function submitPost(btn) {
     _hasMore = true;
     document.getElementById('feed').innerHTML = '';
     document.getElementById('feedEmpty').style.display = 'none';
-    loadPosts();
+    if (sort === 'saved') loadSaved();
+    else loadPosts();
+  }
+
+  async function loadSaved() {
+    const feed = document.getElementById('feed');
+    feed.innerHTML = renderSkeletons(3);
+    try {
+      const r = await fetch('/api/community/saved');
+      if (!r.ok) throw new Error();
+      const data = await r.json();
+      feed.innerHTML = '';
+      if (!data.posts || !data.posts.length) { document.getElementById('feedEmpty').style.display = ''; return; }
+      data.posts.forEach((p, i) => feed.insertAdjacentHTML('beforeend', renderPost(p, i * 0.06)));
+    } catch(e) {
+      feed.innerHTML = '<div class="feed-empty"><i class="fas fa-exclamation-triangle"></i><p>Could not load saved posts.</p></div>';
+    }
   }
 
   // ── refresh feed (banner tap) ─────────────────────────────────────────────
@@ -1811,25 +1848,64 @@ async function loadPosts() {
     if (!isOpen) setTimeout(() => el.querySelector('.comment-input')?.focus(), 120);
   }
 
+  // ── reply state ───────────────────────────────────────────────────────────
+  const _replyState = {};
+
+  function openReply(pid, cid, authorName) {
+    _replyState[pid] = {reply_to: cid, reply_to_name: authorName};
+    const form = document.querySelector(`#cmts-${pid} .comment-form`);
+    if (!form) return;
+    let lbl = form.querySelector('.reply-to-label');
+    if (!lbl) { lbl = document.createElement('div'); lbl.className = 'reply-to-label'; form.prepend(lbl); }
+    lbl.innerHTML = `Replying to <strong>${esc(authorName)}</strong> <button onclick="cancelReply('${pid}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:.8rem;padding:0">✕</button>`;
+    const cmts = document.getElementById(`cmts-${pid}`);
+    if (cmts && !cmts.classList.contains('open')) cmts.classList.add('open');
+    const input = document.getElementById(`cinput-${pid}`);
+    if (input) { input.focus(); if (!input.value) input.value = `@${authorName} `; }
+  }
+
+  function cancelReply(pid) {
+    delete _replyState[pid];
+    document.querySelector(`#cmts-${pid} .reply-to-label`)?.remove();
+    const input = document.getElementById(`cinput-${pid}`);
+    if (input) input.value = '';
+  }
+
   // ── submit comment ────────────────────────────────────────────────────────
   async function submitComment(pid, btn) {
     const input = document.getElementById(`cinput-${pid}`);
     const text = input.value.trim();
     if (!text) { input.focus(); return; }
     btn.disabled = true;
+    const rs = _replyState[pid] || {};
     try {
       const r = await fetch(`/api/community/posts/${pid}/comments`, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({text}),
+        body: JSON.stringify({text, reply_to: rs.reply_to || '', reply_to_name: rs.reply_to_name || ''}),
       });
       if (!r.ok) { const d = await r.json(); alert(d.error || 'Error'); return; }
       const d = await r.json();
       const list = document.getElementById(`clist-${pid}`);
-      list.insertAdjacentHTML('beforeend', renderComment(d.comment));
+      list.insertAdjacentHTML('beforeend', renderComment(d.comment, pid));
       input.value = '';
+      cancelReply(pid);
       const countEl = document.querySelector(`#post-${pid} .cmt-count`);
       if (countEl) countEl.textContent = parseInt(countEl.textContent || 0) + 1;
+    } finally { btn.disabled = false; }
+  }
+
+  // ── bookmark ──────────────────────────────────────────────────────────────
+  async function toggleBookmark(pid, btn) {
+    if (!IS_LOGGED_IN) { window.location = '/client/login'; return; }
+    btn.disabled = true;
+    try {
+      const r = await fetch(`/api/community/posts/${pid}/bookmark`, {method:'POST'});
+      if (!r.ok) return;
+      const d = await r.json();
+      btn.querySelector('i').className = d.bookmarked ? 'fas fa-bookmark' : 'far fa-bookmark';
+      btn.classList.toggle('bookmarked', d.bookmarked);
+      if (_sort === 'saved' && !d.bookmarked) document.getElementById(`post-${pid}`)?.remove();
     } finally { btn.disabled = false; }
   }
 
