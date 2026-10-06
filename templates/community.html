@@ -1207,25 +1207,29 @@
   .lb-row:hover { background: rgba(var(--primary-rgb),0.04); padding-left: 6px; }
   .lb-row:hover::before { transform: scaleY(1); }
 
-  /* ── ONLINE DOT ── */
-  .online-dot {
-    display: inline-block;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--success, #44cc88);
-    box-shadow: 0 0 0 0 rgba(68,204,136,0.6);
-    animation: onlinePulse 2.2s ease-in-out infinite;
-    flex-shrink: 0;
-    margin-left: 0.3rem;
-    margin-top: 0.25rem;
+  /* ── POST STAGGER ── */
+  .post-card { animation: fadeUp 0.35s ease both; }
+  /* ── LIVE COUNT ── */
+  .live-badge {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-size: 0.78rem; font-weight: 600; color: var(--text2);
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 0.25rem 0.65rem;
+    line-height: 1;
   }
-  @keyframes onlinePulse {
+  .live-badge::before {
+    content: '';
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #44cc88;
+    box-shadow: 0 0 0 0 rgba(68,204,136,0.6);
+    animation: livePulse 2.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes livePulse {
     0%,100% { box-shadow: 0 0 0 0 rgba(68,204,136,0.6); }
     50%      { box-shadow: 0 0 0 5px rgba(68,204,136,0); }
   }
 
-  /* ── POST STAGGER ── */
-  .post-card { animation: fadeUp 0.35s ease both; }
 </style>
 {% endblock %}
 
@@ -1239,7 +1243,7 @@
   <div class="comm-stats">
     <div class="comm-stat">
       <strong id="memberCount">{{ member_count }}</strong>
-      <span style="display:inline-flex;align-items:center;justify-content:center;gap:0.3rem;margin-top:0.35rem;">{{ cfg.get('community_members_label','Members') }}<span class="online-dot" title="Community active"></span></span>
+      <span>{{ cfg.get('community_members_label','Members') }}</span>
     </div>
     <div class="comm-stat">
       <strong id="postCount">{{ post_count }}</strong>
@@ -1310,6 +1314,11 @@
 
   <!-- new-post banner -->
   <div id="newPostBanner"><button onclick="refreshFeed()">&#8593; New posts — tap to refresh</button></div>
+
+  <!-- live users -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+    <span class="live-badge" id="liveBadge">&#8203;</span>
+  </div>
 
   <!-- sort tabs -->
   <div class="sort-tabs">
@@ -1800,6 +1809,24 @@ async function loadPosts() {
   }
 
   // ── init ──────────────────────────────────────────────────────────────────
-  loadPosts();
+  
+
+  // ── live users badge ─────────────────────────────────────────────────────────────────
+  function pingPresence() {
+    fetch('/api/community/ping', {method:'POST'}).catch(()=>{});
+  }
+  async function fetchLiveCount() {
+    pingPresence();
+    try {
+      const r = await fetch('/api/community/active');
+      if (!r.ok) return;
+      const { active } = await r.json();
+      const el = document.getElementById('liveBadge');
+      if (el) el.textContent = active + (active === 1 ? ' user online' : ' users online');
+    } catch(e) { /* silent */ }
+  }
+  fetchLiveCount();
+  setInterval(fetchLiveCount, 60000);
+loadPosts();
 </script>
 {% endblock %}

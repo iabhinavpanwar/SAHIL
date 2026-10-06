@@ -3790,6 +3790,28 @@ def community():
         post_count=post_count,      # ← new
     )
 
+@app.route('/api/community/ping', methods=['POST'])
+def community_ping():
+    if community_col is None:
+        return jsonify({'ok': True})
+    uid = session.get('client_id') or request.remote_addr
+    community_col.database['_presence'].update_one(
+        {'_id': uid},
+        {'$set': {'last_seen': datetime.now(timezone.utc)}},
+        upsert=True,
+    )
+    return jsonify({'ok': True})
+
+@app.route('/api/community/active')
+def community_active_users():
+    if community_col is None:
+        return jsonify({'active': 0})
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=5)
+    count = community_col.database['_presence'].count_documents(
+        {'last_seen': {'$gte': cutoff}}
+    )
+    return jsonify({'active': count})
+
 @app.route('/api/community/posts', methods=['GET'])
 def community_get_posts():
     if community_col is None:
