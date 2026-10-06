@@ -3815,13 +3815,20 @@ def community_get_posts():
         cid = session.get('client_id', '')
         for p in posts:
             p['_id'] = str(p['_id'])
-            p['created'] = to_ist(p.get('created'))
+            raw_dt = p.get('created')
+            p['created_iso'] = raw_dt.isoformat() + 'Z' if hasattr(raw_dt, 'isoformat') else ''
+            p['created'] = to_ist(raw_dt)
             p['liked'] = cid in (p.get('likes') or [])
             p['like_count'] = len(p.get('likes') or [])
+            p['reactions'] = p.get('reactions') or {}
+            p['my_reaction'] = (p.get('reactors') or {}).get(cid)
             p.pop('likes', None)
+            p.pop('reactors', None)
             for c in p.get('comments') or []:
                 c['_id'] = str(c['_id'])
-                c['created'] = to_ist(c.get('created'))
+                raw_c = c.get('created')
+                c['created_iso'] = raw_c.isoformat() + 'Z' if hasattr(raw_c, 'isoformat') else ''
+                c['created'] = to_ist(raw_c)
         return jsonify({'posts': posts, 'total': total})
     except Exception as e:
         logger.error('community_get_posts error: %s', e)
@@ -3889,6 +3896,45 @@ def community_like_post(pid):
         liked = True
         count = len(likes) + 1
     return jsonify({'liked': liked, 'like_count': count})
+
+@app.route('/api/community/posts/<pid>/react', methods=['POST'])
+@client_login_required
+@limiter.limit('60 per hour')
+def community_react_post(pid):
+    if community_col is None:
+        return jsonify({'error': 'DB unavailable'}), 500
+    oid = safe_oid(pid)
+    if not oid:
+        return jsonify({'error': 'Invalid id'}), 400
+    emoji = s((request.json or {}).get('emoji', ''), 10)
+    VALID = ['🔥', '💪', '👏', '❤️']
+    if emoji not in VALID:
+        return jsonify({'error': 'Invalid emoji'}), 400
+    cid = session['client_id']
+    post = community_col.find_one({'_id': oid}, {'reactions': 1})
+    if not post:
+        return jsonify({'error': 'Not found'}), 404
+    reactions = post.get('reactions') or {}
+    reactor_key = f'reactors.{cid}'
+    existing = (post.get('reactors') or {}).get(cid)
+    if existing == emoji:
+        # toggle off
+        community_col.update_one({'_id': oid}, {
+            '$inc': {f'reactions.{emoji}': -1},
+            '$unset': {reactor_key: ''},
+        })
+        reactions[emoji] = max(0, reactions.get(emoji, 1) - 1)
+        my_reaction = None
+    else:
+        update = {'$set': {reactor_key: emoji}, '$inc': {f'reactions.{emoji}': 1}}
+        if existing:
+            update['$inc'][f'reactions.{existing}'] = -1
+        community_col.update_one({'_id': oid}, update)
+        if existing:
+            reactions[existing] = max(0, reactions.get(existing, 1) - 1)
+        reactions[emoji] = reactions.get(emoji, 0) + 1
+        my_reaction = emoji
+    return jsonify({'reactions': reactions, 'my_reaction': my_reaction})
 
 @app.route('/api/community/posts/<pid>/comments', methods=['POST'])
 @client_login_required

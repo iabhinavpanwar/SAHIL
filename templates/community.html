@@ -610,6 +610,60 @@
   }
   .sort-tab:hover:not(.active) { color: var(--text); }
 
+  /* ── SKELETON LOADERS ─────────────────────────────────────────────────────────── */
+  @keyframes shimmer {
+    0%   { background-position: -600px 0; }
+    100% { background-position:  600px 0; }
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+    background-size: 600px 100%;
+    animation: shimmer 1.4s infinite linear;
+    border-radius: 6px;
+  }
+  .skeleton-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(0.95rem, 2.6vw, 1.25rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .skeleton-header { display: flex; gap: 0.75rem; align-items: center; }
+  .skeleton-av   { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+  .skeleton-line { height: 12px; }
+  .skeleton-line.w60 { width: 60%; }
+  .skeleton-line.w40 { width: 40%; }
+  .skeleton-line.w80 { width: 80%; }
+  .skeleton-line.w100{ width: 100%; }
+  .skeleton-line.h8  { height: 8px; }
+
+  /* ── NEW-POST BANNER ─────────────────────────────────────────────────────────── */
+  #newPostBanner {
+    display: none;
+    position: sticky;
+    top: calc(var(--nav-h, 72px) + 8px);
+    z-index: 50;
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+  #newPostBanner button {
+    background: var(--primary);
+    color: #000;
+    border: none;
+    border-radius: 20px;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+    animation: fadeUp 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #newPostBanner button:hover { filter: brightness(1.1); }
+
   /* ── LOAD MORE ─────────────────────────────────────────────────────────── */
   .load-more-wrap {
     text-align: center;
@@ -1254,6 +1308,9 @@
     <div class="lb-month" id="lbMonth"></div>
   </div>
 
+  <!-- new-post banner -->
+  <div id="newPostBanner"><button onclick="refreshFeed()">&#8593; New posts — tap to refresh</button></div>
+
   <!-- sort tabs -->
   <div class="sort-tabs">
     <button class="sort-tab active" id="tab-newest" onclick="setSort('newest')">✨ Newest</button>
@@ -1262,6 +1319,9 @@
 
   <!-- feed -->
   <div class="feed" id="feed"></div>
+
+  <!-- infinite scroll sentinel -->
+  <div id="scrollSentinel" style="height:1px"></div>
 
   <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
     <button class="btn btn-outline btn-sm" onclick="loadPosts()">Load more</button>
@@ -1289,6 +1349,8 @@
   let   _loading     = false;
   let   _hasMore     = true;
   let   _sort        = 'newest';
+  let   _newestId    = null;
+  let   _pollTimer   = null;
 
   // ── helpers ──────────────────────────────────────────────────────────────
   function avatar(url, name, size = 40) {
@@ -1400,28 +1462,59 @@ async function submitPost(btn) {
     if (e.key === 'Escape') document.getElementById('postLightbox')?.classList.remove('open');
   });
 
+  // ── relative timestamps ───────────────────────────────────────────────────
+  function timeAgo(isoStr) {
+    if (!isoStr) return '';
+    const diff = Math.floor((Date.now() - new Date(isoStr)) / 1000);
+    if (diff < 60)  return 'just now';
+    if (diff < 3600)  return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+    if (diff < 2592000) return Math.floor(diff / 604800) + 'w ago';
+    return Math.floor(diff / 2592000) + 'mo ago';
+  }
+
+  // ── skeleton loaders ──────────────────────────────────────────────────────
+  function renderSkeletons(n = 3) {
+    return Array.from({length: n}, () => `
+    <div class="skeleton-card">
+      <div class="skeleton-header">
+        <div class="skeleton skeleton-av"></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:.4rem">
+          <div class="skeleton skeleton-line w60"></div>
+          <div class="skeleton skeleton-line w40 h8"></div>
+        </div>
+      </div>
+      <div class="skeleton skeleton-line w100"></div>
+      <div class="skeleton skeleton-line w80"></div>
+      <div class="skeleton skeleton-line w60 h8"></div>
+    </div>`).join('');
+  }
+
   // ── render post ───────────────────────────────────────────────────────────
   function renderPost(p, delay) {
-    const isMine = IS_LOGGED_IN && p.client_id === MY_ID;
+    const isMine    = IS_LOGGED_IN && p.client_id === MY_ID;
     const likeClass = p.liked ? 'liked' : '';
     const likeIcon  = p.liked ? 'fas fa-heart' : 'far fa-heart';
     const comments  = (p.comments || []).map(renderComment).join('');
     const imgHtml   = p.image_url
       ? `<img class="post-img" src="${esc(p.image_url)}" alt="post image" loading="lazy" onclick="openLightbox('${esc(p.image_url)}')">`
       : '';
-    const reactions = p.reactions || {};
+    const reactions  = p.reactions || {};
     const myReaction = p.my_reaction || null;
     const reactionPills = Object.entries(reactions).filter(([,c])=>c>0)
       .map(([emoji,count]) => `<span class="reaction-pill ${myReaction===emoji?'mine':''}" onclick="sendReaction('${p._id}','${emoji}')">${emoji} <span class="rcount">${count}</span></span>`).join('');
     const emojiButtons = EMOJIS.map(e => `<button class="emoji-btn" onclick="sendReaction('${p._id}','${e}')" title="React ${e}">${e}</button>`).join('');
-    const delayStyle = delay ? `style="animation-delay:${delay}s"` : '';
+    const delayStyle   = delay ? `style="animation-delay:${delay}s"` : '';
+    const relTime      = timeAgo(p.created_iso);
+    const fullTime     = esc(p.created);
     return `
     <div class="post-card" id="post-${p._id}" ${delayStyle}>
       <div class="post-header">
         <div class="post-avatar">${avatar(p.avatar_url, p.author_name, 40)}</div>
         <div class="post-meta">
           <strong>${esc(p.author_name)}</strong>
-          <time>${esc(p.created)}</time>
+          <time title="${fullTime}">${relTime || fullTime}</time>
         </div>
         ${isMine ? `<button class="post-delete-btn" title="Delete post" onclick="deletePost('${p._id}',this)"><i class="fas fa-trash-alt"></i></button>` : ''}
       </div>
@@ -1456,13 +1549,15 @@ async function submitPost(btn) {
   }
 
   function renderComment(c) {
+    const relTime  = timeAgo(c.created_iso);
+    const fullTime = esc(c.created);
     return `
     <div class="comment-item">
       ${avatar(c.avatar_url, c.author_name, 28)}
       <div class="comment-bubble">
         <strong>${esc(c.author_name)}</strong>
         <p>${esc(c.text)}</p>
-        <time>${esc(c.created)}</time>
+        <time title="${fullTime}">${relTime || fullTime}</time>
       </div>
     </div>`;
   }
@@ -1480,40 +1575,90 @@ async function submitPost(btn) {
     loadPosts();
   }
 
+  // ── refresh feed (banner tap) ─────────────────────────────────────────────
+  function refreshFeed() {
+    const banner = document.getElementById('newPostBanner');
+    if (banner) banner.style.display = 'none';
+    _skip = 0; _hasMore = true;
+    document.getElementById('feed').innerHTML = '';
+    document.getElementById('feedEmpty').style.display = 'none';
+    loadPosts();
+  }
+
 async function loadPosts() {
   if (_loading || !_hasMore) return;
   _loading = true;
   const wrap = document.getElementById('loadMoreWrap');
-  if (wrap) wrap.innerHTML = '<button class="btn btn-outline btn-sm" disabled><span class="spin"></span> Loading…</button>';
+  // show skeletons only on first page load
+  if (_skip === 0) {
+    document.getElementById('feed').innerHTML = renderSkeletons(3);
+  } else if (wrap) {
+    wrap.innerHTML = '<button class="btn btn-outline btn-sm" disabled><span class="spin"></span></button>';
+  }
   try {
     const r = await fetch(`/api/community/posts?skip=${_skip}&sort=${_sort}`);
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     const posts = data.posts;
-    document.getElementById('postCount').textContent = data.total;   // ← update here
+    document.getElementById('postCount').textContent = data.total;
     const feed = document.getElementById('feed');
+    if (_skip === 0) feed.innerHTML = ''; // clear skeletons
     if (posts.length === 0 && _skip === 0) {
       document.getElementById('feedEmpty').style.display = '';
       if (wrap) wrap.style.display = 'none';
     } else {
       document.getElementById('feedEmpty').style.display = 'none';
-      posts.forEach((p, i) => feed.insertAdjacentHTML('beforeend', renderPost(p, i * 0.06)));
+      posts.forEach((p, i) => {
+        feed.insertAdjacentHTML('beforeend', renderPost(p, i * 0.06));
+      });
+      // track newest post id for polling (only on first page, newest sort)
+      if (_skip === 0 && _sort === 'newest' && posts.length > 0) {
+        _newestId = posts[0]._id;
+      }
       _skip += posts.length;
       _hasMore = posts.length === 10;
       if (wrap) {
-        wrap.style.display = _hasMore ? '' : 'none';
-        wrap.innerHTML = _hasMore ? '<button class="btn btn-outline btn-sm" onclick="loadPosts()">Load more</button>' : '';
+        wrap.style.display = 'none';
+        wrap.innerHTML = '';
       }
     }
   } catch(e) {
     console.error(e);
-    const feed = document.getElementById('feed');
-    feed.innerHTML = '<div class="feed-empty"><i class="fas fa-exclamation-triangle"></i><p>Could not load the feed. Please refresh the page.</p></div>';
+    if (_skip === 0) document.getElementById('feed').innerHTML = '';
+    document.getElementById('feed').insertAdjacentHTML('beforeend',
+      '<div class="feed-empty"><i class="fas fa-exclamation-triangle"></i><p>Could not load the feed. Please refresh.</p></div>');
     if (wrap) wrap.style.display = 'none';
   } finally {
     _loading = false;
   }
 }
+
+  // ── infinite scroll ───────────────────────────────────────────────────────
+  const _sentinel = document.getElementById('scrollSentinel');
+  if (_sentinel && 'IntersectionObserver' in window) {
+    new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && _hasMore && !_loading) loadPosts();
+    }, {rootMargin: '200px'}).observe(_sentinel);
+  }
+
+  // ── new-post polling (30s, newest sort only) ──────────────────────────────
+  async function pollNewPosts() {
+    if (_sort !== 'newest' || !_newestId) return;
+    try {
+      const r = await fetch('/api/community/posts?skip=0&sort=newest');
+      if (!r.ok) return;
+      const data = await r.json();
+      if (data.posts && data.posts.length > 0 && data.posts[0]._id !== _newestId) {
+        const banner = document.getElementById('newPostBanner');
+        if (banner) banner.style.display = 'block';
+      }
+    } catch(e) { /* silent */ }
+  }
+  _pollTimer = setInterval(pollNewPosts, 30000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { clearInterval(_pollTimer); }
+    else { _pollTimer = setInterval(pollNewPosts, 30000); }
+  });
 
   // ── toggle like (with heart burst) ───────────────────────────────────────
   async function toggleLike(pid, btn) {
