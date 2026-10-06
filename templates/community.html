@@ -1161,8 +1161,9 @@
     background: var(--success, #44cc88);
     box-shadow: 0 0 0 0 rgba(68,204,136,0.6);
     animation: onlinePulse 2.2s ease-in-out infinite;
-    vertical-align: middle;
-    margin-left: 0.35rem;
+    flex-shrink: 0;
+    margin-left: 0.3rem;
+    margin-top: 0.25rem;
   }
   @keyframes onlinePulse {
     0%,100% { box-shadow: 0 0 0 0 rgba(68,204,136,0.6); }
@@ -1184,7 +1185,7 @@
   <div class="comm-stats">
     <div class="comm-stat">
       <strong id="memberCount">{{ member_count }}</strong>
-      <span>{{ cfg.get('community_members_label','Members') }}<span class="online-dot" title="Community active"></span></span>
+      <span style="display:inline-flex;align-items:center;justify-content:center;gap:0.3rem;margin-top:0.35rem;">{{ cfg.get('community_members_label','Members') }}<span class="online-dot" title="Community active"></span></span>
     </div>
     <div class="comm-stat">
       <strong id="postCount">{{ post_count }}</strong>
