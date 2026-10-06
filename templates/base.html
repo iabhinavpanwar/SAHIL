@@ -454,16 +454,24 @@
         height: 2px;
         background: var(--text);
         border-radius: 2px;
-        transition: all var(--transition);
+        transition: transform 0.38s cubic-bezier(0.23, 1, 0.32, 1),
+                    opacity   0.22s ease,
+                    width     0.28s ease,
+                    background 0.2s ease;
+        transform-origin: center;
       }
+      .nav-toggle:hover span { background: var(--primary); }
       .nav-toggle.open span:nth-child(1) {
         transform: translateY(7px) rotate(45deg);
+        background: var(--primary);
       }
       .nav-toggle.open span:nth-child(2) {
         opacity: 0;
+        width: 0;
       }
       .nav-toggle.open span:nth-child(3) {
         transform: translateY(-7px) rotate(-45deg);
+        background: var(--primary);
       }
 
       /* ── HERO ──────────────────────────────────────────────────────────────── */
@@ -1806,8 +1814,11 @@
         background: var(--primary);
         color: #000;
         border-color: var(--primary);
-        transform: translateY(-3px);
-        box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.3);
+        transform: translateY(-5px) scale(1.12) rotate(-4deg);
+        box-shadow: 0 10px 28px rgba(var(--primary-rgb), 0.45);
+      }
+      .footer-social a:nth-child(even):hover {
+        transform: translateY(-5px) scale(1.12) rotate(4deg);
       }
 
       .footer-links h4,
@@ -3128,9 +3139,10 @@
       const navToggle = document.getElementById("navToggle");
       const navLinks = document.getElementById("navLinks");
       if (navToggle) {
-        navToggle.addEventListener("click", () =>
-          navLinks.classList.toggle("open"),
-        );
+        navToggle.addEventListener("click", () => {
+          navLinks.classList.toggle("open");
+          navToggle.classList.toggle("open");
+        });
       }
       document.addEventListener("click", (e) => {
         if (
@@ -3291,6 +3303,124 @@
             'box-shadow:0 -4px 20px rgba(0,0,0,.5)';
           document.body.appendChild(b);
         }
+      })();
+    </script>
+
+    <!-- custom cursor -->
+    <div id="cursorDot"></div>
+    <div id="cursorRing"></div>
+
+    <style>
+      @media (pointer: fine) {
+        *, *::before, *::after { cursor: none !important; }
+        #cursorDot {
+          position: fixed; top: 0; left: 0; z-index: 999998;
+          width: 6px; height: 6px;
+          background: var(--primary);
+          border-radius: 50%;
+          pointer-events: none;
+          transform: translate(-50%, -50%);
+          transition: transform 0.08s ease, opacity 0.2s ease;
+          will-change: transform;
+        }
+        #cursorRing {
+          position: fixed; top: 0; left: 0; z-index: 999997;
+          width: 32px; height: 32px;
+          border: 1.5px solid rgba(var(--primary-rgb), 0.6);
+          border-radius: 50%;
+          pointer-events: none;
+          transform: translate(-50%, -50%);
+          transition: transform 0.18s cubic-bezier(0.23,1,0.32,1),
+                      width 0.25s ease, height 0.25s ease,
+                      border-color 0.2s ease, opacity 0.2s ease;
+          will-change: transform;
+        }
+        #cursorRing.hovering {
+          width: 48px; height: 48px;
+          border-color: var(--primary);
+          background: rgba(var(--primary-rgb), 0.06);
+        }
+        #cursorDot.clicking  { transform: translate(-50%,-50%) scale(0.4); }
+        #cursorRing.clicking { transform: translate(-50%,-50%) scale(0.8); }
+      }
+    </style>
+
+    <style>
+      /* page transition overlay */
+      #page-transition {
+        position: fixed; inset: 0;
+        background: var(--bg);
+        z-index: 99999;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.32s ease;
+      }
+      #page-transition.fade-out { opacity: 1; pointer-events: all; }
+    </style>
+    <div id="page-transition"></div>
+
+    <script>
+      // CUSTOM CURSOR
+      (function () {
+        if (!window.matchMedia('(pointer: fine)').matches) return;
+        var dot  = document.getElementById('cursorDot');
+        var ring = document.getElementById('cursorRing');
+        if (!dot || !ring) return;
+        var mx = -100, my = -100, rx = -100, ry = -100;
+        document.addEventListener('mousemove', function (e) {
+          mx = e.clientX; my = e.clientY;
+          dot.style.left  = mx + 'px';
+          dot.style.top   = my + 'px';
+        });
+        (function lerp() {
+          rx += (mx - rx) * 0.14;
+          ry += (my - ry) * 0.14;
+          ring.style.left = rx + 'px';
+          ring.style.top  = ry + 'px';
+          requestAnimationFrame(lerp);
+        })();
+        document.addEventListener('mousedown', function () {
+          dot.classList.add('clicking'); ring.classList.add('clicking');
+        });
+        document.addEventListener('mouseup', function () {
+          dot.classList.remove('clicking'); ring.classList.remove('clicking');
+        });
+        document.addEventListener('mouseover', function (e) {
+          var t = e.target.closest('a,button,[role="button"],label,input,select,textarea,.btn,.dot,.filter-btn,.carousel-btn,.gallery-item');
+          ring.classList.toggle('hovering', !!t);
+        });
+        document.addEventListener('mouseleave', function () {
+          dot.style.opacity = '0'; ring.style.opacity = '0';
+        });
+        document.addEventListener('mouseenter', function () {
+          dot.style.opacity = '1'; ring.style.opacity = '1';
+        });
+      })();
+
+      // PAGE TRANSITIONS
+      (function () {
+        var overlay = document.getElementById('page-transition');
+        if (!overlay) return;
+        // fade in on load
+        overlay.style.opacity = '1';
+        overlay.style.transition = 'none';
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            overlay.style.transition = 'opacity 0.32s ease';
+            overlay.style.opacity = '0';
+          });
+        });
+        // fade out on navigation
+        document.addEventListener('click', function (e) {
+          var a = e.target.closest('a');
+          if (!a) return;
+          var href = a.getAttribute('href');
+          if (!href || href.startsWith('#') || href.startsWith('javascript') ||
+              a.target === '_blank' || e.ctrlKey || e.metaKey || e.shiftKey) return;
+          e.preventDefault();
+          overlay.style.opacity = '1';
+          setTimeout(function () { window.location.href = href; }, 320);
+        });
       })();
     </script>
 
