@@ -1,5 +1,5 @@
 ﻿{% extends "base.html" %}
-{% block title %}My Dashboard — Sahil Panwar Fitness{% endblock %}
+{% block title %}My Dashboard — {{ cfg.get('hero_name','My Trainer') }}{% endblock %}
 
 {% block head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>

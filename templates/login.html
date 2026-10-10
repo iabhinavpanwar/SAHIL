@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Login — Sahil Panwar Fitness</title>
+    <title>Admin Login — {{ cfg.get('hero_name','Sahil Panwar') }} Fitness</title>
     <link
       rel="icon"
       type="image/png"
@@ -1879,32 +1879,29 @@
             <div class="brand-name">
               {{ cfg.get('hero_name', 'SAHIL PANWAR') }}
             </div>
-            <div class="brand-tag">Fitness Studio</div>
+            <div class="brand-tag">{{ cfg.get('login_brand_tag', 'Fitness Studio') }}</div>
           </div>
         </div>
 
         <div class="login-brand-hero">
-          <div class="hero-eyebrow">Admin Access</div>
+          <div class="hero-eyebrow">{{ cfg.get('login_eyebrow', 'Admin Access') }}</div>
           <h1>
-            Manage your<br />
-            <span class="accent">fitness empire</span>
+            {{ cfg.get('login_hero_line1', 'Manage your')|safe }}<br />
+            <span class="accent">{{ cfg.get('login_hero_line2', 'fitness empire') }}</span>
           </h1>
-          <p>
-            Track clients, assign programs, review check-ins and grow your
-            coaching business — all from one powerful dashboard.
-          </p>
+          <p>{{ cfg.get('login_hero_desc', 'Track clients, assign programs, review check-ins and grow your coaching business — all from one powerful dashboard.') }}</p>
           <div class="brand-stats">
             <div class="brand-stat">
-              <div class="num">500+</div>
-              <div class="lbl">Clients</div>
+              <div class="num">{{ cfg.get('login_stat1_num', '500+') }}</div>
+              <div class="lbl">{{ cfg.get('login_stat1_lbl', 'Clients') }}</div>
             </div>
             <div class="brand-stat">
-              <div class="num">10k+</div>
-              <div class="lbl">Workouts</div>
+              <div class="num">{{ cfg.get('login_stat2_num', '10k+') }}</div>
+              <div class="lbl">{{ cfg.get('login_stat2_lbl', 'Workouts') }}</div>
             </div>
             <div class="brand-stat">
-              <div class="num">98%</div>
-              <div class="lbl">Satisfaction</div>
+              <div class="num">{{ cfg.get('login_stat3_num', '98%') }}</div>
+              <div class="lbl">{{ cfg.get('login_stat3_lbl', 'Satisfaction') }}</div>
             </div>
           </div>
         </div>

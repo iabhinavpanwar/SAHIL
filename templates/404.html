@@ -182,9 +182,9 @@
       <i class="fas fa-dumbbell"></i>
     </div>
 
-    <p class="error-eyebrow">Oops — Wrong Rep</p>
-    <h1 class="error-title">Page Not Found</h1>
-    <p class="error-desc">Looks like this page skipped leg day and disappeared. Let's get you back on track.</p>
+    <p class="error-eyebrow">{{ cfg.get('error_404_eyebrow', 'Oops — Wrong Rep') }}</p>
+    <h1 class="error-title">{{ cfg.get('error_404_title', 'Page Not Found') }}</h1>
+    <p class="error-desc">{{ cfg.get('error_404_desc', "Looks like this page skipped leg day and disappeared. Let's get you back on track.") }}</p>
 
     <div class="error-actions">
       <a href="{{ url_for('index') }}" class="btn btn-primary">

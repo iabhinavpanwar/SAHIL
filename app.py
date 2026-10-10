@@ -275,10 +275,13 @@ def _pdf_header(c, title, subtitle=''):
     c.rect(0, h - 80, 5, 80, fill=1, stroke=0)
     c.setFillColor(HexColor('#e8ff00'))
     c.setFont('Helvetica-Bold', 20)
-    c.drawString(22, h - 32, 'Sahil Panwar')
+    _cfg = get_config()
+    _trainer_name = _cfg.get('hero_name', 'Fitness Trainer')
+    _trainer_tag  = _cfg.get('site_tagline', 'Personal Training & Nutrition Coaching')
+    c.drawString(22, h - 32, _trainer_name)
     c.setFillColor(HexColor('#aaaaaa'))
     c.setFont('Helvetica', 9)
-    c.drawString(22, h - 50, 'Personal Training & Nutrition Coaching')
+    c.drawString(22, h - 50, _trainer_tag)
     c.setFillColor(HexColor('#ffffff'))
     c.setFont('Helvetica-Bold', 16)
     c.drawRightString(w - 22, h - 34, title.upper())
@@ -315,7 +318,7 @@ def _pdf_wrap(c, text, x, y, max_width, font='Helvetica', size=10, leading=14, c
 
 # ── MONGODB ───────────────────────────────────────────────────────────────────
 MONGO_URI     = os.environ.get('MONGO_URI', '')
-MONGO_DB_NAME = os.environ.get('MONGO_DB_NAME', 'sahil_fitness')
+MONGO_DB_NAME = os.environ.get('MONGO_DB_NAME', 'fitness_app')
 
 try:
     mongo_client   = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
@@ -394,7 +397,7 @@ def seed():
         return
     config_col.insert_one({
         '_id': 'main',
-        'hero_name': 'Sahil Panwar',
+        'hero_name': 'Your Name',
         'hero_tagline': 'Transform Your Body. Transform Your Life.',
         'hero_cta': 'Book Free Consultation',
         'hero_image': '',
@@ -451,8 +454,8 @@ def seed():
         'callmebot_apikey': '',
         'footer_cta_heading': 'Ready to <span>Transform</span>?',
         'footer_cta_sub': 'Join 100+ clients who have already changed their lives.',
-        'seo_title': 'Sahil Panwar — Personal Fitness Trainer',
-        'seo_desc': 'Transform your body with expert personal training by Sahil Panwar.',
+        'seo_title': 'Your Name — Personal Fitness Trainer',
+        'seo_desc': 'Transform your body with expert personal training.',
         # ── section labels / eyebrows ──────────────────────────────────────
         'hero_see_results_btn': 'See Results',
         'view_all_programs_btn': 'View All Programs',
@@ -3033,7 +3036,7 @@ def client_invoice_pdf(iid):
         c.line(36, 60, w - 36, 60)
         c.setFillColor(HexColor('#9ca3af'))
         c.setFont('Helvetica', 8)
-        c.drawString(36, 46, 'Thank you for your trust in Sahil Panwar.')
+        c.drawString(36, 46, 'Thank you for your trust in ' + get_config().get('hero_name', 'us') + '.')
         c.drawRightString(w - 36, 46, 'This is a computer-generated receipt.')
 
     filename = f"invoice-{str(inv['_id'])[-6:]}.pdf"

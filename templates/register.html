@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}Register — Sahil Panwar Fitness{%
+{% extends "base.html" %} {% block title %}Register — {{ cfg.get('hero_name','Sahil Panwar') }} Fitness{%
 endblock %} {% block head %}
 <style>
   /* ══════════════════════════════════════════════════════════════════════════
@@ -1740,43 +1740,34 @@ endblock %} {% block head %}
       </div>
       <div>
         <div class="brand-name">{{ cfg.get('hero_name', 'SAHIL PANWAR') }}</div>
-        <div class="brand-tag">Client Registration</div>
+        <div class="brand-tag">{{ cfg.get('register_brand_tag', 'Client Registration') }}</div>
       </div>
     </div>
 
     <div class="reg-brand-hero">
-      <div class="hero-eyebrow">Get Started</div>
+      <div class="hero-eyebrow">{{ cfg.get('register_eyebrow', 'Get Started') }}</div>
       <h2>
-        Start your<br />
-        <span class="accent">transformation</span>
+        {{ cfg.get('register_hero_line1', 'Start your')|safe }}<br />
+        <span class="accent">{{ cfg.get('register_hero_line2', 'transformation') }}</span>
       </h2>
-      <p>
-        Create a free account to access your personal training dashboard —
-        workout plans, progress tracking, nutrition, and direct chat with your
-        trainer.
-      </p>
+      <p>{{ cfg.get('register_hero_desc', 'Create a free account to access your personal training dashboard — workout plans, progress tracking, nutrition, and direct chat with your trainer.') }}</p>
 
       <ul class="reg-benefits" style="list-style: none; padding: 0; margin: 0">
         <li class="reg-benefit">
           <i class="fas fa-check" aria-hidden="true"></i>
-          <span
-            ><strong>Personalised programs</strong> tailored to your goals</span
-          >
+          <span>{{ cfg.get('register_benefit_1', '<strong>Personalised programs</strong> tailored to your goals')|safe }}</span>
         </li>
         <li class="reg-benefit">
           <i class="fas fa-chart-line" aria-hidden="true"></i>
-          <span
-            ><strong>Track your progress</strong> with weight &amp;
-            measurements</span
-          >
+          <span>{{ cfg.get('register_benefit_2', '<strong>Track your progress</strong> with weight &amp; measurements')|safe }}</span>
         </li>
         <li class="reg-benefit">
           <i class="fas fa-comments" aria-hidden="true"></i>
-          <span><strong>Direct messaging</strong> with your trainer</span>
+          <span>{{ cfg.get('register_benefit_3', '<strong>Direct messaging</strong> with your trainer')|safe }}</span>
         </li>
         <li class="reg-benefit">
           <i class="fas fa-apple-alt" aria-hidden="true"></i>
-          <span><strong>Nutrition guidance</strong> &amp; meal plans</span>
+          <span>{{ cfg.get('register_benefit_4', '<strong>Nutrition guidance</strong> &amp; meal plans')|safe }}</span>
         </li>
       </ul>
     </div>
@@ -1811,8 +1802,8 @@ endblock %} {% block head %}
         <div class="lock-icon">
           <i class="fas fa-user-plus" aria-hidden="true"></i>
         </div>
-        <h1>Create Account</h1>
-        <p>Join the training program — it takes less than a minute.</p>
+        <h1>{{ cfg.get('register_form_heading', 'Create Account') }}</h1>
+        <p>{{ cfg.get('register_form_subtext', 'Join the training program — it takes less than a minute.') }}</p>
       </div>
 
       {% if error %}
@@ -1894,20 +1885,14 @@ endblock %} {% block head %}
           <span>
             I agree to the
             <a
-              href="#"
-              onclick="
-                event.preventDefault();
-                alert('Terms of Service page coming soon.');
-              "
+              href="{{ url_for('terms') }}"
+              target="_blank"
               >Terms of Service</a
             >
             and
             <a
-              href="#"
-              onclick="
-                event.preventDefault();
-                alert('Privacy Policy page coming soon.');
-              "
+              href="{{ url_for('privacy') }}"
+              target="_blank"
               >Privacy Policy</a
             >.
           </span>
