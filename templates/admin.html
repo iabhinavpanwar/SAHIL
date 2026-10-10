@@ -2752,6 +2752,30 @@
                   </div>
                 </div>
               </div>
+
+              <div class="form-section">
+                <h4>Hero Badge &amp; Trust</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Badge Text</label>
+                    <input type="text" id="cfg_hero_badge_text" maxlength="80" placeholder="Available for New Clients" />
+                  </div>
+                  <div class="form-group">
+                    <label>Eyebrow Text</label>
+                    <input type="text" id="cfg_hero_eyebrow" maxlength="80" placeholder="Personal Fitness Trainer" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Trust Count</label>
+                    <input type="text" id="cfg_hero_trust_count" maxlength="20" placeholder="100+" />
+                  </div>
+                  <div class="form-group">
+                    <label>Trust Label</label>
+                    <input type="text" id="cfg_hero_trust_text" maxlength="40" placeholder="clients" />
+                  </div>
+                </div>
+              </div>
               <div class="form-section">
                 <h4>Stats</h4>
                 <div class="form-row">
@@ -3027,6 +3051,20 @@
                 </div>
               </div>
             </div>
+              <div class="form-section">
+                <h4>Footer CTA</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Footer CTA Heading</label>
+                    <input type="text" id="cfg_footer_cta_heading" maxlength="200" placeholder="Ready to Transform?" />
+                  </div>
+                  <div class="form-group">
+                    <label>Footer CTA Subtext</label>
+                    <input type="text" id="cfg_footer_cta_sub" maxlength="200" placeholder="Join 100+ clients..." />
+                  </div>
+                </div>
+              </div>
+
             <p id="configMsg" class="form-msg"></p>
           </div>
 
@@ -5497,6 +5535,8 @@
         "terms_read_note",
         "seo_title",
         "seo_desc",
+        "hero_badge_text","hero_eyebrow","hero_trust_count","hero_trust_text",
+        "footer_cta_heading","footer_cta_sub",
       ];
 
       async function loadConfig() {
