@@ -5329,14 +5329,20 @@
       async function loadTodayView() {
         const todayEl = document.getElementById("todayView");
         if (!todayEl) return;
-        const now = new Date();
-        const dateStr = now.toLocaleDateString("en-IN", {
+        // Use IST date for all comparisons
+        const nowIST = new Date(Date.now() + 5.5 * 3600000);
+        const dateStr = new Date().toLocaleDateString("en-IN", {
           weekday: "long",
           day: "numeric",
           month: "long",
           year: "numeric",
+          timeZone: "Asia/Kolkata",
         });
-        const todayISO = now.toISOString().slice(0, 10);
+        // IST date parts for matching against "DD Mon YYYY" format from backend
+        const istDay  = String(nowIST.getUTCDate()).padStart(2, '0');
+        const istMon  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][nowIST.getUTCMonth()];
+        const istYear = nowIST.getUTCFullYear();
+        const todayISTPrefix = `${istDay} ${istMon} ${istYear}`;
 
         const [sessRes, ciRes, msgRes, clientRes] = await Promise.all([
           api("/api/admin/sessions"),
@@ -5345,10 +5351,11 @@
           api("/api/admin/clients"),
         ]);
 
+        // s.datetime is IST-formatted: "15 Jun 2025, 09:00 AM"
         const todaySessions = (sessRes.data || []).filter(
           (s) =>
             s.datetime &&
-            s.datetime.includes(todayISO) &&
+            s.datetime.startsWith(todayISTPrefix) &&
             ["confirmed", "pending"].includes(s.status),
         );
         const pendingCI = (ciRes.data || []).filter((c) => !c.reviewed);
@@ -5385,16 +5392,18 @@
               todaySessions.length,
               todaySessions.length
                 ? todaySessions
-                    .map((s) =>
-                      mkItem(
+                    .map((s) => {
+                      const timeMatch = (s.datetime || '').match(/(\d{1,2}:\d{2}\s*[AP]M)/);
+                      const timeSub = timeMatch ? timeMatch[1] : s.datetime;
+                      return mkItem(
                         "fas fa-calendar-check",
                         "var(--success)",
                         "dot-ok",
                         s.client_name || "Client",
-                        s.datetime,
+                        `${timeSub} · ${s.session_type || ''} · ${s.status}`,
                         `switchTab('sessions')`,
-                      ),
-                    )
+                      );
+                    })
                     .join("")
                 : empty("No sessions today"),
             )}
@@ -5492,6 +5501,33 @@
     <div class="dash-stat"><i class="fas fa-rupee-sign" style="color:#44cc88"></i><div><span>₹${(rev.month_collected || 0).toLocaleString()}</span><label>Revenue This Month</label></div></div>
     <div class="dash-stat"><i class="fas fa-clock" style="color:#ffb74d"></i><div><span>₹${(rev.total_outstanding || 0).toLocaleString()}</span><label>Outstanding</label></div></div>
     <div class="dash-stat"><i class="fas fa-file-invoice" style="color:var(--danger)"></i><div><span>${rev.unpaid_count || 0}</span><label>Unpaid Invoices</label></div></div>`;
+        // Update sidebar badge counts
+        refreshSidebarBadges();
+      }
+
+      async function refreshSidebarBadges() {
+        const setBadge = (id, count) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.textContent = count > 0 ? count : '';
+        };
+        const [ciRes, msgRes, bugsRes, commRes, leadsRes] = await Promise.all([
+          api("/api/admin/checkins"),
+          api("/api/admin/messages"),
+          api("/api/admin/bugs"),
+          api("/api/admin/community/posts?page=0"),
+          api("/api/admin/leads"),
+        ]);
+        const pendingCI = (ciRes.data || []).filter(c => !c.reviewed).length;
+        const unreadMsg = (msgRes.data || []).filter(t => t.unread > 0).length;
+        const openBugs = (bugsRes.data || []).filter(b => b.status === 'open').length;
+        const hiddenPosts = (commRes.data?.posts || []).filter(p => p.hidden).length;
+        const unreadLeads = (leadsRes.data || []).filter(l => l.type === 'contact' && !l.read).length;
+        setBadge('checkinsCount', pendingCI);
+        setBadge('messagesCount', unreadMsg);
+        setBadge('bugsCount', openBugs);
+        setBadge('communityCount', hiddenPosts);
+        setBadge('leadsCount', unreadLeads);
       }
 
       // ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -7886,6 +7922,13 @@
         });
         _communityPage++;
         if (moreWrap) moreWrap.style.display = data.has_more ? '' : 'none';
+        if (reset) {
+          const communityBadge = document.getElementById('communityCount');
+          if (communityBadge) {
+            const hidden = (data.posts || []).filter(p => p.hidden).length;
+            communityBadge.textContent = hidden || '';
+          }
+        }
       }
       async function adminDeleteCommunityPost(pid, btnEl) {
         if (!confirm('Permanently delete this post?')) return;
