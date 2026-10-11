@@ -2715,6 +2715,7 @@
         <div class="ov-card orange"><i class="fas fa-shoe-prints"></i><span id="ov_steps">—</span><label>Steps Today</label></div>
         <div class="ov-card blue"><i class="fas fa-tint"></i><span id="ov_water">—</span><label>Water Today</label></div>
         <div class="ov-card"><i class="fas fa-calendar-check"></i><span id="ov_checkins">—</span><label>Check-Ins</label></div>
+        <div class="ov-card orange"><i class="fas fa-calendar-alt"></i><span id="ov_today_session">—</span><label>Today's Session</label></div>
 
       </div>
 
@@ -3349,15 +3350,36 @@ function setRing(id, pct) {
 
 // ── OVERVIEW ─────────────────────────────────────────────────────────────────
 async function loadOverview() {
-  const [statsRes, fpRes, logRes] = await Promise.all([
+  const [statsRes, fpRes, logRes, sessRes] = await Promise.all([
     api('/api/client/stats'),
     api('/api/client/fitness_profile'),
     api('/api/client/daily_log'),
+    api('/api/client/sessions'),
   ]);
   const stats = statsRes.data;
   const fp    = fpRes.data || {};
   const logs  = logRes.data || [];
   _fitnessProfile = fp;
+
+  // Today's session card
+  const todayIST = new Date(Date.now() + 5.5 * 3600000);
+  const todayDay = String(todayIST.getUTCDate()).padStart(2, '0');
+  const todayMon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][todayIST.getUTCMonth()];
+  const todayYear = todayIST.getUTCFullYear();
+  const todayPrefix = `${todayDay} ${todayMon} ${todayYear}`;
+  const sessions = sessRes.data || [];
+  const todaySessions = sessions.filter(s => (s.datetime || '').startsWith(todayPrefix));
+  const ovTodaySess = document.getElementById('ov_today_session');
+  if (ovTodaySess) {
+    if (todaySessions.length) {
+      const s0 = todaySessions[0];
+      const timeMatch = (s0.datetime || '').match(/(\d{1,2}:\d{2}\s*[AP]M)/);
+      ovTodaySess.textContent = timeMatch ? timeMatch[1] : s0.session_type;
+      ovTodaySess.title = s0.session_type + ' — ' + s0.status;
+    } else {
+      ovTodaySess.textContent = 'None';
+    }
+  }
 
   if (stats.latest_weight != null) document.getElementById('ov_weight').textContent = stats.latest_weight + ' kg';
   if (stats.checkins != null) document.getElementById('ov_checkins').textContent = stats.checkins;

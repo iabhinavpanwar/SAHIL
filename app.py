@@ -2402,7 +2402,8 @@ def client_book_session():
         return jsonify({'error': 'Date and time required'}), 400
     try:
         dt = datetime.strptime(f'{date_str} {time_str}', '%Y-%m-%d %H:%M')
-        dt = dt.replace(tzinfo=timezone.utc)
+        # User inputs time in IST; convert to UTC for storage
+        dt = dt.replace(tzinfo=timezone.utc) - _IST
     except ValueError:
         return jsonify({'error': 'Invalid date/time format'}), 400
     result = sessions_col.insert_one({
