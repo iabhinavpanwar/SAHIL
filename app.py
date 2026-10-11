@@ -213,7 +213,7 @@ def _compute_adherence(cid):
             if log.get('date') and _is_trained_log(log):
                 trained.add(str(log['date'])[:10])
     if sessions_col is not None:
-        week_ago = datetime.now(timezone.utc) - timedelta(days=21)
+        week_ago = datetime.now(timezone.utc) - timedelta(days=7)
         for sess in sessions_col.find({
             'client_id': cid,
             'status': {'$in': ['confirmed', 'completed']},
@@ -2271,7 +2271,7 @@ def client_meal_plan_pdf():
 def client_get_water():
     if db is None:
         return jsonify({'glasses': 0}), 500
-    today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    today = _ist_today().strftime('%Y-%m-%d')
     rec   = db['water_log'].find_one({'client_id': session['client_id'], 'date': today})
     return jsonify({'glasses': rec['glasses'] if rec else 0})
 
@@ -2284,7 +2284,7 @@ def client_log_water():
         glasses = max(0, min(20, int((request.json or {}).get('glasses', 0))))
     except (ValueError, TypeError):
         return jsonify({'error': 'Invalid value'}), 400
-    today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    today = _ist_today().strftime('%Y-%m-%d')
     db['water_log'].update_one(
         {'client_id': session['client_id'], 'date': today},
         {'$set': {'glasses': glasses, 'client_id': session['client_id'], 'date': today}},
@@ -2440,6 +2440,7 @@ def admin_create_session():
     stype       = s(d.get('session_type', 'In-Person'), 100)
     notes       = s(d.get('notes', ''), 500)
     client_name = s(d.get('client_name', 'Walk-in'), 200)
+    client_id   = s(d.get('client_id', ''), 50) or None
     status      = s(d.get('status', 'confirmed'), 20)
     if status not in ('confirmed', 'pending', 'completed'):
         status = 'confirmed'
@@ -2447,11 +2448,11 @@ def admin_create_session():
         return jsonify({'error': 'Date and time required'}), 400
     try:
         dt = datetime.strptime(f'{date_str} {time_str}', '%Y-%m-%d %H:%M')
-        dt = dt.replace(tzinfo=timezone.utc)
+        dt = dt.replace(tzinfo=timezone.utc) - _IST  # input is IST, store as UTC
     except ValueError:
         return jsonify({'error': 'Invalid date/time format'}), 400
     result = sessions_col.insert_one({
-        'client_id':     None,
+        'client_id':     client_id,
         'client_name':   client_name,
         'datetime':      dt,
         'session_type':  stype,
@@ -2460,6 +2461,9 @@ def admin_create_session():
         'created':       datetime.now(timezone.utc),
         'admin_created': True,
     })
+    if client_id:
+        dt_ist = to_ist(dt)
+        _push_notify(client_id, '📅 Session Booked', f'{stype} on {dt_ist}', '/client/dashboard', 'session')
     return jsonify({'status': 'created', '_id': str(result.inserted_id)})
 
 @app.route('/api/admin/sessions')
@@ -2711,7 +2715,7 @@ def client_log_workout():
     if db is None:
         return jsonify({'error': 'DB unavailable'}), 500
     d = request.json or {}
-    date_str = s(d.get('date', ''), 12) or datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    date_str = s(d.get('date', ''), 12) or _ist_today().strftime('%Y-%m-%d')
     program_id   = s(d.get('program_id', ''), 50)
     day_label    = s(d.get('day_label', ''), 100)
     notes        = s(d.get('notes', ''), 500)
@@ -2760,7 +2764,7 @@ def client_save_daily_log():
         photo_url = None
     date_str = s(d.get('date', ''), 12)
     if not date_str:
-        date_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        date_str = _ist_today().strftime('%Y-%m-%d')
     try:
         steps         = max(0, int(d.get('steps', 0) or 0))
         cal_in        = max(0, int(d.get('calories_in', 0) or 0))

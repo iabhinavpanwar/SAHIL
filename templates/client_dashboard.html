@@ -3409,10 +3409,10 @@ async function loadOverview() {
     annBanner.style.display = 'none';
   }
 
-  const today = new Date().toISOString().slice(0,10);
+  const _ovTodayIST = new Date(Date.now() + 5.5 * 3600000);
+  const _ovToday = _ovTodayIST.toISOString().slice(0, 10);
   _dailyLogs = logs;
-  _dailyLogs = logs;
-  const todayLog = logs.find(l => l.date === today) || {};
+  const todayLog = logs.find(l => l.date === _ovToday) || {};
   document.getElementById('ov_steps').textContent = fmt(todayLog.steps || 0);
 
   // fetch water from dedicated endpoint
@@ -3507,8 +3507,9 @@ async function loadOverview() {
 
 // ── DAILY TRACKER ────────────────────────────────────────────────────────────
 async function loadTracker() {
-  const today = new Date().toISOString().slice(0,10);
-  document.getElementById('trackerDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  const todayIST = new Date(Date.now() + 5.5 * 3600000);
+  const today = todayIST.toISOString().slice(0, 10);
+  document.getElementById('trackerDate').textContent = todayIST.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
   const [logRes, fpRes] = await Promise.all([api('/api/client/daily_log'), api('/api/client/fitness_profile')]);
   const logs = logRes.data || [];
   const fp   = fpRes.data || {};
@@ -3684,7 +3685,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function saveLog() {
-  const today = new Date().toISOString().slice(0,10);
+  const today = new Date(Date.now() + 5.5 * 3600000).toISOString().slice(0, 10);
   const workoutDone = document.getElementById('log_workout_done').checked;
   const photoWrap = document.getElementById('logPhotoPreview');
   const photoFile = photoWrap && photoWrap._file ? photoWrap._file : (
@@ -4050,9 +4051,10 @@ async function loadWorkout() {
     api('/api/client/workout_log'),
   ]);
   const data = progRes.data;
+  const _wToday = new Date(Date.now() + 5.5 * 3600000).toISOString().slice(0, 10);
   const completedToday = new Set(
     (logRes.data || [])
-      .filter(l => l.date === new Date().toISOString().slice(0,10))
+      .filter(l => l.date === _wToday)
       .map(l => l.day_label)
   );
   const el = document.getElementById('workoutContent');
@@ -4338,7 +4340,7 @@ async function loadInvoices() {
 
 // ── WORKOUT COMPLETION LOG ───────────────────────────────────────────────────
 async function logWorkoutDay(programId, dayLabel, btn) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = new Date(Date.now() + 5.5 * 3600000).toISOString().slice(0, 10);
   const { ok } = await api('/api/client/workout_log', 'POST', { program_id: programId, day_label: dayLabel, date: today });
   if (ok) {
     btn.innerHTML = '<i class="fas fa-check"></i> Done';
